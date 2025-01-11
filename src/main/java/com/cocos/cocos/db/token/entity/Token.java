@@ -19,7 +19,7 @@ public class Token {
     private String refreshToken;
 
     @Column(name = "kakao_refresh_token", nullable = false)
-    private Long KakaoRefreshToken;
+    private String KakaoRefreshToken;
 
     @Column(name = "member_id", nullable = false)
     private Long memberId;
