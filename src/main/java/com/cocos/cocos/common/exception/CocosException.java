@@ -1,6 +1,6 @@
 package com.cocos.cocos.common.exception;
 
-import com.cocos.cocos.common.response.message.FailMessage;
+import com.cocos.cocos.enums.message.FailMessage;
 import lombok.Getter;
 
 @Getter

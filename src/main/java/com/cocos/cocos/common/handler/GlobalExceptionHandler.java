@@ -2,7 +2,7 @@ package com.cocos.cocos.common.handler;
 
 import com.cocos.cocos.common.exception.CocosException;
 import com.cocos.cocos.common.response.BaseResponse;
-import com.cocos.cocos.common.response.message.FailMessage;
+import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.common.response.FailResponse;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import jakarta.persistence.EntityNotFoundException;
