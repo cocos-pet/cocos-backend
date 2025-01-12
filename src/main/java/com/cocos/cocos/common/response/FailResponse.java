@@ -1,6 +1,6 @@
 package com.cocos.cocos.common.response;
 
-import com.cocos.cocos.common.response.message.FailMessage;
+import com.cocos.cocos.enums.message.FailMessage;
 import org.springframework.http.ResponseEntity;
 
 public class FailResponse {
