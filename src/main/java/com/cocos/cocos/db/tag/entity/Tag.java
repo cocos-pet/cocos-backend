@@ -22,4 +22,7 @@ public class Tag {
 
     @Column(name = "tag_id", nullable = false)
     private Long tagId;
+
+    @Column(name = "post_id", nullable = false)
+    private Long postId;
 }
