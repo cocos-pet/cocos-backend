@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/dev/likes")
+@RequestMapping("${api.prefix}/likes")
 @RequiredArgsConstructor
 public class PostLikeController implements PostLikeControllerSwagger {
 
@@ -21,7 +21,7 @@ public class PostLikeController implements PostLikeControllerSwagger {
             @PathVariable(name = "postId") final Long postId
     ) {
         postLikeService.addPostLike(MEMBER_ID, postId);
-        return SuccessResponse.success(SuccessMessage.NO_CONTENT, null);
+        return SuccessResponse.success(SuccessMessage.OK, null);
     }
 
     @DeleteMapping("/{postId}")
@@ -29,6 +29,6 @@ public class PostLikeController implements PostLikeControllerSwagger {
             @PathVariable(name = "postId") final Long postId
     ) {
         postLikeService.deletePostLike(MEMBER_ID, postId);
-        return SuccessResponse.success(SuccessMessage.NO_CONTENT, null);
+        return SuccessResponse.success(SuccessMessage.OK, null);
     }
 }

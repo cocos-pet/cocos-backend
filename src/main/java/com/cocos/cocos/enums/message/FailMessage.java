@@ -33,6 +33,7 @@ public enum FailMessage {
     NOT_FOUND(HttpStatus.NOT_FOUND, 40400, "리소스를 찾을 수 없습니다. "),
     NOT_FOUND_ENTITY(HttpStatus.NOT_FOUND, 40401, "대상을 찾을 수 없습니다. "),
     NOT_FOUND_API(HttpStatus.NOT_FOUND, 40402, "잘못된 API입니다. "),
+    NOT_FOUND_POSTLIKE(HttpStatus.NOT_FOUND, 40403, "게시물 공감을 찾을 수 없습니다."),
 
     /**
      * 405
@@ -44,6 +45,7 @@ public enum FailMessage {
      */
     CONFLICT(HttpStatus.CONFLICT, 40900, "데이터 충돌이 발생했습니다. "),
     INTEGRITY_CONFLICT(HttpStatus.CONFLICT, 40901, "데이터 무결성 위반입니다."),
+    CONFLICT_POSTLIKE(HttpStatus.CONFLICT, 40902, "이미 존재하는 게시글 공감입니다."),
 
     /**
      * 422
