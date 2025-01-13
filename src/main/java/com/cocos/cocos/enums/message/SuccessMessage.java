@@ -10,12 +10,17 @@ public enum SuccessMessage {
     /**
      * 200
      */
-    OK(HttpStatus.OK, 20000, "요청에 성공했습니다. "),
+    OK(HttpStatus.OK, 20000, "요청에 성공했습니다."),
 
     /**
      * 201
      */
-    CREATED(HttpStatus.CREATED, 20100, "요청에 성공했습니다 .");
+    CREATED(HttpStatus.CREATED, 20100, "요청에 성공했습니다."),
+
+    /**
+     * 204
+     */
+    NO_CONTENT(HttpStatus.NO_CONTENT, 20400, "요청에 성공했습니다.");
 
     private final HttpStatus httpStatus;
     private final int code;
