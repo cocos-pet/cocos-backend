@@ -34,6 +34,7 @@ public enum FailMessage {
     NOT_FOUND_ENTITY(HttpStatus.NOT_FOUND, 40401, "대상을 찾을 수 없습니다. "),
     NOT_FOUND_API(HttpStatus.NOT_FOUND, 40402, "잘못된 API입니다. "),
     NOT_FOUND_POSTLIKE(HttpStatus.NOT_FOUND, 40403, "게시물 공감을 찾을 수 없습니다."),
+    NOT_FOUND_BODY(HttpStatus.NOT_FOUND, 40404, "신체 부위를 찾을 수 없습니다."),
 
     /**
      * 405

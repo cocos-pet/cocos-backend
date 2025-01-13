@@ -1,6 +1,7 @@
 package com.cocos.cocos.db.breed.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -20,4 +21,10 @@ public class Breed {
 
     @Column(name = "animal_id", nullable = false)
     private Long animalId;
+
+    @Builder
+    public Breed(String name, Long animalId) {
+        this.name = name;
+        this.animalId = animalId;
+    }
 }
