@@ -19,7 +19,6 @@ import com.cocos.cocos.db.pet.entity.Pet;
 import com.cocos.cocos.db.pet.repository.PetRepository;
 import com.cocos.cocos.db.post.entity.Post;
 import com.cocos.cocos.db.post.entity.PostCategory;
-import com.cocos.cocos.db.post.entity.PostImage;
 import com.cocos.cocos.db.post.repository.*;
 import com.cocos.cocos.db.symptom.entity.Symptom;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
@@ -64,7 +63,7 @@ public class PostService {
                 () -> new CocosException(FailMessage.NOT_FOUND_BREED)
         );
         final List<String> images = postImageRepository.findAllByPostId(postId).stream()
-                .map(PostImage::getImage)
+                .map(postImage -> appDataS3Client.getPresignedUrl(postImage.getImage()))
                 .toList();
         final PostCategory postCategory = postCategoryRepository.findById(post.getCategoryId()).orElseThrow(
                 () -> new CocosException(FailMessage.NOT_FOUND_CATEGORY)
