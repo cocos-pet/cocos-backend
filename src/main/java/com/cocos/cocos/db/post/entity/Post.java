@@ -2,6 +2,7 @@ package com.cocos.cocos.db.post.entity;
 
 import com.cocos.cocos.db.BaseTime;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -27,4 +28,12 @@ public class Post extends BaseTime {
 
     @Column(name = "category_id", nullable = false)
     private Long categoryId;
+
+    @Builder
+    public Post(String title, String content, Long memberId, Long categoryId) {
+        this.title = title;
+        this.content = content;
+        this.memberId = memberId;
+        this.categoryId = categoryId;
+    }
 }

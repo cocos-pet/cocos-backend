@@ -1,6 +1,7 @@
 package com.cocos.cocos.db.post.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -20,4 +21,10 @@ public class PostCategory {
 
     @Column(name = "image", nullable = false)
     private String image;
+
+    @Builder
+    public PostCategory(String name, String image) {
+        this.name = name;
+        this.image = image;
+    }
 }

@@ -2,6 +2,7 @@ package com.cocos.cocos.db.post.entity;
 
 import com.cocos.cocos.enums.tag.TagType;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,4 +26,11 @@ public class PostTag {
 
     @Column(name = "post_id", nullable = false)
     private Long postId;
+
+    @Builder
+    public PostTag(TagType tagType, Long tagId, Long postId) {
+        this.tagType = tagType;
+        this.tagId = tagId;
+        this.postId = postId;
+    }
 }
