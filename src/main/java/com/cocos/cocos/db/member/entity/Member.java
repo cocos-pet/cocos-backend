@@ -3,6 +3,7 @@ package com.cocos.cocos.db.member.entity;
 import com.cocos.cocos.db.BaseTime;
 import com.cocos.cocos.enums.member.Platform;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -35,4 +36,14 @@ public class Member extends BaseTime {
 
     @Column(name = "is_admin", nullable = false)
     private boolean isAdmin;
+
+    @Builder
+    public Member(final String nickname, final String email, final String image, final Platform platform, final String sub, final boolean isAdmin) {
+        this.nickname = nickname;
+        this.email = email;
+        this.image = image;
+        this.platform = platform;
+        this.sub = sub;
+        this.isAdmin = isAdmin;
+    }
 }
