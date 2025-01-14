@@ -10,6 +10,8 @@ import java.util.List;
 public record PostDetailResponse(
         @Schema(description = "사용자 닉네임", example = "하윙")
         String nickname,
+        @Schema(description = "사용자 프로필 이미지", example = "하윙")
+        String profileImage,
         @Schema(description = "품종 이름", example = "포메라니안")
         String breed,
         @Schema(description = "나이", example = "1")

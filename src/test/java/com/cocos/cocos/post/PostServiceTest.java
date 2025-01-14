@@ -24,6 +24,7 @@ import com.cocos.cocos.db.post.repository.*;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.pet.Gender;
 import com.cocos.cocos.enums.tag.TagType;
+import com.cocos.cocos.external.AppDataS3Client;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -76,6 +77,8 @@ public class PostServiceTest {
     private DiseaseRepository diseaseRepository;
     @Mock
     private SymptomRepository symptomRepository;
+    @Mock
+    private AppDataS3Client appDataS3Client;
 
     @Test
     @DisplayName("게시글 세부사항을 조회할 수 있다.")
@@ -107,6 +110,7 @@ public class PostServiceTest {
 
         final Member member = Member.builder()
                 .nickname("닉네임")
+                .image("프로필이미지")
                 .build();
 
         final Breed breed = Breed.builder()
@@ -159,9 +163,13 @@ public class PostServiceTest {
         BDDMockito.given(subCommentRepository.countByCommentId(any())).willReturn(subCommentCounts);
         BDDMockito.given(postTagRepository.findAllByPostId(any())).willReturn(postTags);
         BDDMockito.given(diseaseRepository.findById(any())).willReturn(Optional.ofNullable(disease));
+        BDDMockito.given(appDataS3Client.getPresignedUrl(member.getImage())).willReturn(member.getImage());
+        BDDMockito.given(appDataS3Client.getPresignedUrl(postImage1.getImage())).willReturn(postImage1.getImage());
+        BDDMockito.given(appDataS3Client.getPresignedUrl(postImage2.getImage())).willReturn(postImage2.getImage());
 
         final PostDetailResponse expected = PostDetailResponse.builder()
                 .nickname(member.getNickname())
+                .profileImage(member.getImage())
                 .breed(breed.getName())
                 .petAge(pet.getAge())
                 .likeCounts(likeCounts)
@@ -228,6 +236,10 @@ public class PostServiceTest {
         final List<PostCategory> postCategories = new ArrayList<>(List.of(postCategory1, postCategory2, postCategory3));
 
         BDDMockito.given(postCategoryRepository.findAll()).willReturn(postCategories);
+        BDDMockito.given(appDataS3Client.getPresignedUrl(postCategory1.getImage())).willReturn("이미지1");
+        BDDMockito.given(appDataS3Client.getPresignedUrl(postCategory2.getImage())).willReturn("이미지2");
+        BDDMockito.given(appDataS3Client.getPresignedUrl(postCategory3.getImage())).willReturn("이미지3");
+
 
         final PostCategoriesResponse expected = PostCategoriesResponse.of(postCategories.stream()
                 .map(postCategory -> PostCategoryResponse.of(postCategory.getId(), postCategory.getName(), postCategory.getImage()))
