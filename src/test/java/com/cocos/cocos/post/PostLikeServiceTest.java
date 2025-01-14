@@ -20,9 +20,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("게시글 공감 테스트")
+@DisplayName("게시글 공감 서비스 테스트")
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-public class PostLikeTest {
+public class PostLikeServiceTest {
 
     @InjectMocks
     PostLikeService postLikeService;

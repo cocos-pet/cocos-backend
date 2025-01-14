@@ -1,6 +1,7 @@
 package com.cocos.cocos.db.symptom.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -20,4 +21,10 @@ public class Symptom {
 
     @Column(name = "body_id", nullable = false)
     private Long bodyId;
+
+    @Builder
+    public Symptom(String name, Long bodyId) {
+        this.name = name;
+        this.bodyId = bodyId;
+    }
 }

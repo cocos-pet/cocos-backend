@@ -1,10 +1,10 @@
-package com.cocos.cocos.animal;
+package com.cocos.cocos.body;
 
-import com.cocos.cocos.api.animal.dto.response.AnimalResponse;
-import com.cocos.cocos.api.animal.dto.response.AnimalsResponse;
-import com.cocos.cocos.api.animal.service.AnimalService;
-import com.cocos.cocos.db.animal.entity.Animal;
-import com.cocos.cocos.db.animal.repository.AnimalRepository;
+import com.cocos.cocos.api.body.dto.response.BodiesResponse;
+import com.cocos.cocos.api.body.dto.response.BodyResponse;
+import com.cocos.cocos.api.body.service.BodyService;
+import com.cocos.cocos.db.body.entity.Body;
+import com.cocos.cocos.db.body.repository.BodyRepository;
 import com.cocos.cocos.external.AppDataS3Client;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -23,42 +23,42 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("동물 테스트")
+@DisplayName("신체 부위 서비스 테스트")
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-public class AnimalTest {
+public class BodyServiceTest {
 
     @InjectMocks
-    private AnimalService animalService;
+    private BodyService bodyService;
 
     @Mock
-    private AnimalRepository animalRepository;
+    private BodyRepository bodyRepository;
 
     @Mock
     private AppDataS3Client appDataS3Client;
 
     @Test
-    @DisplayName("동물을 조회할 수 있다.")
-    void addPostLike() {
+    @DisplayName("신체 부위 리스트를 조회할 수 있다.")
+    void getBodies() {
         //given
-        final Animal animal1 = Animal.builder()
+        final Body body1 = Body.builder()
                 .name("이름1")
-                .image("image1")
+                .image("이미지1")
                 .build();
-        final Animal animal2 = Animal.builder()
+        final Body body2 = Body.builder()
                 .name("이름2")
-                .image("image2")
+                .image("이미지2")
                 .build();
-        final List<Animal> animals = new ArrayList<Animal>(List.of(animal1, animal2));
-        final AnimalsResponse expected = AnimalsResponse.of(
-                animals.stream()
-                        .map(animal -> AnimalResponse.of(animal.getId(), animal.getName(), "image"))
+        final List<Body> bodies = new ArrayList<Body>(List.of(body1, body2));
+        final BodiesResponse expected = BodiesResponse.of(
+                bodies.stream()
+                        .map(body -> BodyResponse.of(body.getId(), body.getName(), "image"))
                         .toList()
         );
-        BDDMockito.given(animalRepository.findAll()).willReturn(animals);
+        BDDMockito.given(bodyRepository.findAll()).willReturn(bodies);
         BDDMockito.given(appDataS3Client.getPresignedUrl(any())).willReturn("image");
 
         //when
-        final AnimalsResponse actual = animalService.getAnimals();
+        final BodiesResponse actual = bodyService.getBodies();
 
         //then
         Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
