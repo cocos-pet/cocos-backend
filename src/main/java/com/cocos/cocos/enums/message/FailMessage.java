@@ -35,7 +35,7 @@ public enum FailMessage {
     NOT_FOUND_API(HttpStatus.NOT_FOUND, 40402, "잘못된 API입니다. "),
     NOT_FOUND_POSTLIKE(HttpStatus.NOT_FOUND, 40403, "게시물 공감을 찾을 수 없습니다."),
     NOT_FOUND_BODY(HttpStatus.NOT_FOUND, 40404, "신체 부위를 찾을 수 없습니다."),
-
+    NOT_FOUND_POST(HttpStatus.NOT_FOUND, 40405, "게시글을 찾을 수 없습니다. "),
     /**
      * 405
      */
@@ -57,7 +57,9 @@ public enum FailMessage {
      * 500
      */
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 50000, "서버 내부 오류가 발생했습니다. "),
-
+    INTERNAL_SERVER_ERROR_BREED_ID(HttpStatus.INTERNAL_SERVER_ERROR, 50001, "서버에 유효하지 않은 breedId가 존재합니다. "),
+    INTERNAL_SERVER_ERROR_PET_ID_FOR_MEMBER(HttpStatus.INTERNAL_SERVER_ERROR, 50002, "서버에 유효하지 않은 petId가 존재합니다. "),
+    INTERNAL_SERVER_ERROR_PET_AGE(HttpStatus.INTERNAL_SERVER_ERROR, 50003, "서버에 유효하지 않은 petAge가 존재합니다. "),
     /**
      * 503
      */
