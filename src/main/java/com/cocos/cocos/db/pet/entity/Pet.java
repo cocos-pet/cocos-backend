@@ -35,7 +35,7 @@ public class Pet extends BaseTime {
     private Long breedId;
 
     @Builder
-    public Pet(String name, Gender gender, int age, Long memberId, Long breedId) {
+    public Pet(final String name, final Gender gender, final int age, final Long memberId, final Long breedId) {
         this.name = name;
         this.gender = gender;
         this.age = age;

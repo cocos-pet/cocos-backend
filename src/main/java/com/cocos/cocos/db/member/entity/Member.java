@@ -38,7 +38,7 @@ public class Member extends BaseTime {
     private boolean isAdmin;
 
     @Builder
-    public Member(String nickname, String email, String image, Platform platform, String sub, boolean isAdmin) {
+    public Member(final String nickname, final String email, final String image, final Platform platform, final String sub, final boolean isAdmin) {
         this.nickname = nickname;
         this.email = email;
         this.image = image;

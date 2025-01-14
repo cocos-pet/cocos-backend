@@ -2,6 +2,7 @@ package com.cocos.cocos.db.comment.entity;
 
 import com.cocos.cocos.db.BaseTime;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,4 +25,11 @@ public class SubComment extends BaseTime {
 
     @Column(name = "comment_id", nullable = false)
     private Long commentId;
+
+    @Builder
+    public SubComment(String content, Long memberId, Long commentId) {
+        this.content = content;
+        this.memberId = memberId;
+        this.commentId = commentId;
+    }
 }

@@ -44,7 +44,6 @@ public enum FailMessage {
     NOT_FOUND_SYMPTOM(HttpStatus.NOT_FOUND, 40407, "증상을 찾을 수 없습니다."),
     NOT_FOUND_POSTTAG(HttpStatus.NOT_FOUND, 40407, "태그를 찾을 수 없습니다."),
 
-
     /**
      * 405
      */
@@ -66,7 +65,9 @@ public enum FailMessage {
      * 500
      */
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 50000, "서버 내부 오류가 발생했습니다. "),
-
+    INTERNAL_SERVER_ERROR_BREED_ID(HttpStatus.INTERNAL_SERVER_ERROR, 50001, "서버에 유효하지 않은 breedId가 존재합니다. "),
+    INTERNAL_SERVER_ERROR_PET_ID_FOR_MEMBER(HttpStatus.INTERNAL_SERVER_ERROR, 50002, "서버에 유효하지 않은 petId가 존재합니다. "),
+    INTERNAL_SERVER_ERROR_PET_AGE(HttpStatus.INTERNAL_SERVER_ERROR, 50003, "서버에 유효하지 않은 petAge가 존재합니다. "),
     /**
      * 503
      */
