@@ -3,6 +3,7 @@ package com.cocos.cocos.db.pet.entity;
 import com.cocos.cocos.db.BaseTime;
 import com.cocos.cocos.enums.pet.Gender;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -32,4 +33,13 @@ public class Pet extends BaseTime {
 
     @Column(name = "breed_id", nullable = false)
     private Long breedId;
+
+    @Builder
+    public Pet(String name, Gender gender, int age, Long memberId, Long breedId) {
+        this.name = name;
+        this.gender = gender;
+        this.age = age;
+        this.memberId = memberId;
+        this.breedId = breedId;
+    }
 }

@@ -2,6 +2,7 @@ package com.cocos.cocos.db.post.entity;
 
 import com.cocos.cocos.db.BaseTime;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,4 +22,10 @@ public class PostImage extends BaseTime {
 
     @Column(name = "image", nullable = false)
     private String image;
+
+    @Builder
+    public PostImage(Long postId, String image) {
+        this.postId = postId;
+        this.image = image;
+    }
 }

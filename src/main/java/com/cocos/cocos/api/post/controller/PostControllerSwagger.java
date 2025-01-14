@@ -1,0 +1,36 @@
+package com.cocos.cocos.api.post.controller;
+
+import com.cocos.cocos.api.post.dto.response.PostCategoriesResponse;
+import com.cocos.cocos.api.post.dto.response.PostDetailResponse;
+import com.cocos.cocos.common.response.BaseResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.ResponseEntity;
+
+@Tag(name = "Post Controller", description = "게시글 관련 API")
+public interface PostControllerSwagger {
+
+    @Operation(summary = "게시글 상세 조회 API", description = "게시글을 상세 조회하는 API입니다.")
+    @ApiResponse(
+            responseCode = "200",
+            description = "게시글 상세 조회 성공")
+    @Parameter(name = "postId", description = "게시글 아이디", in = ParameterIn.PATH, required = true, schema = @Schema(type = "Long"))
+    public ResponseEntity<BaseResponse<PostDetailResponse>> getPostDetail(final Long postId);
+
+    @Operation(summary = "게시글 삭제 API", description = "게시글을 삭제하는 API입니다.")
+    @ApiResponse(
+            responseCode = "200",
+            description = "게시글 삭제 성공")
+    @Parameter(name = "postId", description = "게시글 아이디", in = ParameterIn.PATH, required = true, schema = @Schema(type = "Long"))
+    public ResponseEntity<BaseResponse<Void>> deletePost(final Long postId);
+
+    @Operation(summary = "게시글 카테고리 리스트 API", description = "게시글 카테고리 리스트를 조회하는 API입니다.")
+    @ApiResponse(
+            responseCode = "200",
+            description = "게시글 카테고리 리스트 조회 성공")
+    public ResponseEntity<BaseResponse<PostCategoriesResponse>> getPostCategories();
+}

@@ -35,6 +35,15 @@ public enum FailMessage {
     NOT_FOUND_API(HttpStatus.NOT_FOUND, 40402, "잘못된 API입니다. "),
     NOT_FOUND_POSTLIKE(HttpStatus.NOT_FOUND, 40403, "게시물 공감을 찾을 수 없습니다."),
     NOT_FOUND_BODY(HttpStatus.NOT_FOUND, 40404, "신체 부위를 찾을 수 없습니다."),
+    NOT_FOUND_POST(HttpStatus.NOT_FOUND, 40405, "게시글을 찾을 수 없습니다."),
+    NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, 40405, "사용자를 찾을 수 없습니다."),
+    NOT_FOUND_BREED(HttpStatus.NOT_FOUND, 40406, "품종을 찾을 수 없습니다."),
+    NOT_FOUND_CATEGORY(HttpStatus.NOT_FOUND, 40407, "카테고리를 찾을 수 없습니다."),
+    NOT_FOUND_ANIMAL(HttpStatus.NOT_FOUND, 40407, "동물을 찾을 수 없습니다."),
+    NOT_FOUND_DISEASE(HttpStatus.NOT_FOUND, 40407, "질병을 찾을 수 없습니다."),
+    NOT_FOUND_SYMPTOM(HttpStatus.NOT_FOUND, 40407, "증상을 찾을 수 없습니다."),
+    NOT_FOUND_POSTTAG(HttpStatus.NOT_FOUND, 40407, "태그를 찾을 수 없습니다."),
+
 
     /**
      * 405

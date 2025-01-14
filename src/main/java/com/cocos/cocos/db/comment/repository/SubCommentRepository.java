@@ -6,4 +6,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SubCommentRepository extends JpaRepository<SubComment, Long> {
+
+    int countByCommentId(final Long commentId);
+
+    void deleteAllByCommentId(final Long commentId);
 }
