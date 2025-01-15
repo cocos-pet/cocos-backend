@@ -22,6 +22,7 @@ public record CommentAndSubCommentsResponse(
         LocalDateTime createdAt,
         @Schema(description = "작성자여부", example = "true")
         boolean isWriter,
+        @Schema(description = "대댓글 리스트")
         List<SubCommentResponse> subComments
 ) {
     public static CommentAndSubCommentsResponse of(final Long id, final String nickname, final String profileImage, final String breed, final int petAge, final String content, final LocalDateTime createdAt, final boolean isWriter, final List<SubCommentResponse> subComments) {
