@@ -21,7 +21,6 @@ public interface PostControllerSwagger {
     @Parameter(name = "postId", description = "게시글 아이디", in = ParameterIn.PATH, required = true, schema = @Schema(type = "Long"))
     public ResponseEntity<BaseResponse<PostDetailResponse>> getPostDetail(final Long postId);
 
-    @Operation(summary = "게시글 삭제 API", description = "게시글을 삭제하는 API입니다.")
     @ApiResponse(
             responseCode = "200",
             description = "게시글 삭제 성공")

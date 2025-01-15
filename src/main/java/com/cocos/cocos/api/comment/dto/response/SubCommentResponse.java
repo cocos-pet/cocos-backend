@@ -20,9 +20,11 @@ public record SubCommentResponse(
         @Schema(description = "생성일", example = "2025-01-01T00:00:00")
         LocalDateTime createdAt,
         @Schema(description = "작성자 여부",example = "true")
-        boolean isWriter
+        boolean isWriter,
+        @Schema(description = "댓글 사용자 닉네임", example = "언급 표시를 위한 사용자 닉네임입니다.")
+        String mentionedNickname
 ) {
-    public static SubCommentResponse of(final Long id, final String nickname, final String profileImage, final String breed, final int petAge, final String content, LocalDateTime createdAt, final boolean isWriter) {
-        return new SubCommentResponse(id, nickname, profileImage, breed, petAge, content, createdAt, isWriter);
+    public static SubCommentResponse of(final Long id, final String nickname, final String profileImage, final String breed, final int petAge, final String content, LocalDateTime createdAt, final boolean isWriter, final String mentionedNickname) {
+        return new SubCommentResponse(id, nickname, profileImage, breed, petAge, content, createdAt, isWriter, mentionedNickname);
     }
 }

@@ -17,6 +17,7 @@ import com.cocos.cocos.db.pet.repository.PetRepository;
 import com.cocos.cocos.db.post.repository.PostRepository;
 import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.external.MemberDataS3Client;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -37,11 +38,54 @@ public class CommentService {
     private final PostRepository postRepository;
     private final MemberDataS3Client memberDataS3Client;
 
-    public CommentsAndSubCommentsResponse getPostComments(final Long postId, final Long memberId) {
+    @Transactional
+    public void addPostComment(final Long postId, final String content, final Long memberId) {
+        validatePostExists(postId);
+        commentRepository.save(
+                Comment.builder()
+                        .content(content)
+                        .memberId(memberId)
+                        .postId(postId)
+                        .build()
+        );
+    }
 
-        if (!postRepository.existsById(postId)) {
-            throw new CocosException(FailMessage.NOT_FOUND_POST);
+    @Transactional
+    public void deletePostComment(final Long commentId, final Long memberId) {
+        final Comment comment = validateCommentExists(commentId);
+        if (!comment.getMemberId().equals(memberId)) {
+            throw new CocosException(FailMessage.FORBIDDEN_COMMENT_DELETE);
         }
+        commentRepository.deleteById(commentId);
+        subCommentRepository.deleteAllByCommentId(comment.getId());
+    }
+
+    @Transactional
+    public void addPostSubComment(final Long commentId, final Long mentionedMemberId, final String content, final Long memberId) {
+        validateCommentExists(commentId);
+        subCommentRepository.save(
+                SubComment.builder()
+                        .commentId(commentId)
+                        .mentionedMemberId(mentionedMemberId)
+                        .content(content)
+                        .memberId(memberId)
+                        .build()
+        );
+    }
+
+    @Transactional
+    public void deletePostSubComment(final Long subCommentId, final Long memberId) {
+        final SubComment subComment = subCommentRepository.findById(subCommentId).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_SUB_COMMENT)
+        );
+        if (!subComment.getMemberId().equals(memberId)) {
+            throw new CocosException(FailMessage.FORBIDDEN_COMMENT_DELETE);
+        }
+        subCommentRepository.deleteById(subComment.getId());
+    }
+
+    public CommentsAndSubCommentsResponse getPostComments(final Long postId, final Long memberId) {
+        validatePostExists(postId);
 
         final List<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
         final List<Long> commentIds = comments.stream()
@@ -53,7 +97,10 @@ public class CommentService {
                 .collect(Collectors.groupingBy(SubComment::getCommentId));
         final List<Long> memberIds = Stream.concat(
                 comments.stream().map(Comment::getMemberId),
-                subComments.stream().map(SubComment::getMemberId)
+                Stream.concat(
+                        subComments.stream().map(SubComment::getMemberId),
+                        subComments.stream().map(SubComment::getMentionedMemberId)
+                )
         ).distinct().collect(Collectors.toList());
 
         final List<Member> members = memberRepository.findAllById(memberIds);
@@ -68,7 +115,7 @@ public class CommentService {
                 .collect(Collectors.toMap(Member::getId, member -> member));
         Map<Long, List<Pet>> petMap = pets.stream()
                 .collect(Collectors.groupingBy(Pet::getMemberId));
-        Map<Long,String> breedMap = breeds.stream()
+        Map<Long, String> breedMap = breeds.stream()
                 .collect(Collectors.toMap(Breed::getId, Breed::getName));
 
         List<CommentAndSubCommentsResponse> commentDtos = comments.stream()
@@ -78,18 +125,19 @@ public class CommentService {
                                     .map(subComment -> SubCommentResponse.of(
                                             subComment.getId(),
                                             getOrDefaultNickname(subComment.getMemberId(), memberMap),
-                                            memberDataS3Client.getPresignedUrl(subComment.getMemberId() + "/" +  getOrDefaultProfileImage(subComment.getMemberId(), memberMap)),
+                                            memberDataS3Client.getPresignedUrl(subComment.getMemberId() + "/" + getOrDefaultProfileImage(subComment.getMemberId(), memberMap)),
                                             getOrDefaultBreedName(subComment.getMemberId(), petMap, breedMap),
                                             getOrDefaultPetAge(subComment.getMemberId(), petMap),
                                             subComment.getContent(),
                                             subComment.getCreatedAt(),
-                                            subComment.getMemberId().equals(memberId)
+                                            subComment.getMemberId().equals(memberId),
+                                            getOrDefaultNickname(subComment.getMentionedMemberId(), memberMap)
                                     )).toList();
 
                     return CommentAndSubCommentsResponse.of(
                             comment.getId(),
                             getOrDefaultNickname(comment.getMemberId(), memberMap),
-                            memberDataS3Client.getPresignedUrl(comment.getMemberId() + "/" +  getOrDefaultProfileImage(comment.getMemberId(), memberMap)),
+                            memberDataS3Client.getPresignedUrl(comment.getMemberId() + "/" + getOrDefaultProfileImage(comment.getMemberId(), memberMap)),
                             getOrDefaultBreedName(comment.getMemberId(), petMap, breedMap),
                             getOrDefaultPetAge(comment.getMemberId(), petMap),
                             comment.getContent(),
@@ -100,6 +148,18 @@ public class CommentService {
                 }).toList();
 
         return CommentsAndSubCommentsResponse.of(commentDtos);
+    }
+
+    private Comment validateCommentExists(Long commentId) {
+        return commentRepository.findById(commentId).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_COMMENT)
+        );
+    }
+
+    private void validatePostExists(Long postId) {
+        if (!postRepository.existsById(postId)) {
+            throw new CocosException(FailMessage.NOT_FOUND_POST);
+        }
     }
 
     private String getOrDefaultNickname(Long memberId, Map<Long, Member> memberMap) {
