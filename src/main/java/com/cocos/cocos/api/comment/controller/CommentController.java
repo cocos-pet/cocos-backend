@@ -1,5 +1,6 @@
 package com.cocos.cocos.api.comment.controller;
 
+import com.cocos.cocos.api.comment.dto.request.CommentContentRequest;
 import com.cocos.cocos.api.comment.dto.response.CommentsAndSubCommentsResponse;
 import com.cocos.cocos.api.comment.service.CommentService;
 import com.cocos.cocos.common.response.BaseResponse;
@@ -15,6 +16,15 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController implements CommentControllerSwagger {
     private static final Long memberId = 1L;
     private final CommentService commentService;
+
+    @PostMapping("/{postId}")
+    public ResponseEntity<BaseResponse<Void>> addPostComment(
+            @PathVariable(name = "postId") final Long postId,
+            @RequestBody final CommentContentRequest body
+    ) {
+        commentService.addPostComments(postId, body.content(), memberId);
+        return SuccessResponse.success(SuccessMessage.CREATED, null);
+    }
 
     @GetMapping("/{postId}")
     public ResponseEntity<BaseResponse<CommentsAndSubCommentsResponse>> getPostComments(

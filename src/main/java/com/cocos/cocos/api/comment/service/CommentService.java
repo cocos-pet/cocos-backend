@@ -1,6 +1,8 @@
 package com.cocos.cocos.api.comment.service;
 
+import com.cocos.cocos.api.comment.dto.response.CommentAndSubCommentsResponse;
 import com.cocos.cocos.api.comment.dto.response.CommentsAndSubCommentsResponse;
+import com.cocos.cocos.api.comment.dto.response.SubCommentResponse;
 import com.cocos.cocos.common.exception.CocosException;
 import com.cocos.cocos.db.breed.entity.Breed;
 import com.cocos.cocos.db.breed.repository.BreedRepository;
@@ -15,6 +17,7 @@ import com.cocos.cocos.db.pet.repository.PetRepository;
 import com.cocos.cocos.db.post.repository.PostRepository;
 import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.external.MemberDataS3Client;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -35,11 +38,21 @@ public class CommentService {
     private final PostRepository postRepository;
     private final MemberDataS3Client memberDataS3Client;
 
-    public CommentsAndSubCommentsResponse getPostComments(final Long postId, final Long memberId) {
+    @Transactional
+    public void addPostComments(final Long postId, final String content, final Long memberId) {
+        validatePostExists(postId);
+        commentRepository.save(
+                Comment.builder()
+                        .content(content)
+                        .memberId(memberId)
+                        .postId(postId)
+                        .build()
+        );
+    }
 
-        if (!postRepository.existsById(postId)) {
-            throw new CocosException(FailMessage.NOT_FOUND_POST);
-        }
+
+    public CommentsAndSubCommentsResponse getPostComments(final Long postId, final Long memberId) {
+        validatePostExists(postId);
 
         final List<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
         final List<Long> commentIds = comments.stream()
@@ -66,17 +79,17 @@ public class CommentService {
                 .collect(Collectors.toMap(Member::getId, member -> member));
         Map<Long, List<Pet>> petMap = pets.stream()
                 .collect(Collectors.groupingBy(Pet::getMemberId));
-        Map<Long,String> breedMap = breeds.stream()
+        Map<Long, String> breedMap = breeds.stream()
                 .collect(Collectors.toMap(Breed::getId, Breed::getName));
 
-        List<CommentsAndSubCommentsResponse.CommentAndSubCommentsResponse> commentDtos = comments.stream()
+        List<CommentAndSubCommentsResponse> commentDtos = comments.stream()
                 .map(comment -> {
-                    List<CommentsAndSubCommentsResponse.CommentAndSubCommentsResponse.SubCommentResponse> subCommentDtos =
+                    List<SubCommentResponse> subCommentDtos =
                             subCommentsGroupedByCommentId.getOrDefault(comment.getId(), List.of()).stream()
-                                    .map(subComment -> CommentsAndSubCommentsResponse.CommentAndSubCommentsResponse.SubCommentResponse.of(
+                                    .map(subComment -> SubCommentResponse.of(
                                             subComment.getId(),
                                             getOrDefaultNickname(subComment.getMemberId(), memberMap),
-                                            memberDataS3Client.getPresignedUrl(subComment.getMemberId() + "/" +  getOrDefaultProfileImage(subComment.getMemberId(), memberMap)),
+                                            memberDataS3Client.getPresignedUrl(subComment.getMemberId() + "/" + getOrDefaultProfileImage(subComment.getMemberId(), memberMap)),
                                             getOrDefaultBreedName(subComment.getMemberId(), petMap, breedMap),
                                             getOrDefaultPetAge(subComment.getMemberId(), petMap),
                                             subComment.getContent(),
@@ -84,10 +97,10 @@ public class CommentService {
                                             subComment.getMemberId().equals(memberId)
                                     )).toList();
 
-                    return CommentsAndSubCommentsResponse.CommentAndSubCommentsResponse.of(
+                    return CommentAndSubCommentsResponse.of(
                             comment.getId(),
                             getOrDefaultNickname(comment.getMemberId(), memberMap),
-                            memberDataS3Client.getPresignedUrl(comment.getMemberId() + "/" +  getOrDefaultProfileImage(comment.getMemberId(), memberMap)),
+                            memberDataS3Client.getPresignedUrl(comment.getMemberId() + "/" + getOrDefaultProfileImage(comment.getMemberId(), memberMap)),
                             getOrDefaultBreedName(comment.getMemberId(), petMap, breedMap),
                             getOrDefaultPetAge(comment.getMemberId(), petMap),
                             comment.getContent(),
@@ -98,6 +111,12 @@ public class CommentService {
                 }).toList();
 
         return CommentsAndSubCommentsResponse.of(commentDtos);
+    }
+
+    private void validatePostExists(Long postId) {
+        if (!postRepository.existsById(postId)) {
+            throw new CocosException(FailMessage.NOT_FOUND_POST);
+        }
     }
 
     private String getOrDefaultNickname(Long memberId, Map<Long, Member> memberMap) {
