@@ -1,6 +1,7 @@
 package com.cocos.cocos.api.post.controller;
 
 import com.cocos.cocos.api.post.dto.request.PostRequest;
+import com.cocos.cocos.api.post.dto.response.PopularPostsResponse;
 import com.cocos.cocos.api.post.dto.response.PostCategoriesResponse;
 import com.cocos.cocos.api.post.dto.response.PostDetailResponse;
 import com.cocos.cocos.api.post.dto.response.PostImagesResponse;
@@ -49,5 +50,10 @@ public class PostController implements PostControllerSwagger {
                 postRequest.content(), postRequest.images(), postRequest.animalId(),
                 postRequest.symptomIds(), postRequest.diseaseIds()
         ));
+    }
+
+    @GetMapping("/popular")
+    public ResponseEntity<BaseResponse<PopularPostsResponse>> getPopularPosts() {
+        return SuccessResponse.success(SuccessMessage.OK, postService.getPopularPosts(MEMBER_ID));
     }
 }

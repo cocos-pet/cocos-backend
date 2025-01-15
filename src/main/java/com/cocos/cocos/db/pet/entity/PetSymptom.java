@@ -1,6 +1,7 @@
 package com.cocos.cocos.db.pet.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -20,4 +21,10 @@ public class PetSymptom {
 
     @Column(name = "symptom_id", nullable = false)
     private Long symptomId;
+
+    @Builder
+    public PetSymptom(Long petId, Long symptomId) {
+        this.petId = petId;
+        this.symptomId = symptomId;
+    }
 }

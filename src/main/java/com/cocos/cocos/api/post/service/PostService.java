@@ -14,6 +14,8 @@ import com.cocos.cocos.db.disease.repository.DiseaseRepository;
 import com.cocos.cocos.db.member.entity.Member;
 import com.cocos.cocos.db.member.repository.MemberRepository;
 import com.cocos.cocos.db.pet.entity.Pet;
+import com.cocos.cocos.db.pet.entity.PetDisease;
+import com.cocos.cocos.db.pet.entity.PetSymptom;
 import com.cocos.cocos.db.pet.repository.PetDiseaseRepository;
 import com.cocos.cocos.db.pet.repository.PetRepository;
 import com.cocos.cocos.db.pet.repository.PetSymptomRepository;
@@ -29,6 +31,8 @@ import com.cocos.cocos.enums.tag.TagType;
 import com.cocos.cocos.external.AppDataS3Client;
 import com.cocos.cocos.external.MemberDataS3Client;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -199,9 +203,40 @@ public class PostService {
         return PostImagesResponse.of(null);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public PopularPostsResponse getPopularPosts(final Long memberId) {
-        return null;
+        final List<Post> popularPosts = fetchPopularPosts(memberId);
+        return PopularPostsResponse.of(
+                popularPosts.stream()
+                        .map(popularPost -> PopularPostResponse.of(popularPost.getId(), popularPost.getTitle()))
+                        .toList()
+        );
+    }
+
+    private List<Post> fetchPopularPosts(final Long memberId) {
+        if (petRepository.existsByMemberId(memberId)) {
+            final Pet pet = petRepository.findByMemberId(memberId);
+            if (petDiseaseRepository.existsByPetId(pet.getId())) {
+                final List<Long> diseaseIds = petDiseaseRepository.findAllByPetId(pet.getId()).stream()
+                        .map(PetDisease::getDiseaseId)
+                        .toList();
+                final List<Long> postIds = postTagRepository.findAllByTagIdAndTagType(diseaseIds, TagType.DISEASE).stream()
+                        .map(PostTag::getPostId)
+                        .toList();
+                Pageable pageable = PageRequest.of(0, 5);
+                return postRepository.findTopPostsByPostIds(postIds, pageable);
+            } else if (petSymptomRepository.existsByPetId(pet.getId())) {
+                final List<Long> symptomIds = petSymptomRepository.findAllByPetId(pet.getId()).stream()
+                        .map(PetSymptom::getSymptomId)
+                        .toList();
+                final List<Long> postIds = postTagRepository.findAllByTagIdAndTagType(symptomIds, TagType.SYMPTOM).stream()
+                        .map(PostTag::getPostId)
+                        .toList();
+                Pageable pageable = PageRequest.of(0, 5);
+                return postRepository.findTopPostsByPostIds(postIds, pageable);
+            }
+        }
+        return postRepository.findTop5ByLikeCountDesc();
     }
 
 

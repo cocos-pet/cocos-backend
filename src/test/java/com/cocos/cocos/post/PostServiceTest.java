@@ -1,9 +1,6 @@
 package com.cocos.cocos.post;
 
-import com.cocos.cocos.api.post.dto.response.PostCategoriesResponse;
-import com.cocos.cocos.api.post.dto.response.PostCategoryResponse;
-import com.cocos.cocos.api.post.dto.response.PostDetailResponse;
-import com.cocos.cocos.api.post.dto.response.PostImagesResponse;
+import com.cocos.cocos.api.post.dto.response.*;
 import com.cocos.cocos.api.post.service.PostService;
 import com.cocos.cocos.db.animal.repository.AnimalRepository;
 import com.cocos.cocos.db.breed.entity.Breed;
@@ -16,7 +13,11 @@ import com.cocos.cocos.db.disease.repository.DiseaseRepository;
 import com.cocos.cocos.db.member.entity.Member;
 import com.cocos.cocos.db.member.repository.MemberRepository;
 import com.cocos.cocos.db.pet.entity.Pet;
+import com.cocos.cocos.db.pet.entity.PetDisease;
+import com.cocos.cocos.db.pet.entity.PetSymptom;
+import com.cocos.cocos.db.pet.repository.PetDiseaseRepository;
 import com.cocos.cocos.db.pet.repository.PetRepository;
+import com.cocos.cocos.db.pet.repository.PetSymptomRepository;
 import com.cocos.cocos.db.post.entity.Post;
 import com.cocos.cocos.db.post.entity.PostCategory;
 import com.cocos.cocos.db.post.entity.PostImage;
@@ -79,6 +80,10 @@ public class PostServiceTest {
     private DiseaseRepository diseaseRepository;
     @Mock
     private SymptomRepository symptomRepository;
+    @Mock
+    private PetDiseaseRepository petDiseaseRepository;
+    @Mock
+    private PetSymptomRepository petSymptomRepository;
     @Mock
     private AppDataS3Client appDataS3Client;
     @Mock
@@ -403,5 +408,100 @@ public class PostServiceTest {
 
         //then
         Assertions.assertThat(actual.images().size()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("펫이 존재하고 질병이 있는 경우의 인기글 조회를 할 수 있다.")
+    void getPopularPostsWithDisease() {
+        //given
+        final Long memberId = 1L;
+        final Long breedId = 1L;
+        final String name = "이름";
+        final Gender gender = Gender.MALE;
+        final int age = 15;
+
+        final Pet pet = Pet.builder()
+                .name(name)
+                .gender(gender)
+                .memberId(memberId)
+                .breedId(breedId)
+                .age(age)
+                .build();
+
+        final PetDisease petDisease1 = PetDisease.builder()
+                .petId(1L)
+                .diseaseId(1L)
+                .build();
+        final PetDisease petDisease2 = PetDisease.builder()
+                .petId(1L)
+                .diseaseId(2L)
+                .build();
+        final List<PetDisease> petDiseases = new ArrayList<>(List.of(petDisease1, petDisease2));
+
+        final PetSymptom petSymptom1 = PetSymptom.builder()
+                .petId(1L)
+                .symptomId(2L)
+                .build();
+        final PetSymptom petSymptom2 = PetSymptom.builder()
+                .petId(1L)
+                .symptomId(3L)
+                .build();
+        final List<PetSymptom> petSymptoms = new ArrayList<>(List.of(petSymptom1, petSymptom2));
+
+
+        final PostTag postTag1 = PostTag.builder()
+                .tagId(1L)
+                .postId(1L)
+                .tagType(TagType.DISEASE)
+                .build();
+        final PostTag postTag2 = PostTag.builder()
+                .tagId(2L)
+                .postId(1L)
+                .tagType(TagType.DISEASE)
+                .build();
+        final PostTag postTag3 = PostTag.builder()
+                .tagId(2L)
+                .postId(1L)
+                .tagType(TagType.SYMPTOM)
+                .build();
+        final PostTag postTag4 = PostTag.builder()
+                .tagId(3L)
+                .postId(1L)
+                .tagType(TagType.SYMPTOM)
+                .build();
+        final List<PostTag> postTags = new ArrayList<>(List.of(postTag1, postTag2, postTag3, postTag4));
+
+        final Post post1 = Post.builder()
+                .title("title")
+                .content("content")
+                .memberId(1L)
+                .categoryId(1L)
+                .build();
+        final Post post2 = Post.builder()
+                .title("title1")
+                .content("content1")
+                .memberId(1L)
+                .categoryId(2L)
+                .build();
+        final List<Post> posts = new ArrayList<>(List.of(post1, post2));
+
+        BDDMockito.given(petRepository.existsByMemberId(any())).willReturn(true);
+        BDDMockito.given(petRepository.findByMemberId(any())).willReturn(pet);
+        BDDMockito.given(petDiseaseRepository.existsByPetId(any())).willReturn(true);
+        BDDMockito.given(petDiseaseRepository.findAllByPetId(any())).willReturn(petDiseases);
+        BDDMockito.given(postTagRepository.findAllByTagIdAndTagType(any(), any())).willReturn(postTags);
+        BDDMockito.given(postRepository.findTopPostsByPostIds(any(), any())).willReturn(posts);
+
+        final PopularPostsResponse expected = PopularPostsResponse.of(
+                posts.stream()
+                        .map(post -> PopularPostResponse.of(post.getId(), post.getTitle()))
+                        .toList()
+        );
+        //when
+        final PopularPostsResponse actual = postService.getPopularPosts(memberId);
+
+
+        //then
+        Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
     }
 }
