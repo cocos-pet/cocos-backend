@@ -72,6 +72,17 @@ public class CommentService {
         );
     }
 
+    @Transactional
+    public void deletePostSubComment(final Long subCommentId, final Long memberId) {
+        final SubComment subComment = subCommentRepository.findById(subCommentId).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_SUB_COMMENT)
+        );
+        if (!subComment.getMemberId().equals(memberId)) {
+            throw new CocosException(FailMessage.FORBIDDEN_COMMENT_DELETE);
+        }
+        subCommentRepository.deleteById(subComment.getId());
+    }
+
     public CommentsAndSubCommentsResponse getPostComments(final Long postId, final Long memberId) {
         validatePostExists(postId);
 

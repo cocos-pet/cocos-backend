@@ -43,6 +43,14 @@ public class CommentController implements CommentControllerSwagger {
         return SuccessResponse.success(SuccessMessage.CREATED, null);
     }
 
+    @DeleteMapping("/sub/{subCommentId}")
+    public ResponseEntity<BaseResponse<Void>> deletePostSubComment(
+            @PathVariable(name = "subCommentId") final Long subCommentId
+    ) {
+        commentService.deletePostSubComment(subCommentId, memberId);
+        return SuccessResponse.success(SuccessMessage.OK,null);
+    }
+
     @GetMapping("/{postId}")
     public ResponseEntity<BaseResponse<CommentsAndSubCommentsResponse>> getPostComments(
             @PathVariable(name = "postId") final Long postId

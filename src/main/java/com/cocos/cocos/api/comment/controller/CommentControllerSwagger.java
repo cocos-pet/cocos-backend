@@ -42,6 +42,15 @@ public interface CommentControllerSwagger {
             @RequestBody final CommentContentRequest content
     );
 
+    @Operation(summary = "게시글 대댓글 삭제 API", description = "게시글의 대댓글을 삭제하는 API 입니다.")
+    @ApiResponse(
+            responseCode = "200",
+            description = "요청이 성공했습니다. ")
+    @Parameter(name = "subCommentId", description = "대댓글 아이디", in = ParameterIn.PATH, required = true, schema = @Schema(type = "Long"))
+    public ResponseEntity<BaseResponse<Void>> deletePostSubComment(
+            final Long subCommentId
+    );
+
     @Operation(summary = "게시글 댓글&대댓글 조회 API", description = "게시글에 달린 댓글과 대댓글을 조회하는 API입니다. ")
     @ApiResponse(
             responseCode = "200",
