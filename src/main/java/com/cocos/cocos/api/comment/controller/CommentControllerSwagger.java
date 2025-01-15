@@ -1,6 +1,7 @@
 package com.cocos.cocos.api.comment.controller;
 
 import com.cocos.cocos.api.comment.dto.request.CommentContentRequest;
+import com.cocos.cocos.api.comment.dto.request.SubCommentContentRequest;
 import com.cocos.cocos.api.comment.dto.response.CommentsAndSubCommentsResponse;
 import com.cocos.cocos.common.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,7 +40,7 @@ public interface CommentControllerSwagger {
             description = "요청에 성공했습니다.")
     public ResponseEntity<BaseResponse<Void>> addPostSubComment(
             @Parameter(name = "commentId", description = "댓글 아이디", in = ParameterIn.PATH, required = true, schema = @Schema(type = "Long")) final Long commentId,
-            @RequestBody final CommentContentRequest content
+            @RequestBody final SubCommentContentRequest content
     );
 
     @Operation(summary = "게시글 대댓글 삭제 API", description = "게시글의 대댓글을 삭제하는 API 입니다.")

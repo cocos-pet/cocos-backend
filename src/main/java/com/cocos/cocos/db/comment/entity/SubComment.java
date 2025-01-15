@@ -26,10 +26,14 @@ public class SubComment extends BaseTime {
     @Column(name = "comment_id", nullable = false)
     private Long commentId;
 
+    @Column(name = "mentioned_member_id", nullable = false)
+    private Long mentionedMemberId;
+
     @Builder
-    public SubComment(String content, Long memberId, Long commentId) {
+    public SubComment(String content, Long memberId, Long commentId, Long mentionedMemberId) {
         this.content = content;
         this.memberId = memberId;
         this.commentId = commentId;
+        this.mentionedMemberId = mentionedMemberId;
     }
 }

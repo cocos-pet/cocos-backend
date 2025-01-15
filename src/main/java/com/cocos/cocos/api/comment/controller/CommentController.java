@@ -1,6 +1,7 @@
 package com.cocos.cocos.api.comment.controller;
 
 import com.cocos.cocos.api.comment.dto.request.CommentContentRequest;
+import com.cocos.cocos.api.comment.dto.request.SubCommentContentRequest;
 import com.cocos.cocos.api.comment.dto.response.CommentsAndSubCommentsResponse;
 import com.cocos.cocos.api.comment.service.CommentService;
 import com.cocos.cocos.common.response.BaseResponse;
@@ -37,9 +38,9 @@ public class CommentController implements CommentControllerSwagger {
     @PostMapping("/sub/{commentId}")
     public ResponseEntity<BaseResponse<Void>> addPostSubComment(
             @PathVariable(name = "commentId") final Long commentId,
-            @RequestBody final CommentContentRequest body
+            @RequestBody final SubCommentContentRequest body
     ) {
-        commentService.addPostSubComment(commentId, body.content(), memberId);
+        commentService.addPostSubComment(commentId, body.mentionedMemberId(), body.content(), memberId);
         return SuccessResponse.success(SuccessMessage.CREATED, null);
     }
 

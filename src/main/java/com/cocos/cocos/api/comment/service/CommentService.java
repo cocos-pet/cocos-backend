@@ -61,11 +61,12 @@ public class CommentService {
     }
 
     @Transactional
-    public void addPostSubComment(final Long commentId, final String content, final Long memberId) {
+    public void addPostSubComment(final Long commentId, final Long mentionedMemberId, final String content, final Long memberId) {
         validateCommentExists(commentId);
         subCommentRepository.save(
                 SubComment.builder()
                         .commentId(commentId)
+                        .mentionedMemberId(mentionedMemberId)
                         .content(content)
                         .memberId(memberId)
                         .build()
@@ -96,7 +97,10 @@ public class CommentService {
                 .collect(Collectors.groupingBy(SubComment::getCommentId));
         final List<Long> memberIds = Stream.concat(
                 comments.stream().map(Comment::getMemberId),
-                subComments.stream().map(SubComment::getMemberId)
+                Stream.concat(
+                        subComments.stream().map(SubComment::getMemberId),
+                        subComments.stream().map(SubComment::getMentionedMemberId)
+                )
         ).distinct().collect(Collectors.toList());
 
         final List<Member> members = memberRepository.findAllById(memberIds);
@@ -126,7 +130,8 @@ public class CommentService {
                                             getOrDefaultPetAge(subComment.getMemberId(), petMap),
                                             subComment.getContent(),
                                             subComment.getCreatedAt(),
-                                            subComment.getMemberId().equals(memberId)
+                                            subComment.getMemberId().equals(memberId),
+                                            getOrDefaultNickname(subComment.getMentionedMemberId(), memberMap)
                                     )).toList();
 
                     return CommentAndSubCommentsResponse.of(

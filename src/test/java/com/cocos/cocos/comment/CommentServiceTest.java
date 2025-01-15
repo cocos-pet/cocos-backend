@@ -109,6 +109,7 @@ class CommentServiceTest {
         final Long memberId = 1L;
         final String content = "댓글 내용";
         final Long commentId = 1L;
+        final Long mentionedMemberId = 2L;
 
         Comment comment = Comment.builder()
                 .content("댓글 내용")
@@ -120,7 +121,7 @@ class CommentServiceTest {
         BDDMockito.given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
 
         // when
-        commentService.addPostSubComment(commentId, content, memberId);
+        commentService.addPostSubComment(commentId, mentionedMemberId, content, memberId);
 
         // then
         BDDMockito.verify(subCommentRepository, times(1)).save(any(SubComment.class));
