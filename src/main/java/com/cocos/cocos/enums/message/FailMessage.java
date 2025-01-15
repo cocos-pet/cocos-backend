@@ -26,6 +26,7 @@ public enum FailMessage {
      * 403
      */
     FORBIDDEN(HttpStatus.FORBIDDEN, 40300, "권한이 없습니다. "),
+    FORBIDDEN_COMMENT_DELETE(HttpStatus.FORBIDDEN, 40301, "댓글을 삭제할 권한이 없습니다. "),
 
     /**
      * 404
@@ -43,6 +44,7 @@ public enum FailMessage {
     NOT_FOUND_DISEASE(HttpStatus.NOT_FOUND, 40407, "질병을 찾을 수 없습니다."),
     NOT_FOUND_SYMPTOM(HttpStatus.NOT_FOUND, 40407, "증상을 찾을 수 없습니다."),
     NOT_FOUND_POSTTAG(HttpStatus.NOT_FOUND, 40407, "태그를 찾을 수 없습니다."),
+    NOT_FOUND_COMMENT(HttpStatus.NOT_FOUND, 40413, "댓글을 찾을 수 없습니다."),
 
     /**
      * 405

@@ -22,15 +22,23 @@ public class CommentController implements CommentControllerSwagger {
             @PathVariable(name = "postId") final Long postId,
             @RequestBody final CommentContentRequest body
     ) {
-        commentService.addPostComments(postId, body.content(), memberId);
+        commentService.addPostComment(postId, body.content(), memberId);
         return SuccessResponse.success(SuccessMessage.CREATED, null);
     }
 
-    @GetMapping("/{postId}")
-    public ResponseEntity<BaseResponse<CommentsAndSubCommentsResponse>> getPostComments(
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<BaseResponse<Void>> deletePostComment(
             @PathVariable(name = "postId") final Long postId
     ) {
-        final CommentsAndSubCommentsResponse postComments = commentService.getPostComments(postId, memberId);
+        commentService.deletePostComment(postId, memberId);
+        return SuccessResponse.success(SuccessMessage.OK,null);
+    }
+
+    @GetMapping("/{commentId}")
+    public ResponseEntity<BaseResponse<CommentsAndSubCommentsResponse>> getPostComments(
+            @PathVariable(name = "commentId") final Long commentId
+    ) {
+        final CommentsAndSubCommentsResponse postComments = commentService.getPostComments(commentId, memberId);
         return SuccessResponse.success(SuccessMessage.OK, postComments);
     }
 }

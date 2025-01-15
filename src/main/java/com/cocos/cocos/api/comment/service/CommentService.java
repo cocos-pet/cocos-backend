@@ -39,7 +39,7 @@ public class CommentService {
     private final MemberDataS3Client memberDataS3Client;
 
     @Transactional
-    public void addPostComments(final Long postId, final String content, final Long memberId) {
+    public void addPostComment(final Long postId, final String content, final Long memberId) {
         validatePostExists(postId);
         commentRepository.save(
                 Comment.builder()
@@ -48,6 +48,18 @@ public class CommentService {
                         .postId(postId)
                         .build()
         );
+    }
+
+    @Transactional
+    public void deletePostComment(final Long commentId, final Long memberId) {
+        final Comment comment = commentRepository.findById(commentId).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_COMMENT)
+        );
+        if (!comment.getMemberId().equals(memberId)) {
+            throw new CocosException(FailMessage.FORBIDDEN_COMMENT_DELETE);
+        }
+        commentRepository.deleteById(commentId);
+        subCommentRepository.deleteAllByCommentId(comment.getId());
     }
 
 
