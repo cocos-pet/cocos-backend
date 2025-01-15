@@ -1,6 +1,8 @@
 package com.cocos.cocos.api.comment.service;
 
+import com.cocos.cocos.api.comment.dto.response.CommentAndSubCommentsResponse;
 import com.cocos.cocos.api.comment.dto.response.CommentsAndSubCommentsResponse;
+import com.cocos.cocos.api.comment.dto.response.SubCommentResponse;
 import com.cocos.cocos.common.exception.CocosException;
 import com.cocos.cocos.db.breed.entity.Breed;
 import com.cocos.cocos.db.breed.repository.BreedRepository;
@@ -69,11 +71,11 @@ public class CommentService {
         Map<Long,String> breedMap = breeds.stream()
                 .collect(Collectors.toMap(Breed::getId, Breed::getName));
 
-        List<CommentsAndSubCommentsResponse.CommentAndSubCommentsResponse> commentDtos = comments.stream()
+        List<CommentAndSubCommentsResponse> commentDtos = comments.stream()
                 .map(comment -> {
-                    List<CommentsAndSubCommentsResponse.CommentAndSubCommentsResponse.SubCommentResponse> subCommentDtos =
+                    List<SubCommentResponse> subCommentDtos =
                             subCommentsGroupedByCommentId.getOrDefault(comment.getId(), List.of()).stream()
-                                    .map(subComment -> CommentsAndSubCommentsResponse.CommentAndSubCommentsResponse.SubCommentResponse.of(
+                                    .map(subComment -> SubCommentResponse.of(
                                             subComment.getId(),
                                             getOrDefaultNickname(subComment.getMemberId(), memberMap),
                                             memberDataS3Client.getPresignedUrl(subComment.getMemberId() + "/" +  getOrDefaultProfileImage(subComment.getMemberId(), memberMap)),
@@ -84,7 +86,7 @@ public class CommentService {
                                             subComment.getMemberId().equals(memberId)
                                     )).toList();
 
-                    return CommentsAndSubCommentsResponse.CommentAndSubCommentsResponse.of(
+                    return CommentAndSubCommentsResponse.of(
                             comment.getId(),
                             getOrDefaultNickname(comment.getMemberId(), memberMap),
                             memberDataS3Client.getPresignedUrl(comment.getMemberId() + "/" +  getOrDefaultProfileImage(comment.getMemberId(), memberMap)),
