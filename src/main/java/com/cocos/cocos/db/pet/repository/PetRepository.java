@@ -14,4 +14,6 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
 
     List<Pet> findAllByMemberIdIn(@Param("memberIds") List<Long> memberIds);
 
+    boolean existsByMemberId(final Long memberId);
+
 }

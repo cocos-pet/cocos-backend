@@ -1,7 +1,9 @@
 package com.cocos.cocos.api.post.controller;
 
+import com.cocos.cocos.api.post.dto.request.PostRequest;
 import com.cocos.cocos.api.post.dto.response.PostCategoriesResponse;
 import com.cocos.cocos.api.post.dto.response.PostDetailResponse;
+import com.cocos.cocos.api.post.dto.response.PostImagesResponse;
 import com.cocos.cocos.common.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,4 +35,10 @@ public interface PostControllerSwagger {
             responseCode = "200",
             description = "게시글 카테고리 리스트 조회 성공")
     public ResponseEntity<BaseResponse<PostCategoriesResponse>> getPostCategories();
+
+    @Operation(summary = "게시글 추가 API", description = "게시글을 추가하는 API입니다.")
+    @ApiResponse(
+            responseCode = "200",
+            description = "게시글 추가 성공")
+    public ResponseEntity<BaseResponse<PostImagesResponse>> addPost(final PostRequest postRequest);
 }

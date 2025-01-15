@@ -3,6 +3,7 @@ package com.cocos.cocos.post;
 import com.cocos.cocos.api.post.dto.response.PostCategoriesResponse;
 import com.cocos.cocos.api.post.dto.response.PostCategoryResponse;
 import com.cocos.cocos.api.post.dto.response.PostDetailResponse;
+import com.cocos.cocos.api.post.dto.response.PostImagesResponse;
 import com.cocos.cocos.api.post.service.PostService;
 import com.cocos.cocos.db.animal.repository.AnimalRepository;
 import com.cocos.cocos.db.breed.entity.Breed;
@@ -25,6 +26,7 @@ import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.pet.Gender;
 import com.cocos.cocos.enums.tag.TagType;
 import com.cocos.cocos.external.AppDataS3Client;
+import com.cocos.cocos.external.MemberDataS3Client;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -79,6 +81,8 @@ public class PostServiceTest {
     private SymptomRepository symptomRepository;
     @Mock
     private AppDataS3Client appDataS3Client;
+    @Mock
+    private MemberDataS3Client memberDataS3Client;
 
     @Test
     @DisplayName("게시글 세부사항을 조회할 수 있다.")
@@ -250,5 +254,154 @@ public class PostServiceTest {
 
         //then
         Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("이미지, 증상태그, 질병태그, 동물태그가 포함된 게시글을 조회할 수 있다.")
+    void addPost() {
+        //given
+        final Long memberId = 1L;
+        final Long categoryId = 1L;
+        final String title = "제목";
+        final String content = "내용";
+        final List<String> images = new ArrayList<>(List.of("image1.png", "image2.jpg"));
+        final Long animalId = 1L;
+        final List<Long> symptomIds = new ArrayList<>(List.of(2L));
+        final List<Long> diseaseIds = new ArrayList<>(List.of(2L, 3L));
+
+        final Post post = Post.builder()
+                .title(title)
+                .content(content)
+                .memberId(memberId)
+                .categoryId(categoryId)
+                .build();
+
+        BDDMockito.given(postRepository.save(any())).willReturn(post);
+
+        //when
+        postService.addPost(memberId, categoryId, title, content, images, animalId, symptomIds, diseaseIds);
+
+        //then
+        BDDMockito.verify(postRepository, times(1)).save(any());
+        BDDMockito.verify(postTagRepository, times(4)).save(any());
+        BDDMockito.verify(postImageRepository, times(2)).save(any());
+
+    }
+
+    @Test
+    @DisplayName("증상태그, 질병태그, 동물태그가 포함된 게시글을 조회할 수 있다.")
+    void addPostWithoutImage() {
+        //given
+        final Long memberId = 1L;
+        final Long categoryId = 1L;
+        final String title = "제목";
+        final String content = "내용";
+        final Long animalId = 1L;
+        final List<Long> symptomIds = new ArrayList<>(List.of(2L));
+        final List<Long> diseaseIds = new ArrayList<>(List.of(2L, 3L));
+
+        final Post post = Post.builder()
+                .title(title)
+                .content(content)
+                .memberId(memberId)
+                .categoryId(categoryId)
+                .build();
+
+        BDDMockito.given(postRepository.save(any())).willReturn(post);
+
+        //when
+        postService.addPost(memberId, categoryId, title, content, null, animalId, symptomIds, diseaseIds);
+
+        //then
+        BDDMockito.verify(postRepository, times(1)).save(any());
+        BDDMockito.verify(postTagRepository, times(4)).save(any());
+        BDDMockito.verify(postImageRepository, times(0)).save(any());
+
+    }
+
+    @Test
+    @DisplayName("증상태그, 질병태그가 포함된 게시글을 조회할 수 있다.")
+    void addPostWithoutImageAndAnimal() {
+        //given
+        final Long memberId = 1L;
+        final Long categoryId = 1L;
+        final String title = "제목";
+        final String content = "내용";
+        final List<Long> symptomIds = new ArrayList<>(List.of(2L));
+        final List<Long> diseaseIds = new ArrayList<>(List.of(2L, 3L));
+
+        final Post post = Post.builder()
+                .title(title)
+                .content(content)
+                .memberId(memberId)
+                .categoryId(categoryId)
+                .build();
+
+        BDDMockito.given(postRepository.save(any())).willReturn(post);
+
+        //when
+        postService.addPost(memberId, categoryId, title, content, null, null, symptomIds, diseaseIds);
+
+        //then
+        BDDMockito.verify(postRepository, times(1)).save(any());
+        BDDMockito.verify(postTagRepository, times(3)).save(any());
+        BDDMockito.verify(postImageRepository, times(0)).save(any());
+
+    }
+
+    @Test
+    @DisplayName("이미지, 증상태그, 동물태그가 포함된 게시글을 조회할 수 있다.")
+    void addPostWithoutImageAndDisease() {
+        //given
+        final Long memberId = 1L;
+        final Long categoryId = 1L;
+        final String title = "제목";
+        final String content = "내용";
+        final Long animalId = 1L;
+        final List<String> images = new ArrayList<>(List.of("image1.png", "image2.jpg"));
+        final List<Long> symptomIds = new ArrayList<>(List.of(2L));
+
+        final Post post = Post.builder()
+                .title(title)
+                .content(content)
+                .memberId(memberId)
+                .categoryId(categoryId)
+                .build();
+
+        BDDMockito.given(postRepository.save(any())).willReturn(post);
+
+        //when
+        postService.addPost(memberId, categoryId, title, content, images, animalId, symptomIds, null);
+
+        //then
+        BDDMockito.verify(postRepository, times(1)).save(any());
+        BDDMockito.verify(postTagRepository, times(2)).save(any());
+        BDDMockito.verify(postImageRepository, times(2)).save(any());
+    }
+
+    @Test
+    @DisplayName("이미지의 개수만큼 Presigned Url을 생성할 수 있다.")
+    void createPostImagePresignedUrl() {
+        //given
+        final Long memberId = 1L;
+        final Long categoryId = 1L;
+        final String title = "제목";
+        final String content = "내용";
+        final List<String> images = new ArrayList<>(List.of("image1.png", "image2.jpg"));
+
+        final Post post = Post.builder()
+                .title(title)
+                .content(content)
+                .memberId(memberId)
+                .categoryId(categoryId)
+                .build();
+
+        BDDMockito.given(postRepository.save(any())).willReturn(post);
+
+        //when
+        final PostImagesResponse actual = postService.addPost(memberId, categoryId, title, content, images, null, null, null);
+
+        //then
+        Assertions.assertThat(actual.images().size()).isEqualTo(2);
     }
 }
