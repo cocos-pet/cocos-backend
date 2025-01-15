@@ -52,9 +52,7 @@ public class CommentService {
 
     @Transactional
     public void deletePostComment(final Long commentId, final Long memberId) {
-        final Comment comment = commentRepository.findById(commentId).orElseThrow(
-                () -> new CocosException(FailMessage.NOT_FOUND_COMMENT)
-        );
+        final Comment comment = validateCommentExists(commentId);
         if (!comment.getMemberId().equals(memberId)) {
             throw new CocosException(FailMessage.FORBIDDEN_COMMENT_DELETE);
         }
@@ -62,6 +60,17 @@ public class CommentService {
         subCommentRepository.deleteAllByCommentId(comment.getId());
     }
 
+    @Transactional
+    public void addPostSubComment(final Long commentId, final String content, final Long memberId) {
+        validateCommentExists(commentId);
+        subCommentRepository.save(
+                SubComment.builder()
+                        .commentId(commentId)
+                        .content(content)
+                        .memberId(memberId)
+                        .build()
+        );
+    }
 
     public CommentsAndSubCommentsResponse getPostComments(final Long postId, final Long memberId) {
         validatePostExists(postId);
@@ -123,6 +132,12 @@ public class CommentService {
                 }).toList();
 
         return CommentsAndSubCommentsResponse.of(commentDtos);
+    }
+
+    private Comment validateCommentExists(Long commentId) {
+        return commentRepository.findById(commentId).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_COMMENT)
+        );
     }
 
     private void validatePostExists(Long postId) {

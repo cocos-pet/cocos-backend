@@ -34,11 +34,20 @@ public class CommentController implements CommentControllerSwagger {
         return SuccessResponse.success(SuccessMessage.OK,null);
     }
 
-    @GetMapping("/{commentId}")
-    public ResponseEntity<BaseResponse<CommentsAndSubCommentsResponse>> getPostComments(
-            @PathVariable(name = "commentId") final Long commentId
+    @PostMapping("/sub/{commentId}")
+    public ResponseEntity<BaseResponse<Void>> addPostSubComment(
+            @PathVariable(name = "commentId") final Long commentId,
+            @RequestBody final CommentContentRequest body
     ) {
-        final CommentsAndSubCommentsResponse postComments = commentService.getPostComments(commentId, memberId);
+        commentService.addPostSubComment(commentId, body.content(), memberId);
+        return SuccessResponse.success(SuccessMessage.CREATED, null);
+    }
+
+    @GetMapping("/{postId}")
+    public ResponseEntity<BaseResponse<CommentsAndSubCommentsResponse>> getPostComments(
+            @PathVariable(name = "postId") final Long postId
+    ) {
+        final CommentsAndSubCommentsResponse postComments = commentService.getPostComments(postId, memberId);
         return SuccessResponse.success(SuccessMessage.OK, postComments);
     }
 }

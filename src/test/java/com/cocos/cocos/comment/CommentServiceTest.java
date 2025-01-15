@@ -4,6 +4,7 @@ import com.cocos.cocos.api.comment.service.CommentService;
 import com.cocos.cocos.common.exception.CocosException;
 import com.cocos.cocos.db.breed.repository.BreedRepository;
 import com.cocos.cocos.db.comment.entity.Comment;
+import com.cocos.cocos.db.comment.entity.SubComment;
 import com.cocos.cocos.db.comment.repository.CommentRepository;
 import com.cocos.cocos.db.comment.repository.SubCommentRepository;
 import com.cocos.cocos.db.member.repository.MemberRepository;
@@ -100,6 +101,7 @@ class CommentServiceTest {
                 .postId(1L)
                 .build();
 
+        ReflectionTestUtils.setField(comment, "id", commentId);
         BDDMockito.given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
 
         // when
@@ -110,5 +112,29 @@ class CommentServiceTest {
         // then
         BDDMockito.verify(commentRepository, times(0)).deleteById(commentId);
         BDDMockito.verify(subCommentRepository, times(0)).deleteAllByCommentId(commentId);
+    }
+
+    @Test
+    @DisplayName("게시글의 대댓글을 추가할 수 있다.")
+    void addPostSubComment() {
+        // given
+        final Long memberId = 1L;
+        final String content = "댓글 내용";
+        final Long commentId = 1L;
+
+        Comment comment = Comment.builder()
+                .content("댓글 내용")
+                .memberId(2L)
+                .postId(1L)
+                .build();
+
+        ReflectionTestUtils.setField(comment, "id", commentId);
+        BDDMockito.given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+
+        // when
+        commentService.addPostSubComment(commentId, content, memberId);
+
+        // then
+        BDDMockito.verify(subCommentRepository, times(1)).save(any(SubComment.class));
     }
 }
