@@ -29,11 +29,22 @@ public class Post extends BaseTime {
     @Column(name = "category_id", nullable = false)
     private Long categoryId;
 
+    @Column(name = "like_count", nullable = false)
+    private int likeCount = 0;
+
     @Builder
     public Post(String title, String content, Long memberId, Long categoryId) {
         this.title = title;
         this.content = content;
         this.memberId = memberId;
         this.categoryId = categoryId;
+    }
+
+    public void addLike() {
+        this.likeCount++;
+    }
+
+    public void deleteLike() {
+        this.likeCount--;
     }
 }

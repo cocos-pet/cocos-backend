@@ -1,8 +1,6 @@
 package com.cocos.cocos.post;
 
-import com.cocos.cocos.api.post.dto.response.PostCategoriesResponse;
-import com.cocos.cocos.api.post.dto.response.PostCategoryResponse;
-import com.cocos.cocos.api.post.dto.response.PostDetailResponse;
+import com.cocos.cocos.api.post.dto.response.*;
 import com.cocos.cocos.api.post.service.PostService;
 import com.cocos.cocos.db.animal.repository.AnimalRepository;
 import com.cocos.cocos.db.breed.entity.Breed;
@@ -15,7 +13,11 @@ import com.cocos.cocos.db.disease.repository.DiseaseRepository;
 import com.cocos.cocos.db.member.entity.Member;
 import com.cocos.cocos.db.member.repository.MemberRepository;
 import com.cocos.cocos.db.pet.entity.Pet;
+import com.cocos.cocos.db.pet.entity.PetDisease;
+import com.cocos.cocos.db.pet.entity.PetSymptom;
+import com.cocos.cocos.db.pet.repository.PetDiseaseRepository;
 import com.cocos.cocos.db.pet.repository.PetRepository;
+import com.cocos.cocos.db.pet.repository.PetSymptomRepository;
 import com.cocos.cocos.db.post.entity.Post;
 import com.cocos.cocos.db.post.entity.PostCategory;
 import com.cocos.cocos.db.post.entity.PostImage;
@@ -25,6 +27,7 @@ import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.pet.Gender;
 import com.cocos.cocos.enums.tag.TagType;
 import com.cocos.cocos.external.AppDataS3Client;
+import com.cocos.cocos.external.MemberDataS3Client;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -78,7 +81,13 @@ public class PostServiceTest {
     @Mock
     private SymptomRepository symptomRepository;
     @Mock
+    private PetDiseaseRepository petDiseaseRepository;
+    @Mock
+    private PetSymptomRepository petSymptomRepository;
+    @Mock
     private AppDataS3Client appDataS3Client;
+    @Mock
+    private MemberDataS3Client memberDataS3Client;
 
     @Test
     @DisplayName("게시글 세부사항을 조회할 수 있다.")
@@ -247,6 +256,250 @@ public class PostServiceTest {
 
         //when
         final PostCategoriesResponse actual = postService.getCategories();
+
+        //then
+        Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("이미지, 증상태그, 질병태그, 동물태그가 포함된 게시글을 조회할 수 있다.")
+    void addPost() {
+        //given
+        final Long memberId = 1L;
+        final Long categoryId = 1L;
+        final String title = "제목";
+        final String content = "내용";
+        final List<String> images = new ArrayList<>(List.of("image1.png", "image2.jpg"));
+        final Long animalId = 1L;
+        final List<Long> symptomIds = new ArrayList<>(List.of(2L));
+        final List<Long> diseaseIds = new ArrayList<>(List.of(2L, 3L));
+
+        final Post post = Post.builder()
+                .title(title)
+                .content(content)
+                .memberId(memberId)
+                .categoryId(categoryId)
+                .build();
+
+        BDDMockito.given(postRepository.save(any())).willReturn(post);
+
+        //when
+        postService.addPost(memberId, categoryId, title, content, images, animalId, symptomIds, diseaseIds);
+
+        //then
+        BDDMockito.verify(postRepository, times(1)).save(any());
+        BDDMockito.verify(postTagRepository, times(4)).save(any());
+        BDDMockito.verify(postImageRepository, times(2)).save(any());
+
+    }
+
+    @Test
+    @DisplayName("증상태그, 질병태그, 동물태그가 포함된 게시글을 조회할 수 있다.")
+    void addPostWithoutImage() {
+        //given
+        final Long memberId = 1L;
+        final Long categoryId = 1L;
+        final String title = "제목";
+        final String content = "내용";
+        final Long animalId = 1L;
+        final List<Long> symptomIds = new ArrayList<>(List.of(2L));
+        final List<Long> diseaseIds = new ArrayList<>(List.of(2L, 3L));
+
+        final Post post = Post.builder()
+                .title(title)
+                .content(content)
+                .memberId(memberId)
+                .categoryId(categoryId)
+                .build();
+
+        BDDMockito.given(postRepository.save(any())).willReturn(post);
+
+        //when
+        postService.addPost(memberId, categoryId, title, content, null, animalId, symptomIds, diseaseIds);
+
+        //then
+        BDDMockito.verify(postRepository, times(1)).save(any());
+        BDDMockito.verify(postTagRepository, times(4)).save(any());
+        BDDMockito.verify(postImageRepository, times(0)).save(any());
+
+    }
+
+    @Test
+    @DisplayName("증상태그, 질병태그가 포함된 게시글을 조회할 수 있다.")
+    void addPostWithoutImageAndAnimal() {
+        //given
+        final Long memberId = 1L;
+        final Long categoryId = 1L;
+        final String title = "제목";
+        final String content = "내용";
+        final List<Long> symptomIds = new ArrayList<>(List.of(2L));
+        final List<Long> diseaseIds = new ArrayList<>(List.of(2L, 3L));
+
+        final Post post = Post.builder()
+                .title(title)
+                .content(content)
+                .memberId(memberId)
+                .categoryId(categoryId)
+                .build();
+
+        BDDMockito.given(postRepository.save(any())).willReturn(post);
+
+        //when
+        postService.addPost(memberId, categoryId, title, content, null, null, symptomIds, diseaseIds);
+
+        //then
+        BDDMockito.verify(postRepository, times(1)).save(any());
+        BDDMockito.verify(postTagRepository, times(3)).save(any());
+        BDDMockito.verify(postImageRepository, times(0)).save(any());
+
+    }
+
+    @Test
+    @DisplayName("이미지, 증상태그, 동물태그가 포함된 게시글을 조회할 수 있다.")
+    void addPostWithoutImageAndDisease() {
+        //given
+        final Long memberId = 1L;
+        final Long categoryId = 1L;
+        final String title = "제목";
+        final String content = "내용";
+        final Long animalId = 1L;
+        final List<String> images = new ArrayList<>(List.of("image1.png", "image2.jpg"));
+        final List<Long> symptomIds = new ArrayList<>(List.of(2L));
+
+        final Post post = Post.builder()
+                .title(title)
+                .content(content)
+                .memberId(memberId)
+                .categoryId(categoryId)
+                .build();
+
+        BDDMockito.given(postRepository.save(any())).willReturn(post);
+
+        //when
+        postService.addPost(memberId, categoryId, title, content, images, animalId, symptomIds, null);
+
+        //then
+        BDDMockito.verify(postRepository, times(1)).save(any());
+        BDDMockito.verify(postTagRepository, times(2)).save(any());
+        BDDMockito.verify(postImageRepository, times(2)).save(any());
+    }
+
+    @Test
+    @DisplayName("이미지의 개수만큼 Presigned Url을 생성할 수 있다.")
+    void createPostImagePresignedUrl() {
+        //given
+        final Long memberId = 1L;
+        final Long categoryId = 1L;
+        final String title = "제목";
+        final String content = "내용";
+        final List<String> images = new ArrayList<>(List.of("image1.png", "image2.jpg"));
+
+        final Post post = Post.builder()
+                .title(title)
+                .content(content)
+                .memberId(memberId)
+                .categoryId(categoryId)
+                .build();
+
+        BDDMockito.given(postRepository.save(any())).willReturn(post);
+
+        //when
+        final PostImagesResponse actual = postService.addPost(memberId, categoryId, title, content, images, null, null, null);
+
+        //then
+        Assertions.assertThat(actual.images().size()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("펫이 존재하고 질병이 있는 경우의 인기글 조회를 할 수 있다.")
+    void getPopularPostsWithDisease() {
+        //given
+        final Long memberId = 1L;
+        final Long breedId = 1L;
+        final String name = "이름";
+        final Gender gender = Gender.MALE;
+        final int age = 15;
+
+        final Pet pet = Pet.builder()
+                .name(name)
+                .gender(gender)
+                .memberId(memberId)
+                .breedId(breedId)
+                .age(age)
+                .build();
+
+        final PetDisease petDisease1 = PetDisease.builder()
+                .petId(1L)
+                .diseaseId(1L)
+                .build();
+        final PetDisease petDisease2 = PetDisease.builder()
+                .petId(1L)
+                .diseaseId(2L)
+                .build();
+        final List<PetDisease> petDiseases = new ArrayList<>(List.of(petDisease1, petDisease2));
+
+        final PetSymptom petSymptom1 = PetSymptom.builder()
+                .petId(1L)
+                .symptomId(2L)
+                .build();
+        final PetSymptom petSymptom2 = PetSymptom.builder()
+                .petId(1L)
+                .symptomId(3L)
+                .build();
+        final List<PetSymptom> petSymptoms = new ArrayList<>(List.of(petSymptom1, petSymptom2));
+
+
+        final PostTag postTag1 = PostTag.builder()
+                .tagId(1L)
+                .postId(1L)
+                .tagType(TagType.DISEASE)
+                .build();
+        final PostTag postTag2 = PostTag.builder()
+                .tagId(2L)
+                .postId(1L)
+                .tagType(TagType.DISEASE)
+                .build();
+        final PostTag postTag3 = PostTag.builder()
+                .tagId(2L)
+                .postId(1L)
+                .tagType(TagType.SYMPTOM)
+                .build();
+        final PostTag postTag4 = PostTag.builder()
+                .tagId(3L)
+                .postId(1L)
+                .tagType(TagType.SYMPTOM)
+                .build();
+        final List<PostTag> postTags = new ArrayList<>(List.of(postTag1, postTag2, postTag3, postTag4));
+
+        final Post post1 = Post.builder()
+                .title("title")
+                .content("content")
+                .memberId(1L)
+                .categoryId(1L)
+                .build();
+        final Post post2 = Post.builder()
+                .title("title1")
+                .content("content1")
+                .memberId(1L)
+                .categoryId(2L)
+                .build();
+        final List<Post> posts = new ArrayList<>(List.of(post1, post2));
+
+        BDDMockito.given(petRepository.existsByMemberId(any())).willReturn(true);
+        BDDMockito.given(petRepository.findByMemberId(any())).willReturn(pet);
+        BDDMockito.given(petDiseaseRepository.existsByPetId(any())).willReturn(true);
+        BDDMockito.given(petDiseaseRepository.findAllByPetId(any())).willReturn(petDiseases);
+        BDDMockito.given(postTagRepository.findAllByTagIdAndTagType(any(), any())).willReturn(postTags);
+        BDDMockito.given(postRepository.findTopPostsByPostIds(any(), any())).willReturn(posts);
+
+        final PopularPostsResponse expected = PopularPostsResponse.of(
+                posts.stream()
+                        .map(post -> PopularPostResponse.of(post.getId(), post.getTitle()))
+                        .toList()
+        );
+        //when
+        final PopularPostsResponse actual = postService.getPopularPosts(memberId);
+
 
         //then
         Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);

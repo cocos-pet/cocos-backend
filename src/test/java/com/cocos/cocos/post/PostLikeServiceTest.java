@@ -2,8 +2,10 @@ package com.cocos.cocos.post;
 
 import com.cocos.cocos.api.post.service.PostLikeService;
 import com.cocos.cocos.common.exception.CocosException;
+import com.cocos.cocos.db.post.entity.Post;
 import com.cocos.cocos.db.post.entity.PostLike;
 import com.cocos.cocos.db.post.repository.PostLikeRepository;
+import com.cocos.cocos.db.post.repository.PostRepository;
 import com.cocos.cocos.enums.message.FailMessage;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +17,8 @@ import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -30,19 +34,32 @@ public class PostLikeServiceTest {
     @Mock
     PostLikeRepository postLikeRepository;
 
+    @Mock
+    PostRepository postRepository;
+
     @Test
     @DisplayName("게시글에 공감을 추가할 수 있다.")
     void addPostLike() {
         //given
         final Long memberId = 1L;
         final Long postId = 1L;
+        final Long categoryId = 1L;
+        final Post post = Post.builder()
+                .title("title")
+                .content("content")
+                .memberId(memberId)
+                .categoryId(categoryId)
+                .build();
+
         BDDMockito.given(postLikeRepository.existsByMemberIdAndPostId(any(), any())).willReturn(false);
+        BDDMockito.given(postRepository.findById(any())).willReturn(Optional.ofNullable(post));
 
         //when
         postLikeService.addPostLike(memberId, postId);
 
         //then
         BDDMockito.verify(postLikeRepository, times(1)).save(any(PostLike.class));
+        Assertions.assertThat(post.getLikeCount()).isEqualTo(1);
     }
 
     @Test
@@ -51,7 +68,15 @@ public class PostLikeServiceTest {
         // given
         final Long memberId = 1L;
         final Long postId = 1L;
+        final Long categoryId = 1L;
+        final Post post = Post.builder()
+                .title("title")
+                .content("content")
+                .memberId(memberId)
+                .categoryId(categoryId)
+                .build();
         BDDMockito.given(postLikeRepository.existsByMemberIdAndPostId(any(), any())).willReturn(true);
+        BDDMockito.given(postRepository.findById(any())).willReturn(Optional.ofNullable(post));
 
         // when
         postLikeService.deletePostLike(memberId, postId);

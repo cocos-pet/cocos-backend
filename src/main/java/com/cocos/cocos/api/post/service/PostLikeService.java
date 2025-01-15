@@ -1,8 +1,10 @@
 package com.cocos.cocos.api.post.service;
 
 import com.cocos.cocos.common.exception.CocosException;
+import com.cocos.cocos.db.post.entity.Post;
 import com.cocos.cocos.db.post.entity.PostLike;
 import com.cocos.cocos.db.post.repository.PostLikeRepository;
+import com.cocos.cocos.db.post.repository.PostRepository;
 import com.cocos.cocos.enums.message.FailMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PostLikeService {
 
     private final PostLikeRepository postLikeRepository;
+    private final PostRepository postRepository;
 
     @Transactional
     public void addPostLike(final Long memberId, final Long postId) {
@@ -25,6 +28,10 @@ public class PostLikeService {
                         .postId(postId)
                         .build()
         );
+        final Post post = postRepository.findById(postId).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_POST)
+        );
+        post.addLike();
     }
 
     @Transactional
@@ -33,5 +40,9 @@ public class PostLikeService {
             throw new CocosException(FailMessage.NOT_FOUND_POSTLIKE);
         }
         postLikeRepository.deleteByMemberIdAndPostId(memberId, postId);
+        final Post post = postRepository.findById(postId).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_POST)
+        );
+        post.deleteLike();
     }
 }

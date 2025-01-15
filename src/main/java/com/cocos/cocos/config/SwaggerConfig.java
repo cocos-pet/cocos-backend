@@ -38,9 +38,9 @@ public class SwaggerConfig {
 
     private Info apiInfo() {
         return new Info()
-                .title("Offroad API Swagger")
+                .title("COCOS API Swagger")
                 .description(SWAGGER_DESCRIPTION)
-                .version("v1");
+                .version("dev");
     }
 
 
