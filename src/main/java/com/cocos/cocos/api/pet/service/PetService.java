@@ -44,14 +44,23 @@ public class PetService {
 
     @Transactional()
     public void addPet(final PetCreateRequest petCreateRequest, final Long memberId) {
-        if (!breedRepository.existsById(petCreateRequest.breedId())) {
-            throw new CocosException(FailMessage.NOT_FOUND_BREED);
+        if (petRepository.existsByMemberId(memberId)) {
+            throw new CocosException(FailMessage.CONFLICT_PET);
         }
+
+        final Breed breed = breedRepository.findById(petCreateRequest.breedId()).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_BREED)
+        );
+
+        final Animal animal = animalRepository.findById(breed.getAnimalId()).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_ANIMAL)
+        );
 
         final Pet pet = petRepository.save(
                 Pet.builder()
                         .name(petCreateRequest.name())
                         .gender(petCreateRequest.gender())
+                        .image(animal.getId().toString()+".png")
                         .age(petCreateRequest.age())
                         .memberId(memberId)
                         .breedId(petCreateRequest.breedId())

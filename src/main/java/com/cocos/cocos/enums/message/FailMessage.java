@@ -58,6 +58,7 @@ public enum FailMessage {
     CONFLICT(HttpStatus.CONFLICT, 40900, "데이터 충돌이 발생했습니다. "),
     INTEGRITY_CONFLICT(HttpStatus.CONFLICT, 40901, "데이터 무결성 위반입니다."),
     CONFLICT_POSTLIKE(HttpStatus.CONFLICT, 40902, "이미 존재하는 게시글 공감입니다."),
+    CONFLICT_PET(HttpStatus.CONFLICT, 40903, "이미 사용자의 애완동물이 존재합니다. "),
 
     /**
      * 422
