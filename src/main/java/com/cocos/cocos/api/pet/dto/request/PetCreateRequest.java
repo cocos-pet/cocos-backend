@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 @Schema(description = "애완동물 생성 형식")
-public record PetGenerationRequest(
+public record PetCreateRequest(
         @Schema(description = "동물 종 아이디", example = "1")
         Long breedId,
 
@@ -25,7 +25,7 @@ public record PetGenerationRequest(
         @Schema(description = "증상 아이디 리스트", example = "[1,2,3]")
         List<Long> symptomIds
 ) {
-    public static PetGenerationRequest of(final Long breedId, final String name, final Gender gender, final int age, final List<Long> diseaseIds, final List<Long> symptomIds) {
-        return new PetGenerationRequest(breedId, name, gender, age, diseaseIds, symptomIds);
+    public static PetCreateRequest of(final Long breedId, final String name, final Gender gender, final int age, final List<Long> diseaseIds, final List<Long> symptomIds) {
+        return new PetCreateRequest(breedId, name, gender, age, diseaseIds, symptomIds);
     }
 }

@@ -12,4 +12,6 @@ public interface PetDiseaseRepository extends JpaRepository<PetDisease, Long> {
     boolean existsByPetId(final Long petId);
 
     List<PetDisease> findAllByPetId(final Long petId);
+
+    void deleteAllByPetId(final Long petId);
 }

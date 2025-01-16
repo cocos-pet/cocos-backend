@@ -27,7 +27,7 @@ public enum FailMessage {
      */
     FORBIDDEN(HttpStatus.FORBIDDEN, 40300, "권한이 없습니다. "),
     FORBIDDEN_COMMENT_DELETE(HttpStatus.FORBIDDEN, 40301, "댓글을 삭제할 권한이 없습니다. "),
-
+    FORBIDDEN_PET_UPDATE(HttpStatus.FORBIDDEN, 40302, "애완동물 정보를 수정할 권리가 없습니다. "),
     /**
      * 404
      */
@@ -46,6 +46,7 @@ public enum FailMessage {
     NOT_FOUND_POSTTAG(HttpStatus.NOT_FOUND, 40412, "태그를 찾을 수 없습니다."),
     NOT_FOUND_COMMENT(HttpStatus.NOT_FOUND, 40413, "댓글을 찾을 수 없습니다."),
     NOT_FOUND_SUB_COMMENT(HttpStatus.NOT_FOUND, 40414, "대댓글을 찾을 수 없습니다."),
+    NOT_FOUND_PET(HttpStatus.NOT_FOUND, 40415, "애완동물을 찾을 없습니다. "),
     /**
      * 405
      */

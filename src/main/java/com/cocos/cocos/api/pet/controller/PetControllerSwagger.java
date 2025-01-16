@@ -1,6 +1,6 @@
 package com.cocos.cocos.api.pet.controller;
 
-import com.cocos.cocos.api.pet.dto.request.PetGenerationRequest;
+import com.cocos.cocos.api.pet.dto.request.PetCreateRequest;
 import com.cocos.cocos.common.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,6 +16,6 @@ public interface PetControllerSwagger {
             responseCode = "201",
             description = "애완동물 추가 성공")
     public ResponseEntity<BaseResponse<Void>> addPet(
-            @RequestBody final PetGenerationRequest petGenerationRequest
+            @RequestBody final PetCreateRequest petCreateRequest
     );
 }

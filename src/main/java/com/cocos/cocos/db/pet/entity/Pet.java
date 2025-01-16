@@ -42,4 +42,11 @@ public class Pet extends BaseTime {
         this.memberId = memberId;
         this.breedId = breedId;
     }
+
+    public void updateFields(final String name, final Gender gender, final Integer age, final Long breedId) {
+        if (name != null) this.name = name;
+        if (gender != null) this.gender = gender;
+        if (age != null) this.age = age;
+        if (breedId != null) this.breedId = breedId;
+    }
 }

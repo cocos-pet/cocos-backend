@@ -1,6 +1,7 @@
 package com.cocos.cocos.api.pet.controller;
 
-import com.cocos.cocos.api.pet.dto.request.PetGenerationRequest;
+import com.cocos.cocos.api.pet.dto.request.PetCreateRequest;
+import com.cocos.cocos.api.pet.dto.request.PetUpdateRequest;
 import com.cocos.cocos.api.pet.service.PetService;
 import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.common.response.SuccessResponse;
@@ -18,9 +19,18 @@ public class PetController implements PetControllerSwagger {
 
     @PostMapping
     public ResponseEntity<BaseResponse<Void>> addPet(
-            @RequestBody final PetGenerationRequest petGenerationRequest
+            @RequestBody final PetCreateRequest petCreateRequest
     ) {
-        petService.addPet(petGenerationRequest, memberId);
+        petService.addPet(petCreateRequest, memberId);
         return SuccessResponse.success(SuccessMessage.CREATED, null);
+    }
+
+    @PatchMapping("/{petId}")
+    public ResponseEntity<BaseResponse<Void>> updatePet(
+            @PathVariable(name = "petId") final Long petId,
+            @RequestBody final PetUpdateRequest petUpdateRequest
+    ) {
+        petService.updatePet(petUpdateRequest, petId,  memberId);
+        return SuccessResponse.success(SuccessMessage.OK, null);
     }
 }
