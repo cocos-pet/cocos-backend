@@ -1,5 +1,6 @@
 package com.cocos.cocos.api.pet.controller;
 
+import com.cocos.cocos.api.pet.dto.reponse.PetResponse;
 import com.cocos.cocos.api.pet.dto.request.PetCreateRequest;
 import com.cocos.cocos.api.pet.dto.request.PetUpdateRequest;
 import com.cocos.cocos.api.pet.service.PetService;
@@ -32,5 +33,12 @@ public class PetController implements PetControllerSwagger {
     ) {
         petService.updatePet(petUpdateRequest, petId,  memberId);
         return SuccessResponse.success(SuccessMessage.OK, null);
+    }
+
+    @GetMapping
+    public ResponseEntity<BaseResponse<PetResponse>> getPet(
+            @RequestParam(name = "nickname", required = false) final String nickname
+    ) {
+        return SuccessResponse.success(SuccessMessage.OK,  petService.getPet(nickname, memberId));
     }
 }

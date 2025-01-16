@@ -34,13 +34,17 @@ public class Pet extends BaseTime {
     @Column(name = "breed_id", nullable = false)
     private Long breedId;
 
+    @Column(name = "image",nullable = false)
+    private String image;
+
     @Builder
-    public Pet(final String name, final Gender gender, final int age, final Long memberId, final Long breedId) {
+    public Pet(final String name, final Gender gender, final int age, final Long memberId, final Long breedId, final String image) {
         this.name = name;
         this.gender = gender;
         this.age = age;
         this.memberId = memberId;
         this.breedId = breedId;
+        this.image = image;
     }
 
     public void updateFields(final String name, final Gender gender, final Integer age, final Long breedId) {

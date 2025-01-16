@@ -1,16 +1,28 @@
 package com.cocos.cocos.api.pet.service;
 
+import com.cocos.cocos.api.pet.dto.reponse.PetDiseaseResponse;
+import com.cocos.cocos.api.pet.dto.reponse.PetResponse;
+import com.cocos.cocos.api.pet.dto.reponse.PetSymptomResponse;
 import com.cocos.cocos.api.pet.dto.request.PetCreateRequest;
 import com.cocos.cocos.api.pet.dto.request.PetUpdateRequest;
 import com.cocos.cocos.common.exception.CocosException;
+import com.cocos.cocos.db.animal.entity.Animal;
+import com.cocos.cocos.db.animal.repository.AnimalRepository;
+import com.cocos.cocos.db.breed.entity.Breed;
 import com.cocos.cocos.db.breed.repository.BreedRepository;
+import com.cocos.cocos.db.disease.entity.Disease;
+import com.cocos.cocos.db.disease.repository.DiseaseRepository;
+import com.cocos.cocos.db.member.repository.MemberRepository;
 import com.cocos.cocos.db.pet.entity.Pet;
 import com.cocos.cocos.db.pet.entity.PetDisease;
 import com.cocos.cocos.db.pet.entity.PetSymptom;
 import com.cocos.cocos.db.pet.repository.PetDiseaseRepository;
 import com.cocos.cocos.db.pet.repository.PetRepository;
 import com.cocos.cocos.db.pet.repository.PetSymptomRepository;
+import com.cocos.cocos.db.symptom.entity.Symptom;
+import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.message.FailMessage;
+import com.cocos.cocos.external.AppDataS3Client;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +36,11 @@ public class PetService {
     private final PetSymptomRepository petSymptomRepository;
     private final PetDiseaseRepository petDiseaseRepository;
     private final BreedRepository breedRepository;
+    private final AnimalRepository animalRepository;
+    private final DiseaseRepository diseaseRepository;
+    private final SymptomRepository symptomRepository;
+    private final MemberRepository memberRepository;
+    private final AppDataS3Client appDataS3Client;
 
     @Transactional()
     public void addPet(final PetCreateRequest petCreateRequest, final Long memberId) {
@@ -89,7 +106,7 @@ public class PetService {
     }
 
     private void savePetDiseases(final List<Long> diseaseIds, Long petId) {
-        final List<PetDisease> petDiseases =diseaseIds.stream()
+        final List<PetDisease> petDiseases = diseaseIds.stream()
                 .map(diseaseId -> new PetDisease(petId, diseaseId))
                 .toList();
 
@@ -122,5 +139,54 @@ public class PetService {
                 savePetSymptoms(petUpdateRequest.symptomIds(), pet.getId());
             }
         }
+    }
+
+    public PetResponse getPet(final String nickname, final Long memberId) {
+        final Long selectedMemberId = (nickname != null)
+                ? memberRepository.findByNickname(nickname).getId()
+                : memberId;
+
+        final Pet pet = petRepository.findByMemberId(selectedMemberId);
+
+        if (pet == null) {
+            throw new CocosException(FailMessage.NOT_FOUND_PET);
+        }
+
+        final Breed breed = breedRepository.findById(pet.getBreedId())
+                .orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_BREED));
+
+        final Animal animal = animalRepository.findById(breed.getAnimalId())
+                .orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_ANIMAL));
+
+
+        final List<PetDisease> petDiseases = petDiseaseRepository.findAllByPetId(pet.getId());
+        final List<Disease> diseases = petDiseases.stream()
+                .map(petDisease -> {
+                    return diseaseRepository.findById(petDisease.getDiseaseId()).orElseThrow(
+                            () -> new CocosException(FailMessage.NOT_FOUND_DISEASE)
+                    );
+                }).toList();
+
+        final List<PetSymptom> petSymptoms = petSymptomRepository.findAllByPetId(pet.getId());
+        final List<Symptom> symptoms = petSymptoms.stream()
+                .map(petSymptom -> {
+                    return symptomRepository.findById(petSymptom.getSymptomId()).orElseThrow(
+                            () -> new CocosException(FailMessage.NOT_FOUND_SYMPTOM)
+                    );
+                }).toList();
+
+        return PetResponse.of(
+                pet.getId(),
+                appDataS3Client.getPresignedUrl(pet.getImage()),
+                pet.getName(),
+                pet.getAge(),
+                pet.getGender(),
+                breed.getId(),
+                breed.getName(),
+                animal.getId(),
+                animal.getName(),
+                diseases.stream().map(disease -> PetDiseaseResponse.of(disease.getId(), disease.getName())).toList(),
+                symptoms.stream().map(symptom -> PetSymptomResponse.of(symptom.getId(), symptom.getName())).toList()
+        );
     }
 }
