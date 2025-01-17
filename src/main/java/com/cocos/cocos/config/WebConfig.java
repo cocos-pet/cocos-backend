@@ -1,5 +1,6 @@
 package com.cocos.cocos.config;
 
+import com.cocos.cocos.util.PetProblemEnumConverter;
 import com.cocos.cocos.util.SortCriteriaEnumConverter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
@@ -11,5 +12,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addFormatters(FormatterRegistry registry) {
         registry.addConverter(new SortCriteriaEnumConverter());
+        registry.addConverter(new PetProblemEnumConverter());
     }
 }
