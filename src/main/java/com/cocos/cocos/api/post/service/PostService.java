@@ -27,20 +27,27 @@ import com.cocos.cocos.db.post.repository.*;
 import com.cocos.cocos.db.symptom.entity.Symptom;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.message.FailMessage;
+import com.cocos.cocos.enums.post.SortCriteria;
 import com.cocos.cocos.enums.tag.TagType;
 import com.cocos.cocos.external.AppDataS3Client;
 import com.cocos.cocos.external.MemberDataS3Client;
+import com.cocos.cocos.util.PostSpecification;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PostService {
 
     private final PostRepository postRepository;
@@ -239,5 +246,117 @@ public class PostService {
         return postRepository.findTop5ByLikeCountDesc();
     }
 
+    @Transactional(readOnly = true)
+    public PostListResponse getPosts(final String keyword, final List<Long> animalIds, final List<Long> symptomIds,
+                                     final List<Long> diseaseIds, final SortCriteria sortBy, final Long cursorId,
+                                     final Long categoryId, final Long likeCount, final LocalDateTime createAt) {
+        Specification<Post> spec = (root, query, criteriaBuilder) -> null;
+        if (keyword != null) {
+            spec = spec.and(PostSpecification.hasKeyword(keyword));
+        }
+        if (animalIds != null) {
+            final List<PostTag> postTags = postTagRepository.findAllByTagIdAndTagType(animalIds, TagType.ANIMAL);
+            final List<Long> postIds = postTags.stream()
+                    .map(PostTag::getPostId)
+                    .toList();
+            spec = spec.and(PostSpecification.inPostIds(postIds));
+        }
+        if (symptomIds != null) {
+            final List<PostTag> postTags = postTagRepository.findAllByTagIdAndTagType(symptomIds, TagType.SYMPTOM);
+            final List<Long> postIds = postTags.stream()
+                    .map(PostTag::getPostId)
+                    .toList();
+            spec = spec.and(PostSpecification.inPostIds(postIds));
+        }
+        if (diseaseIds != null) {
+            final List<PostTag> postTags = postTagRepository.findAllByTagIdAndTagType(diseaseIds, TagType.DISEASE);
+            final List<Long> postIds = postTags.stream()
+                    .map(PostTag::getPostId)
+                    .toList();
+            spec = spec.and(PostSpecification.inPostIds(postIds));
+        }
+        if (categoryId != null) {
+            spec = spec.and(PostSpecification.equalCategory(categoryId));
+        }
+
+        if (cursorId != null) {
+            if (sortBy.equals(SortCriteria.RECENT)) {
+                spec = spec.and(PostSpecification.lessThanByRecentCursorId(createAt, cursorId));
+                log.info("최신 순일 때 커서 이후");
+            } else if (sortBy.equals(SortCriteria.POPULAR)) {
+                spec = spec.and(PostSpecification.lessThanByPostLikeCursorId(likeCount, createAt, cursorId));
+                log.info("인기 순일 때 커서 이후");
+            }
+        }
+        // 정렬 및 페이징
+        Sort sort;
+        if (sortBy.equals(SortCriteria.POPULAR)) {
+            sort = Sort.by(
+                    Sort.Order.desc("likeCount"),
+                    Sort.Order.desc("createdAt"),
+                    Sort.Order.desc("id")
+            );
+            log.info("인기 순일 때 기준");
+        } else if (sortBy.equals(SortCriteria.RECENT)) {
+            sort = Sort.by(
+                    Sort.Order.desc("createdAt"),
+                    Sort.Order.desc("id")
+            );
+            log.info("최신 순일 때 기준");
+        } else {
+            throw new IllegalArgumentException("Invalid sort type");
+        }
+
+        Pageable pageable = PageRequest.of(0, 2, sort);
+        final List<Post> posts = postRepository.findAll(spec, pageable).getContent();
+
+        Long nextCursorId = null;
+        if (!posts.isEmpty()) {
+            Post lastPost = posts.get(posts.size() - 1); // 마지막 Post 가져오기
+            nextCursorId = lastPost.getId(); // 정렬 기준에 따라 커서 생성
+        }
+
+        return PostListResponse.of(nextCursorId,
+                posts.stream()
+                        .map(post -> {
+                            final Member member = memberRepository.findById(post.getMemberId()).orElseThrow(
+                                    () -> new CocosException(FailMessage.NOT_FOUND_MEMBER)
+                            );
+                            final Pet pet = petRepository.findByMemberId(member.getId());
+                            final Breed breed = breedRepository.findById(pet.getBreedId()).orElseThrow(
+                                    () -> new CocosException(FailMessage.NOT_FOUND_BREED)
+                            );
+                            final int commentCounts = commentRepository.countByPostId(post.getId());
+                            final int subCommentCounts = commentRepository.findAllByPostId(post.getId()).stream()
+                                    .mapToInt(comment -> subCommentRepository.countByCommentId(comment.getId()))
+                                    .sum();
+                            final List<PostImage> postImages = postImageRepository.findAllByPostId(post.getId());
+                            final String image = getImageUrl(postImages);
+                            return PostResponse.builder()
+                                    .id(post.getId())
+                                    .breed(breed.getName())
+                                    .petAge(pet.getAge())
+                                    .title(post.getTitle())
+                                    .content(post.getContent())
+                                    .likeCount(post.getLikeCount())
+                                    .commentCount(commentCounts + subCommentCounts)
+                                    .createdAt(post.getCreatedAt())
+                                    .updatedAt(post.getUpdatedAt())
+                                    .image(image)
+                                    .category(postCategoryRepository.findById(post.getCategoryId()).orElseThrow(
+                                            () -> new CocosException(FailMessage.NOT_FOUND_CATEGORY)
+                                    ).getName())
+                                    .build();
+                        })
+                        .toList()
+        );
+    }
+
+    private String getImageUrl(final List<PostImage> postImages) {
+        if (!postImages.isEmpty()) {
+            return memberDataS3Client.getPresignedUrl(postImages.getFirst().getImage());
+        }
+        return null;
+    }
 
 }
