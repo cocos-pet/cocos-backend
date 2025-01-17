@@ -21,7 +21,7 @@ public record SubCommentResponse(
         LocalDateTime createdAt,
         @Schema(description = "작성자 여부",example = "true")
         boolean isWriter,
-        @Schema(description = "댓글 사용자 닉네임", example = "언급 표시를 위한 사용자 닉네임입니다.")
+        @Schema(description = "언급 표시를 위한 사용자 닉네임", example = "빵빵이")
         String mentionedNickname
 ) {
     public static SubCommentResponse of(final Long id, final String nickname, final String profileImage, final String breed, final int petAge, final String content, LocalDateTime createdAt, final boolean isWriter, final String mentionedNickname) {
