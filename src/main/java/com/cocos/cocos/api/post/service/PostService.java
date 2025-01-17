@@ -362,4 +362,53 @@ public class PostService {
         return null;
     }
 
+    @Transactional(readOnly = true)
+    public MemberPostsResponse getMemberPosts(final Long memberId, final String nickname) {
+        final Member member = findMember(memberId, nickname);
+        log.info(member.getId().toString());
+        final List<Post> posts = postRepository.findAllByMemberId(member.getId());
+        final Pet pet = petRepository.findByMemberId(member.getId());
+        final Breed breed = breedRepository.findById(pet.getBreedId()).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_BREED)
+        );
+        return MemberPostsResponse.of(
+                posts.stream()
+                        .map(post -> {
+                            final int commentCounts = commentRepository.countByPostId(post.getId());
+                            final int subCommentCounts = commentRepository.findAllByPostId(post.getId()).stream()
+                                    .mapToInt(comment -> subCommentRepository.countByCommentId(comment.getId()))
+                                    .sum();
+
+                            final List<PostImage> postImages = postImageRepository.findAllByPostId(post.getId());
+                            final String image = getImageUrl(postImages);
+
+                            return MemberPostDetailResponse.builder()
+                                    .id(post.getId())
+                                    .nickname(member.getNickname())
+                                    .title(post.getTitle())
+                                    .content(post.getContent())
+                                    .likeCount(post.getLikeCount())
+                                    .commentCount(commentCounts + subCommentCounts)
+                                    .createdAt(post.getCreatedAt())
+                                    .updatedAt(post.getUpdatedAt())
+                                    .image(image)
+                                    .category(postCategoryRepository.findById(post.getCategoryId()).orElseThrow(
+                                            () -> new CocosException(FailMessage.NOT_FOUND_CATEGORY)
+                                    ).getName())
+                                    .breed(breed.getName())
+                                    .age(pet.getAge())
+                                    .build();
+                        }).toList()
+        );
+    }
+
+    private Member findMember(final Long memberId, final String nickname) {
+        if (nickname != null) {
+            return memberRepository.findByNickname(nickname);
+        }
+        return memberRepository.findById(memberId).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_MEMBER)
+        );
+    }
+
 }
