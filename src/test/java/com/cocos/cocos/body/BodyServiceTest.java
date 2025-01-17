@@ -5,6 +5,9 @@ import com.cocos.cocos.api.body.dto.response.BodyResponse;
 import com.cocos.cocos.api.body.service.BodyService;
 import com.cocos.cocos.db.body.entity.Body;
 import com.cocos.cocos.db.body.repository.BodyRepository;
+import com.cocos.cocos.db.disease.entity.Disease;
+import com.cocos.cocos.db.disease.repository.DiseaseRepository;
+import com.cocos.cocos.enums.pet.PetProblem;
 import com.cocos.cocos.external.AppDataS3Client;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -34,6 +37,9 @@ public class BodyServiceTest {
     private BodyRepository bodyRepository;
 
     @Mock
+    private DiseaseRepository diseaseRepository;
+
+    @Mock
     private AppDataS3Client appDataS3Client;
 
     @Test
@@ -48,17 +54,28 @@ public class BodyServiceTest {
                 .name("이름2")
                 .image("이미지2")
                 .build();
+        final Disease disease1 = Disease.builder()
+                .bodyId(1L)
+                .name("질병1")
+                .build();
+        final Disease disease2 = Disease.builder()
+                .bodyId(2L)
+                .name("질병2")
+                .build();
+        final List<Disease> diseases = new ArrayList<>(List.of(disease1, disease2));
         final List<Body> bodies = new ArrayList<Body>(List.of(body1, body2));
         final BodiesResponse expected = BodiesResponse.of(
                 bodies.stream()
                         .map(body -> BodyResponse.of(body.getId(), body.getName(), "image"))
                         .toList()
         );
-        BDDMockito.given(bodyRepository.findAll()).willReturn(bodies);
+
+        BDDMockito.given(diseaseRepository.findAll()).willReturn(diseases);
+        BDDMockito.given(bodyRepository.findAllById(any())).willReturn(bodies);
         BDDMockito.given(appDataS3Client.getPresignedUrl(any())).willReturn("image");
 
         //when
-        final BodiesResponse actual = bodyService.getBodies();
+        final BodiesResponse actual = bodyService.getBodies(PetProblem.DISEASE);
 
         //then
         Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);

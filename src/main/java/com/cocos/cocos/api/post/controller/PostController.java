@@ -1,10 +1,8 @@
 package com.cocos.cocos.api.post.controller;
 
+import com.cocos.cocos.api.post.dto.request.PostListRequest;
 import com.cocos.cocos.api.post.dto.request.PostRequest;
-import com.cocos.cocos.api.post.dto.response.PopularPostsResponse;
-import com.cocos.cocos.api.post.dto.response.PostCategoriesResponse;
-import com.cocos.cocos.api.post.dto.response.PostDetailResponse;
-import com.cocos.cocos.api.post.dto.response.PostImagesResponse;
+import com.cocos.cocos.api.post.dto.response.*;
 import com.cocos.cocos.api.post.service.PostService;
 import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.common.response.SuccessResponse;
@@ -55,5 +53,15 @@ public class PostController implements PostControllerSwagger {
     @GetMapping("/popular")
     public ResponseEntity<BaseResponse<PopularPostsResponse>> getPopularPosts() {
         return SuccessResponse.success(SuccessMessage.OK, postService.getPopularPosts(MEMBER_ID));
+    }
+
+    @PostMapping("/filters")
+    public ResponseEntity<BaseResponse<PostListResponse>> getPosts(
+            @RequestBody final PostListRequest postListRequest
+    ) {
+        return SuccessResponse.success(SuccessMessage.OK, postService.getPosts(MEMBER_ID, postListRequest.keyword(),
+                postListRequest.animalIds(), postListRequest.symptomIds(), postListRequest.diseaseIds(),
+                postListRequest.sortBy(), postListRequest.cursorId(), postListRequest.categoryId(),
+                postListRequest.likeCount(), postListRequest.createAt()));
     }
 }

@@ -18,11 +18,22 @@ public class SearchService {
 
     @Transactional(readOnly = true)
     public SearchResponse getSearch(final Long memberId) {
-        final List<Search> searchList = searchRepository.findTop5ByMemberIdOrderByCreatedAtDesc(memberId);
+        final List<Search> searchList = searchRepository.findTop5ByMemberIdOrderByUpdatedAtDesc(memberId);
         return SearchResponse.of(
                 searchList.stream()
                         .map(search -> KeywordResponse.of(search.getId(), search.getKeyword()))
                         .toList()
         );
+    }
+
+    @Transactional
+    public Void addSearch(final Long memberId, final String keyword) {
+        if (searchRepository.existsByMemberIdAndKeyword(memberId, keyword)) {
+            final Search search = searchRepository.findByMemberIdAndKeyword(memberId, keyword);
+            search.updateTime();
+        } else {
+            searchRepository.save(Search.builder().memberId(memberId).keyword(keyword).build());
+        }
+        return null;
     }
 }

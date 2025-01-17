@@ -7,9 +7,7 @@ import com.cocos.cocos.common.response.SuccessResponse;
 import com.cocos.cocos.enums.message.SuccessMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("${api.prefix}/search")
@@ -22,5 +20,12 @@ public class SearchController implements SearchControllerSwagger {
     @GetMapping
     public ResponseEntity<BaseResponse<SearchResponse>> getSearch() {
         return SuccessResponse.success(SuccessMessage.OK, searchService.getSearch(MEMBER_ID));
+    }
+
+    @PostMapping
+    public ResponseEntity<BaseResponse<Void>> addSearch(
+            @RequestParam final String keyword
+    ) {
+        return SuccessResponse.success(SuccessMessage.OK, searchService.addSearch(MEMBER_ID, keyword));
     }
 }

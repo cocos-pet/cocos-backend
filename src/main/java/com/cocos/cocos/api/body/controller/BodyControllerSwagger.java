@@ -2,7 +2,11 @@ package com.cocos.cocos.api.body.controller;
 
 import com.cocos.cocos.api.body.dto.response.BodiesResponse;
 import com.cocos.cocos.common.response.BaseResponse;
+import com.cocos.cocos.enums.pet.PetProblem;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -14,5 +18,6 @@ public interface BodyControllerSwagger {
     @ApiResponse(
             responseCode = "200",
             description = "신체 부위 조회 성공")
-    public ResponseEntity<BaseResponse<BodiesResponse>> getBodies();
+    @Parameter(name = "petProblem", description = "반려동물 문제", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "String"))
+    public ResponseEntity<BaseResponse<BodiesResponse>> getBodies(final PetProblem petProblem);
 }
