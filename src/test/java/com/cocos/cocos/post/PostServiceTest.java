@@ -111,7 +111,7 @@ public class PostServiceTest {
                 .build();
         final Pet pet = Pet.builder()
                 .name("반려동물 이름")
-                .gender(Gender.MALE)
+                .gender(Gender.M)
                 .age(1)
                 .breedId(breedId)
                 .memberId(memberId)
@@ -417,7 +417,7 @@ public class PostServiceTest {
         final Long memberId = 1L;
         final Long breedId = 1L;
         final String name = "이름";
-        final Gender gender = Gender.MALE;
+        final Gender gender = Gender.M;
         final int age = 15;
 
         final Pet pet = Pet.builder()
