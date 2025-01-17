@@ -46,7 +46,7 @@ public class SearchServiceTest {
                 .keyword("keyword1")
                 .build();
         final List<Search> searchList = new ArrayList<>(List.of(search1, search2));
-        BDDMockito.given(searchRepository.findTop5ByMemberIdOrderByCreatedAtDesc(any())).willReturn(searchList);
+        BDDMockito.given(searchRepository.findTop5ByMemberIdOrderByUpdatedAtDesc(any())).willReturn(searchList);
 
         final SearchResponse expected = SearchResponse.of(
                 searchList.stream()
