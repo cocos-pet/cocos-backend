@@ -18,4 +18,6 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
 
     @Query("SELECT p FROM Post p WHERE p.id IN :postIds ORDER BY p.likeCount DESC")
     List<Post> findTopPostsByPostIds(@Param("postIds") List<Long> postIds, Pageable pageable);
+
+    List<Post> findAllByMemberId(final Long memberId);
 }

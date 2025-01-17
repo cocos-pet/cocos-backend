@@ -1,10 +1,7 @@
 package com.cocos.cocos.api.post.controller;
 
 import com.cocos.cocos.api.post.dto.request.PostRequest;
-import com.cocos.cocos.api.post.dto.response.PopularPostsResponse;
-import com.cocos.cocos.api.post.dto.response.PostCategoriesResponse;
-import com.cocos.cocos.api.post.dto.response.PostDetailResponse;
-import com.cocos.cocos.api.post.dto.response.PostImagesResponse;
+import com.cocos.cocos.api.post.dto.response.*;
 import com.cocos.cocos.common.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,6 +21,7 @@ public interface PostControllerSwagger {
     @Parameter(name = "postId", description = "게시글 아이디", in = ParameterIn.PATH, required = true, schema = @Schema(type = "Long"))
     public ResponseEntity<BaseResponse<PostDetailResponse>> getPostDetail(final Long postId);
 
+    @Operation(summary = "게시글 삭제 API", description = "게시글을 삭제하는 API입니다.")
     @ApiResponse(
             responseCode = "200",
             description = "게시글 삭제 성공")
@@ -47,4 +45,11 @@ public interface PostControllerSwagger {
             responseCode = "200",
             description = "인기 게시글 조회 성공")
     public ResponseEntity<BaseResponse<PopularPostsResponse>> getPopularPosts();
+
+    @Operation(summary = "사용자 게시글 조회 API", description = "사용자 게시글을 조회하는 API입니다.")
+    @ApiResponse(
+            responseCode = "200",
+            description = "사용자 게시글 조회 성공")
+    @Parameter(name = "nickname", description = "모모", in = ParameterIn.QUERY, required = false, schema = @Schema(type = "String"))
+    public ResponseEntity<BaseResponse<MemberPostsResponse>> getMemberPosts(final String nickname);
 }

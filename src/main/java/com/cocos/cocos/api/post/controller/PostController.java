@@ -64,4 +64,11 @@ public class PostController implements PostControllerSwagger {
                 postListRequest.sortBy(), postListRequest.cursorId(), postListRequest.categoryId(),
                 postListRequest.likeCount(), postListRequest.createAt()));
     }
+
+    @GetMapping("/my")
+    public ResponseEntity<BaseResponse<MemberPostsResponse>> getMemberPosts(
+            @RequestParam(name = "nickname", required = false) final String nickname
+    ) {
+        return SuccessResponse.success(SuccessMessage.OK, postService.getMemberPosts(MEMBER_ID, nickname));
+    }
 }
