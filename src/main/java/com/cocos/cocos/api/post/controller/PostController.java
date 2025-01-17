@@ -65,7 +65,7 @@ public class PostController implements PostControllerSwagger {
                 postListRequest.likeCount(), postListRequest.createAt()));
     }
 
-    @GetMapping("/members")
+    @GetMapping("/my")
     public ResponseEntity<BaseResponse<MemberPostsResponse>> getMemberPosts(
             @RequestParam(name = "nickname", required = false) final String nickname
     ) {
