@@ -15,4 +15,6 @@ public interface SubCommentRepository extends JpaRepository<SubComment, Long> {
     void deleteAllByCommentId(final Long commentId);
 
     List<SubComment> findByCommentIdInOrderByCreatedAtAsc(@Param("commentId") List<Long> commentId);
+
+    List<SubComment> findByMemberIdOrderByCreatedAtAsc(final Long memberId);
 }

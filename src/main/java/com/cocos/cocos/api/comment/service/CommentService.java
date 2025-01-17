@@ -1,8 +1,6 @@
 package com.cocos.cocos.api.comment.service;
 
-import com.cocos.cocos.api.comment.dto.response.CommentAndSubCommentsResponse;
-import com.cocos.cocos.api.comment.dto.response.CommentsAndSubCommentsResponse;
-import com.cocos.cocos.api.comment.dto.response.SubCommentResponse;
+import com.cocos.cocos.api.comment.dto.response.*;
 import com.cocos.cocos.common.exception.CocosException;
 import com.cocos.cocos.db.breed.entity.Breed;
 import com.cocos.cocos.db.breed.repository.BreedRepository;
@@ -14,6 +12,7 @@ import com.cocos.cocos.db.member.entity.Member;
 import com.cocos.cocos.db.member.repository.MemberRepository;
 import com.cocos.cocos.db.pet.entity.Pet;
 import com.cocos.cocos.db.pet.repository.PetRepository;
+import com.cocos.cocos.db.post.entity.Post;
 import com.cocos.cocos.db.post.repository.PostRepository;
 import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.external.MemberDataS3Client;
@@ -148,6 +147,54 @@ public class CommentService {
                 }).toList();
 
         return CommentsAndSubCommentsResponse.of(commentDtos);
+    }
+
+    public MyAllCommentsResponse getMyComments(final Long memberId) {
+
+        final List<Comment> comments = commentRepository.findByMemberIdOrderByCreatedAtAsc(memberId);
+        final List<Long> commentIds = comments.stream()
+                .map(Comment::getId)
+                .toList();
+        final List<SubComment> subComments = subCommentRepository.findByCommentIdInOrderByCreatedAtAsc(commentIds);
+        final List<MyCommentResponse> myComments = comments.stream()
+                .map(comment -> {
+                    final String postTitle = postRepository.findById(comment.getPostId()).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_POST)).getTitle();
+                    return MyCommentResponse.of(
+                            comment.getId(),
+                            comment.getContent(),
+                            comment.getPostId(),
+                            postTitle,
+                            comment.getCreatedAt()
+                    );
+                }).toList();
+
+        final List<MySubCommentResponse> mySubComments = subComments.stream()
+                .map(subComment -> {
+                    final Comment comment = commentRepository.findById(subComment.getCommentId()).orElseThrow(
+                            () -> new CocosException(FailMessage.NOT_FOUND_COMMENT)
+                    );
+                    final Post post = postRepository.findById(comment.getId()).orElseThrow(
+                            () -> new CocosException(FailMessage.NOT_FOUND_POST)
+                    );
+
+                    final Member mentionedMember = memberRepository.findById(subComment.getMentionedMemberId()).orElseThrow(
+                            () -> new CocosException(FailMessage.NOT_FOUND_MEMBER)
+                    );
+                    return MySubCommentResponse.of(
+                            subComment.getId(),
+                            subComment.getContent(),
+                            post.getId(),
+                            post.getTitle(),
+                            subComment.getCreatedAt(),
+                            mentionedMember.getNickname()
+                    );
+                })
+                .collect(Collectors.toList());
+
+        return MyAllCommentsResponse.of(
+                myComments,
+                mySubComments
+        );
     }
 
     private Comment validateCommentExists(Long commentId) {
