@@ -59,7 +59,7 @@ public class PostController implements PostControllerSwagger {
     public ResponseEntity<BaseResponse<PostListResponse>> getPosts(
             @RequestBody final PostListRequest postListRequest
     ) {
-        return SuccessResponse.success(SuccessMessage.OK, postService.getPosts(postListRequest.keyword(),
+        return SuccessResponse.success(SuccessMessage.OK, postService.getPosts(MEMBER_ID, postListRequest.keyword(),
                 postListRequest.animalIds(), postListRequest.symptomIds(), postListRequest.diseaseIds(),
                 postListRequest.sortBy(), postListRequest.cursorId(), postListRequest.categoryId(),
                 postListRequest.likeCount(), postListRequest.createAt()));

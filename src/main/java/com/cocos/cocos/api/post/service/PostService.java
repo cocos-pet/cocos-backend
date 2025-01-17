@@ -24,6 +24,8 @@ import com.cocos.cocos.db.post.entity.PostCategory;
 import com.cocos.cocos.db.post.entity.PostImage;
 import com.cocos.cocos.db.post.entity.PostTag;
 import com.cocos.cocos.db.post.repository.*;
+import com.cocos.cocos.db.search.entity.Search;
+import com.cocos.cocos.db.search.repository.SearchRepository;
 import com.cocos.cocos.db.symptom.entity.Symptom;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.message.FailMessage;
@@ -65,6 +67,7 @@ public class PostService {
     private final SymptomRepository symptomRepository;
     private final PetDiseaseRepository petDiseaseRepository;
     private final PetSymptomRepository petSymptomRepository;
+    private final SearchRepository searchRepository;
     private final AppDataS3Client appDataS3Client;
     private final MemberDataS3Client memberDataS3Client;
 
@@ -247,12 +250,16 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PostListResponse getPosts(final String keyword, final List<Long> animalIds, final List<Long> symptomIds,
+    public PostListResponse getPosts(final Long memberId, final String keyword, final List<Long> animalIds, final List<Long> symptomIds,
                                      final List<Long> diseaseIds, final SortCriteria sortBy, final Long cursorId,
                                      final Long categoryId, final Long likeCount, final LocalDateTime createAt) {
         Specification<Post> spec = (root, query, criteriaBuilder) -> null;
         if (keyword != null) {
             spec = spec.and(PostSpecification.hasKeyword(keyword));
+            searchRepository.save(Search.builder()
+                    .keyword(keyword)
+                    .memberId(memberId)
+                    .build());
         }
         if (animalIds != null) {
             final List<PostTag> postTags = postTagRepository.findAllByTagIdAndTagType(animalIds, TagType.ANIMAL);
