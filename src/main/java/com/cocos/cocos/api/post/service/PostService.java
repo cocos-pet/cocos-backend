@@ -334,7 +334,7 @@ public class PostService {
                                     .mapToInt(comment -> subCommentRepository.countByCommentId(comment.getId()))
                                     .sum();
                             final List<PostImage> postImages = postImageRepository.findAllByPostId(post.getId());
-                            final String image = getImageUrl(postImages);
+                            final String image = getFirstImage(postImages);
                             return PostResponse.builder()
                                     .id(post.getId())
                                     .breed(breed.getName())
@@ -355,7 +355,7 @@ public class PostService {
         );
     }
 
-    private String getImageUrl(final List<PostImage> postImages) {
+    private String getFirstImage(final List<PostImage> postImages) {
         if (!postImages.isEmpty()) {
             return memberDataS3Client.getPresignedUrl(postImages.getFirst().getImage());
         }
@@ -380,7 +380,7 @@ public class PostService {
                                     .sum();
 
                             final List<PostImage> postImages = postImageRepository.findAllByPostId(post.getId());
-                            final String image = getImageUrl(postImages);
+                            final String image = getFirstImage(postImages);
 
                             return MemberPostDetailResponse.builder()
                                     .id(post.getId())
