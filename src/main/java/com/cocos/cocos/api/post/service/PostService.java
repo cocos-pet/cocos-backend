@@ -24,7 +24,6 @@ import com.cocos.cocos.db.post.entity.PostCategory;
 import com.cocos.cocos.db.post.entity.PostImage;
 import com.cocos.cocos.db.post.entity.PostTag;
 import com.cocos.cocos.db.post.repository.*;
-import com.cocos.cocos.db.search.entity.Search;
 import com.cocos.cocos.db.search.repository.SearchRepository;
 import com.cocos.cocos.db.symptom.entity.Symptom;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
@@ -256,10 +255,6 @@ public class PostService {
         Specification<Post> spec = (root, query, criteriaBuilder) -> null;
         if (keyword != null) {
             spec = spec.and(PostSpecification.hasKeyword(keyword));
-            searchRepository.save(Search.builder()
-                    .keyword(keyword)
-                    .memberId(memberId)
-                    .build());
         }
         if (animalIds != null) {
             final List<PostTag> postTags = postTagRepository.findAllByTagIdAndTagType(animalIds, TagType.ANIMAL);
@@ -314,14 +309,15 @@ public class PostService {
             throw new IllegalArgumentException("Invalid sort type");
         }
 
-        Pageable pageable = PageRequest.of(0, 2, sort);
-        final List<Post> posts = postRepository.findAll(spec, pageable).getContent();
+        //Pageable pageable = PageRequest.of(0, 2, sort); //무한 스크롤 용
+        final List<Post> posts = postRepository.findAll(spec, sort);
 
+        //무한 스크롤 용
         Long nextCursorId = null;
-        if (!posts.isEmpty()) {
+        /*if (!posts.isEmpty()) {
             Post lastPost = posts.get(posts.size() - 1); // 마지막 Post 가져오기
             nextCursorId = lastPost.getId(); // 정렬 기준에 따라 커서 생성
-        }
+        }*/
 
         return PostListResponse.of(nextCursorId,
                 posts.stream()
