@@ -1,16 +1,20 @@
 package com.cocos.cocos.config;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
-
+@OpenAPIDefinition(
+        servers = {
+                @Server(url = "https://www.cocos.r-e.kr", description = "개발 서버"),
+                @Server(url = "http://localhost:8080", description = "로컬 서버")
+        })
 @Configuration
 public class SwaggerConfig {
 
@@ -32,18 +36,11 @@ public class SwaggerConfig {
         SecurityRequirement securityRequirement = new SecurityRequirement()
                 .addList("Bearer Token");
 
-        Server server = new Server();
-        server.setUrl("https://www.cocos.r-e.kr");
-
-        Server server1 = new Server();
-        server.setUrl("http://localhost:8080");
-
         return new OpenAPI()
                 .components(new Components()
                         .addSecuritySchemes("Bearer Token", apiKey))
                 .addSecurityItem(securityRequirement)
-                .info(apiInfo())
-                .servers(List.of(server, server1));
+                .info(apiInfo());
     }
 
     private Info apiInfo() {
