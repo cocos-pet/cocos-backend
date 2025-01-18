@@ -13,10 +13,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.RequestCacheConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.Arrays;
 
 @Configuration
 @RequiredArgsConstructor
@@ -47,13 +43,13 @@ public class SecurityConfig {
                     exception.accessDeniedHandler(customAccessDeniedHandler);
                 });
 
-        http.cors(AbstractHttpConfigurer::disable);
-
         http.authorizeHttpRequests(auth -> {
                     auth.requestMatchers(AUTH_WHITE_LIST).permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        http.cors(cors -> cors.configurationSource(CorsConfig.corsConfigurationSource()));
 
         return http.build();
     }
@@ -77,17 +73,5 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
-    }
-
-    @Profile("dev")
-    @Bean
-    UrlBasedCorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173/", "https://www.cocos.r-e.kr/", "https://cocos-pet.kr/"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowCredentials(true);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", configuration);
-        return source;
     }
 }
