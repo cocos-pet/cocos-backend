@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "Member Controller", description = "사용자 관련 API")
 public interface MemberControllerSwagger {
@@ -14,5 +15,7 @@ public interface MemberControllerSwagger {
     @ApiResponse(
             responseCode = "200",
             description = "사용자 조회에 성공했습니다.")
-    public ResponseEntity<BaseResponse<MemberProfileResponse>> getMemberProfile(final Long memberId);
+    public ResponseEntity<BaseResponse<MemberProfileResponse>> getMemberProfile(
+            @RequestParam(name = "nickname", required = false) final String nickname
+    );
 }

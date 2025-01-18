@@ -18,10 +18,23 @@ public class MemberService {
     private final MemberDataS3Client memberDataS3Client;
 
     @Transactional(readOnly = true)
-    public MemberProfileResponse getMemberProfile(final Long memberId) {
-        final Member member = memberRepository.findById(memberId).orElseThrow(
+    public MemberProfileResponse getMemberProfile(final String nickname, final Long memberId) {
+        final Long selectedMemberId = (nickname != null ) ? findMemberByNickname(nickname): memberId;
+        final Member member = memberRepository.findById(selectedMemberId).orElseThrow(
                 () -> new CocosException(FailMessage.NOT_FOUND_MEMBER)
         );
         return MemberProfileResponse.of(member.getNickname(), memberDataS3Client.getPresignedUrl(member.getImage()));
+    }
+
+    private Long findMemberByNickname(String nickname) {
+        if (nickname != null) {
+            final Member member = memberRepository.findByNickname(nickname);
+            if (member == null) {
+                throw new CocosException((FailMessage.NOT_FOUND_MEMBER));
+            }
+            return member.getId();
+        } else {
+            return null;
+        }
     }
 }
