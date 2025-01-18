@@ -1,6 +1,7 @@
 package com.cocos.cocos.db.member.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,4 +24,15 @@ public class MemberToken {
 
     @Column(name = "member_id", nullable = false)
     private Long memberId;
+
+    @Builder
+    public MemberToken(String refreshToken, String kakaoRefreshToken, Long memberId) {
+        this.refreshToken = refreshToken;
+        KakaoRefreshToken = kakaoRefreshToken;
+        this.memberId = memberId;
+    }
+
+    public void updateRefreshToken(final String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
 }
