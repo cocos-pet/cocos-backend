@@ -1,6 +1,7 @@
 package com.cocos.cocos.api.member.controller;
 
 import com.cocos.cocos.api.member.dto.response.MemberProfileResponse;
+import com.cocos.cocos.api.member.dto.response.NicknameExistenceResponse;
 import com.cocos.cocos.common.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -18,4 +19,10 @@ public interface MemberControllerSwagger {
     public ResponseEntity<BaseResponse<MemberProfileResponse>> getMemberProfile(
             @RequestParam(name = "nickname", required = false) final String nickname
     );
+
+    @Operation(summary = "사용자 정보 업데이트 API", description = "사용자를 정보 업데이트 API 입니다.")
+    @ApiResponse(
+            responseCode = "200",
+            description = "요청에 성공했습니다. ")
+    public ResponseEntity<BaseResponse<NicknameExistenceResponse>> updateMemberProfile(@RequestParam final String nickname);
 }
