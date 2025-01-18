@@ -49,7 +49,7 @@ public enum FailMessage {
     NOT_FOUND_POSTTAG(HttpStatus.NOT_FOUND, 40412, "태그를 찾을 수 없습니다."),
     NOT_FOUND_COMMENT(HttpStatus.NOT_FOUND, 40413, "댓글을 찾을 수 없습니다."),
     NOT_FOUND_SUB_COMMENT(HttpStatus.NOT_FOUND, 40414, "대댓글을 찾을 수 없습니다."),
-    NOT_FOUND_PET(HttpStatus.NOT_FOUND, 40415, "애완동물을 찾을 없습니다. "),
+    NOT_FOUND_PET(HttpStatus.NOT_FOUND, 40415, "애완동물을 찾을 수 없습니다. "),
     /**
      * 405
      */
