@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "Comment Controller", description = "댓글 관련 API")
 public interface CommentControllerSwagger {
@@ -64,5 +65,7 @@ public interface CommentControllerSwagger {
     @ApiResponse(
             responseCode = "200",
             description = "요청에 성공했습니다.")
-    public ResponseEntity<BaseResponse<MyAllCommentsResponse>> getMyComments ();
+    public ResponseEntity<BaseResponse<MyAllCommentsResponse>> getMyComments (
+            @RequestParam final String nickname
+    );
 }

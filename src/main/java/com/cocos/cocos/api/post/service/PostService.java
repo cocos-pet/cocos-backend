@@ -365,7 +365,6 @@ public class PostService {
     @Transactional(readOnly = true)
     public MemberPostsResponse getMemberPosts(final Long memberId, final String nickname) {
         final Member member = findMember(memberId, nickname);
-        log.info(member.getId().toString());
         final List<Post> posts = postRepository.findAllByMemberId(member.getId());
         final Pet pet = petRepository.findByMemberId(member.getId());
         final Breed breed = breedRepository.findById(pet.getBreedId()).orElseThrow(
@@ -404,7 +403,12 @@ public class PostService {
 
     private Member findMember(final Long memberId, final String nickname) {
         if (nickname != null) {
-            return memberRepository.findByNickname(nickname);
+            final Member member =  memberRepository.findByNickname(nickname);
+            if (member == null) {
+                throw new CocosException(FailMessage.NOT_FOUND_MEMBER);
+            } else {
+                return member;
+            }
         }
         return memberRepository.findById(memberId).orElseThrow(
                 () -> new CocosException(FailMessage.NOT_FOUND_MEMBER)

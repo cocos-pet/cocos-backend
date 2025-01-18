@@ -5,6 +5,7 @@ import com.cocos.cocos.api.member.dto.response.MemberProfileResponse;
 import com.cocos.cocos.api.member.dto.response.ReissueTokenResponse;
 import com.cocos.cocos.api.member.dto.response.TokenResponse;
 import com.cocos.cocos.auth.JwtProvider;
+import com.cocos.cocos.api.member.dto.response.NicknameExistenceResponse;
 import com.cocos.cocos.common.exception.CocosException;
 import com.cocos.cocos.db.member.entity.Member;
 import com.cocos.cocos.db.member.entity.MemberToken;
@@ -29,8 +30,9 @@ public class MemberService {
     private final MemberTokenRepository memberTokenRepository;
 
     @Transactional(readOnly = true)
-    public MemberProfileResponse getMemberProfile(final Long memberId) {
-        final Member member = memberRepository.findById(memberId).orElseThrow(
+    public MemberProfileResponse getMemberProfile(final String nickname, final Long memberId) {
+        final Long selectedMemberId = (nickname != null ) ? findMemberByNickname(nickname): memberId;
+        final Member member = memberRepository.findById(selectedMemberId).orElseThrow(
                 () -> new CocosException(FailMessage.NOT_FOUND_MEMBER)
         );
         return MemberProfileResponse.of(member.getNickname(), memberDataS3Client.getPresignedUrl(member.getImage()));
@@ -92,5 +94,28 @@ public class MemberService {
         return null;
     }
 
+    private Long findMemberByNickname(String nickname) {
+        if (nickname != null) {
+            final Member member = memberRepository.findByNickname(nickname);
+            if (member == null) {
+                throw new CocosException((FailMessage.NOT_FOUND_MEMBER));
+            }
+            return member.getId();
+        } else {
+            return null;
+
+    @Transactional
+    public NicknameExistenceResponse updateMemberProfile(final String nickname, final Long memberId) {
+        if (memberRepository.existsByNickname(nickname)) {
+            return NicknameExistenceResponse.of(true);
+        } else {
+            final Member member = memberRepository.findById(memberId).orElseThrow(
+                    ()-> new CocosException(FailMessage.NOT_FOUND_MEMBER)
+            );
+            member.updateFields(nickname);
+            return NicknameExistenceResponse.of(false);
+
+        }
+    }
 }
 
