@@ -31,7 +31,7 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public MemberProfileResponse getMemberProfile(final String nickname, final Long memberId) {
-        final Long selectedMemberId = (nickname != null ) ? findMemberByNickname(nickname): memberId;
+        final Long selectedMemberId = (nickname != null) ? findMemberByNickname(nickname) : memberId;
         final Member member = memberRepository.findById(selectedMemberId).orElseThrow(
                 () -> new CocosException(FailMessage.NOT_FOUND_MEMBER)
         );
@@ -103,6 +103,8 @@ public class MemberService {
             return member.getId();
         } else {
             return null;
+        }
+    };
 
     @Transactional
     public NicknameExistenceResponse updateMemberProfile(final String nickname, final Long memberId) {
@@ -110,7 +112,7 @@ public class MemberService {
             return NicknameExistenceResponse.of(true);
         } else {
             final Member member = memberRepository.findById(memberId).orElseThrow(
-                    ()-> new CocosException(FailMessage.NOT_FOUND_MEMBER)
+                    () -> new CocosException(FailMessage.NOT_FOUND_MEMBER)
             );
             member.updateFields(nickname);
             return NicknameExistenceResponse.of(false);
