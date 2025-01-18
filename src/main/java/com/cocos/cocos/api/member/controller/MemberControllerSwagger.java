@@ -46,4 +46,10 @@ public interface MemberControllerSwagger {
             responseCode = "200",
             description = "요청에 성공했습니다. ")
     public ResponseEntity<BaseResponse<NicknameExistenceResponse>> updateMemberProfile(@RequestParam final String nickname);
+
+    @Operation(summary = "닉네임 중복 조회 API", description = "중복된 닉네임이 있는지 검사합니다. ")
+    @ApiResponse(
+            responseCode = "200",
+            description = "요청에 성공했습니다. ")
+    public ResponseEntity<BaseResponse<NicknameExistenceResponse>> checkNickname(@RequestParam final String nickname);
 }

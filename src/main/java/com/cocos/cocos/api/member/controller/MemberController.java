@@ -40,6 +40,14 @@ public class MemberController implements MemberControllerSwagger {
         return SuccessResponse.success(SuccessMessage.OK, nicknameExistenceResponse);
     }
 
+    @GetMapping("/check")
+    public ResponseEntity<BaseResponse<NicknameExistenceResponse>> checkNickname(
+            @RequestParam(name = "nickname") final String nickname
+    ) {
+        final NicknameExistenceResponse nicknameExistenceResponse = memberService.checkNickname(nickname);
+        return SuccessResponse.success(SuccessMessage.OK, nicknameExistenceResponse);
+    }
+
     @PostMapping("/login")
     public ResponseEntity<BaseResponse<LoginResponse>> login(
             @RequestBody final LoginRequest loginRequest
