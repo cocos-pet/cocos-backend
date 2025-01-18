@@ -122,7 +122,7 @@ public class PostService {
 
         return PostDetailResponse.builder()
                 .nickname(member.getNickname())
-                .profileImage(appDataS3Client.getPresignedUrl(member.getImage()))
+                .profileImage(memberDataS3Client.getPresignedUrl(member.getImage()))
                 .breed(breed.getName())
                 .petAge(pet.getAge())
                 .likeCounts(likeCounts)
