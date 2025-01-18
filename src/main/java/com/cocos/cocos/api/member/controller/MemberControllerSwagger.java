@@ -15,8 +15,10 @@ public interface MemberControllerSwagger {
     @Operation(summary = "사용자 조회 API", description = "사용자를 조회하는 API 입니다.")
     @ApiResponse(
             responseCode = "200",
-            description = "요청에 성공했습니다. ")
-    public ResponseEntity<BaseResponse<MemberProfileResponse>> getMemberProfile(final Long memberId);
+            description = "사용자 조회에 성공했습니다.")
+    public ResponseEntity<BaseResponse<MemberProfileResponse>> getMemberProfile(
+            @RequestParam(name = "nickname", required = false) final String nickname
+    );
 
     @Operation(summary = "사용자 정보 업데이트 API", description = "사용자를 정보 업데이트 API 입니다.")
     @ApiResponse(

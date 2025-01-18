@@ -149,9 +149,9 @@ public class CommentService {
         return CommentsAndSubCommentsResponse.of(commentDtos);
     }
 
-    public MyAllCommentsResponse getMyComments(final Long memberId) {
-
-        final List<Comment> comments = commentRepository.findByMemberIdOrderByCreatedAtAsc(memberId);
+    public MyAllCommentsResponse getMyComments(final String nickname, final Long memberId) {
+        final Long selectedMemberId = (nickname != null ) ? findMemberByNickname(nickname): memberId;
+        final List<Comment> comments = commentRepository.findByMemberIdOrderByCreatedAtAsc(selectedMemberId);
         final List<Long> commentIds = comments.stream()
                 .map(Comment::getId)
                 .toList();
@@ -234,5 +234,17 @@ public class CommentService {
                 .findFirst()
                 .map(Pet::getAge)
                 .orElseThrow(() -> new CocosException(FailMessage.INTERNAL_SERVER_ERROR_PET_AGE));
+    }
+
+    private Long findMemberByNickname(String nickname) {
+        if (nickname != null) {
+            final Member member = memberRepository.findByNickname(nickname);
+            if (member == null) {
+                throw new CocosException((FailMessage.NOT_FOUND_MEMBER));
+            }
+            return member.getId();
+        } else {
+            return null;
+        }
     }
 }

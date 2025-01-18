@@ -8,18 +8,23 @@ import com.cocos.cocos.common.response.SuccessResponse;
 import com.cocos.cocos.enums.message.SuccessMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("${api.prefix}/members")
 @RequiredArgsConstructor
-public class MemberController {
+public class MemberController implements MemberControllerSwagger {
     private static final Long memberId = 1L;
     private final MemberService memberService;
 
     @GetMapping
-    public ResponseEntity<BaseResponse<MemberProfileResponse>> getMemberProfile() {
-        return SuccessResponse.success(SuccessMessage.OK, memberService.getMemberProfile(memberId));
+    public ResponseEntity<BaseResponse<MemberProfileResponse>> getMemberProfile(
+            @RequestParam(name = "nickname", required = false) final String nickname
+    ) {
+        return SuccessResponse.success(SuccessMessage.OK, memberService.getMemberProfile(nickname, memberId));
     }
 
     @PatchMapping
