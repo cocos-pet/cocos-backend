@@ -47,6 +47,8 @@ public class SecurityConfig {
                     exception.accessDeniedHandler(customAccessDeniedHandler);
                 });
 
+        http.cors(AbstractHttpConfigurer::disable);
+
         http.authorizeHttpRequests(auth -> {
                     auth.requestMatchers(AUTH_WHITE_LIST).permitAll();
                     auth.anyRequest().authenticated();
