@@ -9,6 +9,8 @@ import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
+
 @Configuration
 public class SwaggerConfig {
 
@@ -33,11 +35,15 @@ public class SwaggerConfig {
         Server server = new Server();
         server.setUrl("https://www.cocos.r-e.kr");
 
+        Server server1 = new Server();
+        server.setUrl("http://localhost:8080");
+
         return new OpenAPI()
                 .components(new Components()
                         .addSecuritySchemes("Bearer Token", apiKey))
                 .addSecurityItem(securityRequirement)
-                .info(apiInfo());
+                .info(apiInfo())
+                .servers(List.of(server, server1));
     }
 
     private Info apiInfo() {
