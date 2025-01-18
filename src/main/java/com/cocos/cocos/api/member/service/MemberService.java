@@ -1,6 +1,7 @@
 package com.cocos.cocos.api.member.service;
 
 import com.cocos.cocos.api.member.dto.response.MemberProfileResponse;
+import com.cocos.cocos.api.member.dto.response.NicknameExistenceResponse;
 import com.cocos.cocos.common.exception.CocosException;
 import com.cocos.cocos.db.member.entity.Member;
 import com.cocos.cocos.db.member.repository.MemberRepository;
@@ -23,5 +24,18 @@ public class MemberService {
                 () -> new CocosException(FailMessage.NOT_FOUND_MEMBER)
         );
         return MemberProfileResponse.of(member.getNickname(), memberDataS3Client.getPresignedUrl(member.getImage()));
+    }
+
+    @Transactional
+    public NicknameExistenceResponse updateMemberProfile(final String nickname, final Long memberId) {
+        if (memberRepository.existsByNickname(nickname)) {
+            return NicknameExistenceResponse.of(true);
+        } else {
+            final Member member = memberRepository.findById(memberId).orElseThrow(
+                    ()-> new CocosException(FailMessage.NOT_FOUND_MEMBER)
+            );
+            member.updateFields(nickname);
+            return NicknameExistenceResponse.of(false);
+        }
     }
 }
