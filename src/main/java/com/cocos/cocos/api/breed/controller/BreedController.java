@@ -18,7 +18,7 @@ public class BreedController implements BreedControllerSwagger {
 
     @GetMapping("/{animalId}")
     public ResponseEntity<BaseResponse<BreedsResponse>> getBreeds(
-            @RequestParam(name = "breedName") final String breedName,
+            @RequestParam(name = "breedName", required = false) final String breedName,
             @PathVariable(name = "animalId") final Long animalId
     ) {
         return SuccessResponse.success(SuccessMessage.OK, breedService.getBreeds(breedName, animalId));
