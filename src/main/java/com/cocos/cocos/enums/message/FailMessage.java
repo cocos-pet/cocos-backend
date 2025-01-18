@@ -21,6 +21,9 @@ public enum FailMessage {
      * 401
      */
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, 40100, "인증이 필요합니다. "),
+    UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, 40101, "인증되지 않은 사용자 입니다."),
+    UNAUTHORIZED_EXPIRATION_JWT_EXCEPTION(HttpStatus.UNAUTHORIZED, 40102, "기간이 만료된 토큰입니다."),
+
 
     /**
      * 403
