@@ -18,6 +18,12 @@ public class BreedService {
 
     @Transactional(readOnly = true)
     public BreedsResponse getBreeds(final String breedName, final Long animalId) {
+        if (breedName == null || breedName.isEmpty()) {
+            final List<Breed> allBreeds = breedRepository.findAllByAnimalId(animalId);
+            return BreedsResponse.of(allBreeds.stream()
+                    .map(breed -> BreedResponse.of(breed.getId(), breed.getName()))
+                    .toList());
+        }
         final List<Breed> breeds = breedRepository.findAllByNameContainingAndAnimalId(breedName, animalId);
         return BreedsResponse.of(breeds.stream()
                 .map(breed -> BreedResponse.of(breed.getId(), breed.getName()))

@@ -10,4 +10,6 @@ import java.util.List;
 public interface BreedRepository extends JpaRepository<Breed, Long> {
 
     List<Breed> findAllByNameContainingAndAnimalId(final String Name, final Long animalId);
+
+    List<Breed> findAllByAnimalId(final Long animalId);
 }
