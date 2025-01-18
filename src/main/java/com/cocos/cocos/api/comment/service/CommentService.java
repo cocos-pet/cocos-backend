@@ -62,6 +62,9 @@ public class CommentService {
     @Transactional
     public void addPostSubComment(final Long commentId, final Long mentionedMemberId, final String content, final Long memberId) {
         validateCommentExists(commentId);
+        if (!memberRepository.existsById(mentionedMemberId)) {
+            throw new CocosException(FailMessage.NOT_FOUND_MENTIONED_MEMBER);
+        }
         subCommentRepository.save(
                 SubComment.builder()
                         .commentId(commentId)
