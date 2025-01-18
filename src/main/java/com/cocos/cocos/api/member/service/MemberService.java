@@ -119,5 +119,14 @@ public class MemberService {
 
         }
     }
+
+    public NicknameExistenceResponse checkNickname(final String nickname) {
+        if (memberRepository.existsByNickname(nickname)) {
+            return NicknameExistenceResponse.of(true);
+        } else {
+            return NicknameExistenceResponse.of(false);
+
+        }
+    }
 }
 

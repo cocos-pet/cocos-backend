@@ -50,6 +50,8 @@ public enum FailMessage {
     NOT_FOUND_COMMENT(HttpStatus.NOT_FOUND, 40413, "댓글을 찾을 수 없습니다."),
     NOT_FOUND_SUB_COMMENT(HttpStatus.NOT_FOUND, 40414, "대댓글을 찾을 수 없습니다."),
     NOT_FOUND_PET(HttpStatus.NOT_FOUND, 40415, "애완동물을 찾을 수 없습니다. "),
+    NOT_FOUND_MENTIONED_MEMBER(HttpStatus.NOT_FOUND, 40416, "언급된 사용자를 찾을 수 없습니다. "),
+
     /**
      * 405
      */

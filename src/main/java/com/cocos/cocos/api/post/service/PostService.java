@@ -83,7 +83,7 @@ public class PostService {
                 () -> new CocosException(FailMessage.NOT_FOUND_BREED)
         );
         final List<String> images = postImageRepository.findAllByPostId(postId).stream()
-                .map(postImage -> appDataS3Client.getPresignedUrl(postImage.getImage()))
+                .map(postImage -> memberDataS3Client.getPresignedUrl(postImage.getImage()))
                 .toList();
         final PostCategory postCategory = postCategoryRepository.findById(post.getCategoryId()).orElseThrow(
                 () -> new CocosException(FailMessage.NOT_FOUND_CATEGORY)
@@ -403,7 +403,7 @@ public class PostService {
 
     private Member findMember(final Long memberId, final String nickname) {
         if (nickname != null) {
-            final Member member =  memberRepository.findByNickname(nickname);
+            final Member member = memberRepository.findByNickname(nickname);
             if (member == null) {
                 throw new CocosException(FailMessage.NOT_FOUND_MEMBER);
             } else {
