@@ -24,7 +24,7 @@ public class SearchController implements SearchControllerSwagger {
 
     @PostMapping
     public ResponseEntity<BaseResponse<Void>> addSearch(
-            @RequestParam final String keyword
+            @RequestParam(name = "keyword") final String keyword
     ) {
         return SuccessResponse.success(SuccessMessage.OK, searchService.addSearch(MEMBER_ID, keyword));
     }
