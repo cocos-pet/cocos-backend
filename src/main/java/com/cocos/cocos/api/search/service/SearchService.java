@@ -6,6 +6,7 @@ import com.cocos.cocos.db.search.entity.Search;
 import com.cocos.cocos.db.search.repository.SearchRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class SearchService {
 
     @Transactional(readOnly = true)
     public SearchResponse getSearch(final Long memberId) {
+        //ToDo: 검색어도 함께
         final List<Search> searchList = searchRepository.findTop5ByMemberIdOrderByUpdatedAtDesc(memberId);
         return SearchResponse.of(
                 searchList.stream()
@@ -26,13 +28,16 @@ public class SearchService {
         );
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public Void addSearch(final Long memberId, final String keyword) {
         if (searchRepository.existsByMemberIdAndKeyword(memberId, keyword)) {
             final Search search = searchRepository.findByMemberIdAndKeyword(memberId, keyword);
             search.updateTime();
         } else {
-            searchRepository.save(Search.builder().memberId(memberId).keyword(keyword).build());
+            searchRepository.save(Search.builder()
+                    .memberId(memberId)
+                    .keyword(keyword)
+                    .build());
         }
         return null;
     }
