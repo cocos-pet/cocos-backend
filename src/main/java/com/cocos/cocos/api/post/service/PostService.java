@@ -71,7 +71,7 @@ public class PostService {
     private final MemberDataS3Client memberDataS3Client;
 
     @Transactional(readOnly = true)
-    public PostDetailResponse getPostDetail(final Long postId) {
+    public PostDetailResponse getPostDetail(final Long postId, final Long memberId) {
         final Post post = postRepository.findById(postId).orElseThrow(
                 () -> new CocosException(FailMessage.NOT_FOUND_POST)
         );
@@ -132,6 +132,7 @@ public class PostService {
                 .images(images)
                 .category(postCategory.getName())
                 .tags(tags)
+                .isLiked(postLikeRepository.existsByMemberIdAndPostId(memberId, postId))
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .build();

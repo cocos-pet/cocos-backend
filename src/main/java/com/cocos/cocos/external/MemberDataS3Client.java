@@ -26,6 +26,9 @@ public class MemberDataS3Client {
     }
 
     public String getPresignedUrl(final String fileName) {
+        if (fileName == null || fileName.equals("")) {
+            return null;
+        }
         final GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
                 .key(fileName)
@@ -45,6 +48,10 @@ public class MemberDataS3Client {
     }
 
     public String putPresignedUrl(final String fileName) {
+        if (fileName == null || fileName.equals("")) {
+            return null;
+        }
+
         final PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(fileName)

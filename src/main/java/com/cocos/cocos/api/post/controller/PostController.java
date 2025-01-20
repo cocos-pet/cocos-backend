@@ -23,7 +23,7 @@ public class PostController implements PostControllerSwagger {
     public ResponseEntity<BaseResponse<PostDetailResponse>> getPostDetail(
             @PathVariable(name = "postId") final Long postId
     ) {
-        return SuccessResponse.success(SuccessMessage.OK, postService.getPostDetail(postId));
+        return SuccessResponse.success(SuccessMessage.OK, postService.getPostDetail(postId, PrincipalHandler.getMemberIdFromPrincipal()));
     }
 
     @DeleteMapping("/{postId}")

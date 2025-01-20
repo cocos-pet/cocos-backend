@@ -167,6 +167,7 @@ public class PostServiceTest {
         BDDMockito.given(postImageRepository.findAllByPostId(any())).willReturn(postImages);
         BDDMockito.given(postCategoryRepository.findById(any())).willReturn(Optional.ofNullable(postCategory));
         BDDMockito.given(postLikeRepository.countByPostId(any())).willReturn(likeCounts);
+        BDDMockito.given(postLikeRepository.existsByMemberIdAndPostId(any(), any())).willReturn(true);
         BDDMockito.given(commentRepository.countByPostId(any())).willReturn(commentCounts);
         BDDMockito.given(commentRepository.findAllByPostId(any())).willReturn(comments);
         BDDMockito.given(subCommentRepository.countByCommentId(any())).willReturn(subCommentCounts);
@@ -187,12 +188,13 @@ public class PostServiceTest {
                 .content(post.getContent())
                 .images(images)
                 .category(postCategory.getName())
+                .isLiked(true)
                 .tags(tags)
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .build();
         //when
-        final PostDetailResponse actual = postService.getPostDetail(postId);
+        final PostDetailResponse actual = postService.getPostDetail(postId, memberId);
 
         //then
         Assertions.assertThat(expected).usingRecursiveComparison().isEqualTo(actual);
