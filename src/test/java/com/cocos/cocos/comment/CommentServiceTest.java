@@ -148,7 +148,7 @@ class CommentServiceTest {
         commentService.deletePostSubComment(subCommentId, memberId);
 
         // then
-        BDDMockito.verify(subCommentRepository, times(1)).deleteById(commentId);
+        BDDMockito.verify(subCommentRepository, times(1)).deleteById(subCommentId);
     }
 
     @Test
