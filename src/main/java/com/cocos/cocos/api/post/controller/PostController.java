@@ -7,6 +7,7 @@ import com.cocos.cocos.api.post.service.PostService;
 import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.common.response.SuccessResponse;
 import com.cocos.cocos.enums.message.SuccessMessage;
+import com.cocos.cocos.util.PrincipalHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class PostController implements PostControllerSwagger {
 
-    private static final Long MEMBER_ID = 1L;
     private final PostService postService;
 
     @GetMapping("/{postId}")
@@ -44,7 +44,7 @@ public class PostController implements PostControllerSwagger {
             @RequestBody final PostRequest postRequest
     ) {
         return SuccessResponse.success(SuccessMessage.OK, postService.addPost(
-                MEMBER_ID, postRequest.categoryId(), postRequest.title(),
+                PrincipalHandler.getMemberIdFromPrincipal(), postRequest.categoryId(), postRequest.title(),
                 postRequest.content(), postRequest.images(), postRequest.animalId(),
                 postRequest.symptomIds(), postRequest.diseaseIds()
         ));
@@ -52,14 +52,14 @@ public class PostController implements PostControllerSwagger {
 
     @GetMapping("/popular")
     public ResponseEntity<BaseResponse<PopularPostsResponse>> getPopularPosts() {
-        return SuccessResponse.success(SuccessMessage.OK, postService.getPopularPosts(MEMBER_ID));
+        return SuccessResponse.success(SuccessMessage.OK, postService.getPopularPosts(PrincipalHandler.getMemberIdFromPrincipal()));
     }
 
     @PostMapping("/filters")
     public ResponseEntity<BaseResponse<PostListResponse>> getPosts(
             @RequestBody final PostListRequest postListRequest
     ) {
-        return SuccessResponse.success(SuccessMessage.OK, postService.getPosts(MEMBER_ID, postListRequest.keyword(),
+        return SuccessResponse.success(SuccessMessage.OK, postService.getPosts(PrincipalHandler.getMemberIdFromPrincipal(), postListRequest.keyword(),
                 postListRequest.animalIds(), postListRequest.symptomIds(), postListRequest.diseaseIds(),
                 postListRequest.sortBy(), postListRequest.cursorId(), postListRequest.categoryId(),
                 postListRequest.likeCount(), postListRequest.createAt()));
@@ -69,6 +69,6 @@ public class PostController implements PostControllerSwagger {
     public ResponseEntity<BaseResponse<MemberPostsResponse>> getMemberPosts(
             @RequestParam(name = "nickname", required = false) final String nickname
     ) {
-        return SuccessResponse.success(SuccessMessage.OK, postService.getMemberPosts(MEMBER_ID, nickname));
+        return SuccessResponse.success(SuccessMessage.OK, postService.getMemberPosts(PrincipalHandler.getMemberIdFromPrincipal(), nickname));
     }
 }

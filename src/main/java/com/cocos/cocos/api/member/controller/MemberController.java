@@ -22,21 +22,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("${api.prefix}/members")
 @RequiredArgsConstructor
 public class MemberController implements MemberControllerSwagger {
-    private static final Long memberId = 1L;
+
     private final MemberService memberService;
 
     @GetMapping
     public ResponseEntity<BaseResponse<MemberProfileResponse>> getMemberProfile(
             @RequestParam(name = "nickname", required = false) final String nickname
     ) {
-        return SuccessResponse.success(SuccessMessage.OK, memberService.getMemberProfile(nickname, memberId));
+        return SuccessResponse.success(SuccessMessage.OK, memberService.getMemberProfile(nickname, PrincipalHandler.getMemberIdFromPrincipal()));
     }
 
     @PatchMapping
     public ResponseEntity<BaseResponse<NicknameExistenceResponse>> updateMemberProfile(
             @RequestParam(name = "nickname") final String nickname
     ) {
-        final NicknameExistenceResponse nicknameExistenceResponse = memberService.updateMemberProfile(nickname, memberId);
+        final NicknameExistenceResponse nicknameExistenceResponse = memberService.updateMemberProfile(nickname, PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.OK, nicknameExistenceResponse);
     }
 

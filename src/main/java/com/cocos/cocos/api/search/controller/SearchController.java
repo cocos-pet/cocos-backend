@@ -5,6 +5,7 @@ import com.cocos.cocos.api.search.service.SearchService;
 import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.common.response.SuccessResponse;
 import com.cocos.cocos.enums.message.SuccessMessage;
+import com.cocos.cocos.util.PrincipalHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,18 +15,17 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class SearchController implements SearchControllerSwagger {
 
-    private static final Long MEMBER_ID = 1L;
     private final SearchService searchService;
 
     @GetMapping
     public ResponseEntity<BaseResponse<SearchResponse>> getSearch() {
-        return SuccessResponse.success(SuccessMessage.OK, searchService.getSearch(MEMBER_ID));
+        return SuccessResponse.success(SuccessMessage.OK, searchService.getSearch(PrincipalHandler.getMemberIdFromPrincipal()));
     }
 
     @PostMapping
     public ResponseEntity<BaseResponse<Void>> addSearch(
             @RequestParam(name = "keyword") final String keyword
     ) {
-        return SuccessResponse.success(SuccessMessage.OK, searchService.addSearch(MEMBER_ID, keyword));
+        return SuccessResponse.success(SuccessMessage.OK, searchService.addSearch(PrincipalHandler.getMemberIdFromPrincipal(), keyword));
     }
 }

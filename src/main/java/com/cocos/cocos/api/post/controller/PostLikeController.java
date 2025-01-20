@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class PostLikeController implements PostLikeControllerSwagger {
 
-    private static final Long MEMBER_ID = 1L;
     private final PostLikeService postLikeService;
 
     @PostMapping("/{postId}")
@@ -29,7 +28,7 @@ public class PostLikeController implements PostLikeControllerSwagger {
     public ResponseEntity<BaseResponse<Void>> deletePostLike(
             @PathVariable(name = "postId") final Long postId
     ) {
-        postLikeService.deletePostLike(MEMBER_ID, postId);
+        postLikeService.deletePostLike(PrincipalHandler.getMemberIdFromPrincipal(), postId);
         return SuccessResponse.success(SuccessMessage.OK, null);
     }
 }
