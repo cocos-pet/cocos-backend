@@ -10,4 +10,5 @@ import java.util.List;
 public interface SymptomRepository extends JpaRepository<Symptom, Long> {
 
     List<Symptom> findAllByBodyId(final Long BodyId);
+    List<Symptom> findByIdIn(final List<Long> ids);
 }

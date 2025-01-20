@@ -79,8 +79,8 @@ public class PetService {
     }
 
     private void validatePetDiseases(List<Long> diseaseIds) {
-        List<Long> validDiseaseIds = petDiseaseRepository.findAllById(diseaseIds).stream()
-                .map(PetDisease::getId)
+        List<Long> validDiseaseIds = diseaseRepository.findByIdIn(diseaseIds).stream()
+                .map(Disease::getId)
                 .toList();
 
         List<Long> invalidDiseaseIds = diseaseIds.stream()
@@ -93,8 +93,8 @@ public class PetService {
     }
 
     private void validatePetSymptoms(List<Long> symptomIds) {
-        List<Long> validSymptomIds = petSymptomRepository.findAllById(symptomIds).stream()
-                .map(PetSymptom::getId)
+        List<Long> validSymptomIds = symptomRepository.findByIdIn(symptomIds).stream()
+                .map(Symptom::getId)
                 .toList();
 
         List<Long> invalidSymptomIds = symptomIds.stream()
@@ -128,8 +128,10 @@ public class PetService {
         if (!pet.getMemberId().equals(memberId)) {
             throw new CocosException(FailMessage.FORBIDDEN_PET_UPDATE);
         }
-        if (!breedRepository.existsById(petUpdateRequest.breedId())) {
-            throw new CocosException(FailMessage.NOT_FOUND_BREED);
+        if (petUpdateRequest.breedId() != null) {
+            if (!breedRepository.existsById(petUpdateRequest.breedId())) {
+                throw new CocosException(FailMessage.NOT_FOUND_BREED);
+            }
         }
         pet.updateFields(petUpdateRequest.name(), petUpdateRequest.gender(), petUpdateRequest.age(), petUpdateRequest.breedId());
 
