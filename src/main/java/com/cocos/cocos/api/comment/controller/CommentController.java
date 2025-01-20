@@ -8,6 +8,7 @@ import com.cocos.cocos.api.comment.service.CommentService;
 import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.common.response.SuccessResponse;
 import com.cocos.cocos.enums.message.SuccessMessage;
+import com.cocos.cocos.util.PrincipalHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("${api.prefix}/comments")
 @RequiredArgsConstructor
 public class CommentController implements CommentControllerSwagger {
-    private static final Long memberId = 1L;
+
     private final CommentService commentService;
 
     @PostMapping("/{postId}")
@@ -24,7 +25,7 @@ public class CommentController implements CommentControllerSwagger {
             @PathVariable(name = "postId") final Long postId,
             @RequestBody final CommentContentRequest body
     ) {
-        commentService.addPostComment(postId, body.content(), memberId);
+        commentService.addPostComment(postId, body.content(), PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.CREATED, null);
     }
 
@@ -32,8 +33,8 @@ public class CommentController implements CommentControllerSwagger {
     public ResponseEntity<BaseResponse<Void>> deletePostComment(
             @PathVariable(name = "commentId") final Long commentId
     ) {
-        commentService.deletePostComment(commentId, memberId);
-        return SuccessResponse.success(SuccessMessage.OK,null);
+        commentService.deletePostComment(commentId, PrincipalHandler.getMemberIdFromPrincipal());
+        return SuccessResponse.success(SuccessMessage.OK, null);
     }
 
     @PostMapping("/sub/{commentId}")
@@ -41,7 +42,7 @@ public class CommentController implements CommentControllerSwagger {
             @PathVariable(name = "commentId") final Long commentId,
             @RequestBody final SubCommentContentRequest body
     ) {
-        commentService.addPostSubComment(commentId, body.mentionedMemberId(), body.content(), memberId);
+        commentService.addPostSubComment(commentId, body.mentionedMemberId(), body.content(), PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.CREATED, null);
     }
 
@@ -49,15 +50,15 @@ public class CommentController implements CommentControllerSwagger {
     public ResponseEntity<BaseResponse<Void>> deletePostSubComment(
             @PathVariable(name = "subCommentId") final Long subCommentId
     ) {
-        commentService.deletePostSubComment(subCommentId, memberId);
-        return SuccessResponse.success(SuccessMessage.OK,null);
+        commentService.deletePostSubComment(subCommentId, PrincipalHandler.getMemberIdFromPrincipal());
+        return SuccessResponse.success(SuccessMessage.OK, null);
     }
 
     @GetMapping("/{postId}")
     public ResponseEntity<BaseResponse<CommentsAndSubCommentsResponse>> getPostComments(
             @PathVariable(name = "postId") final Long postId
     ) {
-        final CommentsAndSubCommentsResponse postComments = commentService.getPostComments(postId, memberId);
+        final CommentsAndSubCommentsResponse postComments = commentService.getPostComments(postId, PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.OK, postComments);
     }
 
@@ -65,6 +66,6 @@ public class CommentController implements CommentControllerSwagger {
     public ResponseEntity<BaseResponse<MyAllCommentsResponse>> getMyComments(
             @RequestParam(name = "nickname", required = false) final String nickname
     ) {
-        return SuccessResponse.success(SuccessMessage.OK, commentService.getMyComments(nickname, memberId));
+        return SuccessResponse.success(SuccessMessage.OK, commentService.getMyComments(nickname, PrincipalHandler.getMemberIdFromPrincipal()));
     }
 }
