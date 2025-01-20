@@ -29,6 +29,8 @@ public class MemberService {
     private final JwtProvider jwtProvider;
     private final MemberTokenRepository memberTokenRepository;
 
+    private static final String MEMBER_BASE_IMAGE_URL = "member/baseProfileImage.png";
+
     @Transactional(readOnly = true)
     public MemberProfileResponse getMemberProfile(final String nickname, final Long memberId) {
         final Long selectedMemberId = (nickname != null) ? findMemberByNickname(nickname) : memberId;
@@ -54,7 +56,7 @@ public class MemberService {
         } else {
             member = memberRepository.save(Member.builder()
                     .email("")
-                    .image("")
+                    .image(MEMBER_BASE_IMAGE_URL)
                     .isAdmin(false)
                     .nickname("")
                     .platform(Platform.KAKAO)
@@ -104,7 +106,9 @@ public class MemberService {
         } else {
             return null;
         }
-    };
+    }
+
+    ;
 
     @Transactional
     public NicknameExistenceResponse updateMemberProfile(final String nickname, final Long memberId) {

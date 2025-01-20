@@ -33,6 +33,8 @@ public record PostDetailResponse(
         @Schema(description = "생성일", example = "yyyy-mm-dd:hh-mm-ss~")
         LocalDateTime createdAt,
         @Schema(description = "수정일", example = "yyyy-mm-dd:hh-mm-ss~")
-        LocalDateTime updatedAt
+        LocalDateTime updatedAt,
+        @Schema(description = "좋아요 클릭 여부", example = "true")
+        boolean isLiked
 ) {
 }
