@@ -127,7 +127,7 @@ public class CommentService {
                                     .map(subComment -> SubCommentResponse.of(
                                             subComment.getId(),
                                             getOrDefaultNickname(subComment.getMemberId(), memberMap),
-                                            memberDataS3Client.getPresignedUrl(subComment.getMemberId() + "/" + getOrDefaultProfileImage(subComment.getMemberId(), memberMap)),
+                                            memberDataS3Client.getPresignedUrl(getOrDefaultProfileImage(subComment.getMemberId(), memberMap)),
                                             getOrDefaultBreedName(subComment.getMemberId(), petMap, breedMap),
                                             getOrDefaultPetAge(subComment.getMemberId(), petMap),
                                             subComment.getContent(),
@@ -139,7 +139,7 @@ public class CommentService {
                     return CommentAndSubCommentsResponse.of(
                             comment.getId(),
                             getOrDefaultNickname(comment.getMemberId(), memberMap),
-                            memberDataS3Client.getPresignedUrl(comment.getMemberId() + "/" + getOrDefaultProfileImage(comment.getMemberId(), memberMap)),
+                            memberDataS3Client.getPresignedUrl(getOrDefaultProfileImage(comment.getMemberId(), memberMap)),
                             getOrDefaultBreedName(comment.getMemberId(), petMap, breedMap),
                             getOrDefaultPetAge(comment.getMemberId(), petMap),
                             comment.getContent(),
