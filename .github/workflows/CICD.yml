@@ -55,6 +55,7 @@ jobs:
           script: |
             docker stop cocos-container || true
             docker rm cocos-container || true
+            docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/cocos || true
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/cocos
             docker run -d -p 8080:8080 --name cocos-container \
               ${{ secrets.DOCKERHUB_USERNAME }}/cocos
