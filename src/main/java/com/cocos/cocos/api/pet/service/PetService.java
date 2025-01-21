@@ -42,25 +42,19 @@ public class PetService {
     private final MemberRepository memberRepository;
     private final AppDataS3Client appDataS3Client;
 
+    private static final String PET_BASE_IMAGE_URL = "member/basePetImage.png";
+
     @Transactional()
     public void addPet(final PetCreateRequest petCreateRequest, final Long memberId) {
         if (petRepository.existsByMemberId(memberId)) {
             throw new CocosException(FailMessage.CONFLICT_PET);
         }
 
-        final Breed breed = breedRepository.findById(petCreateRequest.breedId()).orElseThrow(
-                () -> new CocosException(FailMessage.NOT_FOUND_BREED)
-        );
-
-        final Animal animal = animalRepository.findById(breed.getAnimalId()).orElseThrow(
-                () -> new CocosException(FailMessage.NOT_FOUND_ANIMAL)
-        );
-
         final Pet pet = petRepository.save(
                 Pet.builder()
                         .name(petCreateRequest.name())
                         .gender(petCreateRequest.gender())
-                        .image(animal.getId().toString()+".png")
+                        .image(PET_BASE_IMAGE_URL)
                         .age(petCreateRequest.age())
                         .memberId(memberId)
                         .breedId(petCreateRequest.breedId())
@@ -153,6 +147,10 @@ public class PetService {
     }
 
     public PetResponse getPet(final String nickname, final Long memberId) {
+        if (nickname != null && !memberRepository.existsByNickname(nickname)) {
+                throw new CocosException(FailMessage.NOT_FOUND_MEMBER);
+            }
+
         final Long selectedMemberId = (nickname != null)
                 ? memberRepository.findByNickname(nickname).getId()
                 : memberId;
