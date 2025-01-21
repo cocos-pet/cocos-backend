@@ -205,7 +205,7 @@ public class CommentService {
     }
 
     private void validatePet(Long memberId) {
-        if (petRepository.existsByMemberId(memberId)) {
+        if (!petRepository.existsByMemberId(memberId)) {
             throw new CocosException(FailMessage.NOT_FOUND_PET);
         }
     }
