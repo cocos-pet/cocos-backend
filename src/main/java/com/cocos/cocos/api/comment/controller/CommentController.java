@@ -42,7 +42,7 @@ public class CommentController implements CommentControllerSwagger {
             @PathVariable(name = "commentId") final Long commentId,
             @RequestBody final SubCommentContentRequest body
     ) {
-        commentService.addPostSubComment(commentId, body.mentionedMemberId(), body.content(), PrincipalHandler.getMemberIdFromPrincipal());
+        commentService.addPostSubComment(commentId, body.nickname(), body.content(), PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.CREATED, null);
     }
 
