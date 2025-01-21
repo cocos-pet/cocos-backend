@@ -40,6 +40,8 @@ public class CommentService {
     @Transactional
     public void addPostComment(final Long postId, final String content, final Long memberId) {
         validatePostExists(postId);
+        validatePet(memberId);
+
         commentRepository.save(
                 Comment.builder()
                         .content(content)
@@ -65,6 +67,8 @@ public class CommentService {
         if (!memberRepository.existsById(mentionedMemberId)) {
             throw new CocosException(FailMessage.NOT_FOUND_MENTIONED_MEMBER);
         }
+
+        validatePet(memberId);
         subCommentRepository.save(
                 SubComment.builder()
                         .commentId(commentId)
@@ -198,6 +202,12 @@ public class CommentService {
                 myComments,
                 mySubComments
         );
+    }
+
+    private void validatePet(Long memberId) {
+        if (!petRepository.existsByMemberId(memberId)) {
+            throw new CocosException(FailMessage.NOT_FOUND_PET);
+        }
     }
 
     private Comment validateCommentExists(Long commentId) {
