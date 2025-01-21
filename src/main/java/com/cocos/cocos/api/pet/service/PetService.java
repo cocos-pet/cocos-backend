@@ -147,6 +147,10 @@ public class PetService {
     }
 
     public PetResponse getPet(final String nickname, final Long memberId) {
+        if (nickname != null && !memberRepository.existsByNickname(nickname)) {
+                throw new CocosException(FailMessage.NOT_FOUND_MEMBER);
+            }
+
         final Long selectedMemberId = (nickname != null)
                 ? memberRepository.findByNickname(nickname).getId()
                 : memberId;
