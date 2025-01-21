@@ -62,10 +62,10 @@ public class CommentController implements CommentControllerSwagger {
         return SuccessResponse.success(SuccessMessage.OK, postComments);
     }
 
-    @GetMapping("/my")
-    public ResponseEntity<BaseResponse<MyAllCommentsResponse>> getMyComments(
+    @GetMapping("/members")
+    public ResponseEntity<BaseResponse<MyAllCommentsResponse>> getMemberComments(
             @RequestParam(name = "nickname", required = false) final String nickname
     ) {
-        return SuccessResponse.success(SuccessMessage.OK, commentService.getMyComments(nickname, PrincipalHandler.getMemberIdFromPrincipal()));
+        return SuccessResponse.success(SuccessMessage.OK, commentService.getMemberComments(nickname, PrincipalHandler.getMemberIdFromPrincipal()));
     }
 }

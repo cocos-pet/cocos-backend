@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 public record SearchResponse(
-        @Schema(description = "검색 내역", example = "1")
+        @Schema(description = "검색 내역")
         List<KeywordResponse> keywords
 ) {
     public static SearchResponse of(final List<KeywordResponse> keywords) {
