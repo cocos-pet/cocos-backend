@@ -16,5 +16,5 @@ public interface SubCommentRepository extends JpaRepository<SubComment, Long> {
 
     List<SubComment> findByCommentIdInOrderByCreatedAtAsc(@Param("commentId") List<Long> commentId);
 
-    List<SubComment> findByMemberIdOrderByCreatedAtAsc(final Long memberId);
+    List<SubComment> findAllByMemberIdOrderByCreatedAtDesc(final Long memberId);
 }
