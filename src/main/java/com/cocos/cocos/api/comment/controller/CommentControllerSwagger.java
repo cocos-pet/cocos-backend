@@ -61,11 +61,11 @@ public interface CommentControllerSwagger {
     @Parameter(name = "postId", description = "게시글 아이디", in = ParameterIn.PATH, required = true, schema = @Schema(type = "Long"))
     public ResponseEntity<BaseResponse<CommentsAndSubCommentsResponse>> getPostComments(final Long postId);
 
-    @Operation(summary = "나의 댓글&대댓글 조회 API", description = "내가 단 댓글과 대댓글을 조회하는 API입니다. ")
+    @Operation(summary = "사용자 댓글 & 대댓글 조회 API", description = "사용자의 댓글과 대댓글을 조회하는 API입니다. ")
     @ApiResponse(
             responseCode = "200",
             description = "요청에 성공했습니다.")
-    public ResponseEntity<BaseResponse<MyAllCommentsResponse>> getMyComments (
+    public ResponseEntity<BaseResponse<MyAllCommentsResponse>> getMemberComments(
             @RequestParam final String nickname
     );
 }

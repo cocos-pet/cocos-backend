@@ -156,7 +156,7 @@ public class CommentService {
         return CommentsAndSubCommentsResponse.of(commentDtos);
     }
 
-    public MyAllCommentsResponse getMyComments(final String nickname, final Long memberId) {
+    public MyAllCommentsResponse getMemberComments(final String nickname, final Long memberId) {
         final Long selectedMemberId = (nickname != null ) ? findMemberByNickname(nickname): memberId;
         final List<Comment> comments = commentRepository.findByMemberIdOrderByCreatedAtAsc(selectedMemberId);
         final List<Long> commentIds = comments.stream()

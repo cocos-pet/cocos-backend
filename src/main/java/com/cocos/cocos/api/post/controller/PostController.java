@@ -62,10 +62,10 @@ public class PostController implements PostControllerSwagger {
         return SuccessResponse.success(SuccessMessage.OK, postService.getPosts(PrincipalHandler.getMemberIdFromPrincipal(), postListRequest.keyword(),
                 postListRequest.animalIds(), postListRequest.symptomIds(), postListRequest.diseaseIds(),
                 postListRequest.sortBy(), postListRequest.cursorId(), postListRequest.categoryId(),
-                postListRequest.likeCount(), postListRequest.createAt()));
+                postListRequest.likeCount(), postListRequest.createdAt()));
     }
 
-    @GetMapping("/my")
+    @GetMapping("/members")
     public ResponseEntity<BaseResponse<MemberPostsResponse>> getMemberPosts(
             @RequestParam(name = "nickname", required = false) final String nickname
     ) {

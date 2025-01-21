@@ -4,7 +4,7 @@ import com.cocos.cocos.enums.member.Platform;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record LoginRequest(
-        @Schema(description = "소셜 플랫폼", example = "KAKAO")
+        @Schema(description = "소셜 플랫폼", example = "KAKAO or GOOGLE or APPLE")
         Platform platform,
         @Schema(description = "코드", example = "egagasdgasdgdagdasgasgasdgdasgasdglkj")
         String code

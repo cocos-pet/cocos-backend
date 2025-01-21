@@ -13,7 +13,7 @@ public record PetCreateRequest(
         @Schema(description = "반려동물 이름", example = "포리")
         String name,
 
-        @Schema(description = "성별", example = "F")
+        @Schema(description = "성별", example = "F or M")
         Gender gender,
 
         @Schema(description = "나이", example = "12")

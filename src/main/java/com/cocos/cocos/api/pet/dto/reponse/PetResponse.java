@@ -14,7 +14,7 @@ public record PetResponse(
         String petName,
         @Schema(description = "애완동물 성별",example = "12")
         int petAge,
-        @Schema(description = "애완동물 나이", example = "애완동물 성별")
+        @Schema(description = "애완동물 나이", example = "M or F")
         Gender petGender,
         @Schema(description = "종 아이디", example = "1")
         Long breedId,
