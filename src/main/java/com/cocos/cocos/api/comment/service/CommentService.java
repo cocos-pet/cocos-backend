@@ -157,12 +157,9 @@ public class CommentService {
     }
 
     public MyAllCommentsResponse getMemberComments(final String nickname, final Long memberId) {
-        final Long selectedMemberId = (nickname != null ) ? findMemberByNickname(nickname): memberId;
-        final List<Comment> comments = commentRepository.findByMemberIdOrderByCreatedAtAsc(selectedMemberId);
-        final List<Long> commentIds = comments.stream()
-                .map(Comment::getId)
-                .toList();
-        final List<SubComment> subComments = subCommentRepository.findByCommentIdInOrderByCreatedAtAsc(commentIds);
+        final Long selectedMemberId = findMemberByNickname(nickname, memberId);
+
+        final List<Comment> comments = commentRepository.findAllByMemberIdOrderByCreatedAtDesc(selectedMemberId);
         final List<MyCommentResponse> myComments = comments.stream()
                 .map(comment -> {
                     final String postTitle = postRepository.findById(comment.getPostId()).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_POST)).getTitle();
@@ -175,12 +172,14 @@ public class CommentService {
                     );
                 }).toList();
 
+        final List<SubComment> subComments = subCommentRepository.findAllByMemberIdOrderByCreatedAtDesc(selectedMemberId);
         final List<MySubCommentResponse> mySubComments = subComments.stream()
                 .map(subComment -> {
                     final Comment comment = commentRepository.findById(subComment.getCommentId()).orElseThrow(
                             () -> new CocosException(FailMessage.NOT_FOUND_COMMENT)
                     );
-                    final Post post = postRepository.findById(comment.getId()).orElseThrow(
+
+                    final Post post = postRepository.findById(comment.getPostId()).orElseThrow(
                             () -> new CocosException(FailMessage.NOT_FOUND_POST)
                     );
 
@@ -196,7 +195,7 @@ public class CommentService {
                             mentionedMember.getNickname()
                     );
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         return MyAllCommentsResponse.of(
                 myComments,
@@ -249,7 +248,7 @@ public class CommentService {
                 .orElseThrow(() -> new CocosException(FailMessage.INTERNAL_SERVER_ERROR_PET_AGE));
     }
 
-    private Long findMemberByNickname(String nickname) {
+    private Long findMemberByNickname(final String nickname, final Long memberId) {
         if (nickname != null) {
             final Member member = memberRepository.findByNickname(nickname);
             if (member == null) {
@@ -257,7 +256,7 @@ public class CommentService {
             }
             return member.getId();
         } else {
-            return null;
+            return memberId;
         }
     }
 }
