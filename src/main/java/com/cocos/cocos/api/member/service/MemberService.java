@@ -13,6 +13,7 @@ import com.cocos.cocos.db.member.repository.MemberRepository;
 import com.cocos.cocos.db.member.repository.MemberTokenRepository;
 import com.cocos.cocos.enums.member.Platform;
 import com.cocos.cocos.enums.message.FailMessage;
+import com.cocos.cocos.external.AppDataS3Client;
 import com.cocos.cocos.external.KakaoLoginClient;
 import com.cocos.cocos.external.MemberDataS3Client;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final MemberDataS3Client memberDataS3Client;
+    private final AppDataS3Client appDataS3Client;
     private final KakaoLoginClient kakaoLoginClient;
     private final JwtProvider jwtProvider;
     private final MemberTokenRepository memberTokenRepository;
@@ -37,7 +39,7 @@ public class MemberService {
         final Member member = memberRepository.findById(selectedMemberId).orElseThrow(
                 () -> new CocosException(FailMessage.NOT_FOUND_MEMBER)
         );
-        return MemberProfileResponse.of(member.getNickname(), memberDataS3Client.getPresignedUrl(member.getImage()));
+        return MemberProfileResponse.of(member.getNickname(), appDataS3Client.getPresignedUrl(member.getImage()));
     }
 
     @Transactional
@@ -58,7 +60,6 @@ public class MemberService {
                     .email("")
                     .image(MEMBER_BASE_IMAGE_URL)
                     .isAdmin(false)
-                    .nickname("")
                     .platform(Platform.KAKAO)
                     .sub(sub)
                     .build()
