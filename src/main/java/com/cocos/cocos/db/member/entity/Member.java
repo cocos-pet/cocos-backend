@@ -18,7 +18,7 @@ public class Member extends BaseTime {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "nickname", nullable = false, unique = true)
+    @Column(name = "nickname", unique = true)
     private String nickname;
 
     @Column(name = "email", nullable = false)
@@ -48,6 +48,6 @@ public class Member extends BaseTime {
     }
 
     public void updateFields(final String nickname) {
-        if (nickname != null ) this.nickname = nickname;
+        if (nickname != null) this.nickname = nickname;
     }
 }
