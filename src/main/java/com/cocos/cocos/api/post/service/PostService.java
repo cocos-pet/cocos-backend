@@ -41,6 +41,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -257,21 +258,21 @@ public class PostService {
         if (keyword != null) {
             spec = spec.and(PostSpecification.hasKeyword(keyword));
         }
-        if (!animalIds.isEmpty() || animalIds != null) {
+        if (!CollectionUtils.isEmpty(animalIds)) {
             final List<PostTag> postTags = postTagRepository.findAllByTagIdAndTagType(animalIds, TagType.ANIMAL);
             final List<Long> postIds = postTags.stream()
                     .map(PostTag::getPostId)
                     .toList();
             spec = spec.and(PostSpecification.inPostIds(postIds));
         }
-        if (!symptomIds.isEmpty() || symptomIds != null) {
+        if (!CollectionUtils.isEmpty(symptomIds)) {
             final List<PostTag> postTags = postTagRepository.findAllByTagIdAndTagType(symptomIds, TagType.SYMPTOM);
             final List<Long> postIds = postTags.stream()
                     .map(PostTag::getPostId)
                     .toList();
             spec = spec.and(PostSpecification.inPostIds(postIds));
         }
-        if (!diseaseIds.isEmpty() || diseaseIds != null) {
+        if (!CollectionUtils.isEmpty(diseaseIds)) {
             final List<PostTag> postTags = postTagRepository.findAllByTagIdAndTagType(diseaseIds, TagType.DISEASE);
             final List<Long> postIds = postTags.stream()
                     .map(PostTag::getPostId)
