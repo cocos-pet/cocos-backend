@@ -257,21 +257,21 @@ public class PostService {
         if (keyword != null) {
             spec = spec.and(PostSpecification.hasKeyword(keyword));
         }
-        if (animalIds != null) {
+        if (!animalIds.isEmpty()) {
             final List<PostTag> postTags = postTagRepository.findAllByTagIdAndTagType(animalIds, TagType.ANIMAL);
             final List<Long> postIds = postTags.stream()
                     .map(PostTag::getPostId)
                     .toList();
             spec = spec.and(PostSpecification.inPostIds(postIds));
         }
-        if (symptomIds != null) {
+        if (!symptomIds.isEmpty()) {
             final List<PostTag> postTags = postTagRepository.findAllByTagIdAndTagType(symptomIds, TagType.SYMPTOM);
             final List<Long> postIds = postTags.stream()
                     .map(PostTag::getPostId)
                     .toList();
             spec = spec.and(PostSpecification.inPostIds(postIds));
         }
-        if (diseaseIds != null) {
+        if (!diseaseIds.isEmpty()) {
             final List<PostTag> postTags = postTagRepository.findAllByTagIdAndTagType(diseaseIds, TagType.DISEASE);
             final List<Long> postIds = postTags.stream()
                     .map(PostTag::getPostId)
