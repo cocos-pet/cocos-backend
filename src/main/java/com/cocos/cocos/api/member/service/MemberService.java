@@ -39,7 +39,7 @@ public class MemberService {
         final Member member = memberRepository.findById(selectedMemberId).orElseThrow(
                 () -> new CocosException(FailMessage.NOT_FOUND_MEMBER)
         );
-        return MemberProfileResponse.of(member.getNickname(), appDataS3Client.getPresignedUrl(member.getImage()));
+        return MemberProfileResponse.of(member.getNickname(), memberDataS3Client.getPresignedUrl(member.getImage()));
     }
 
     @Transactional

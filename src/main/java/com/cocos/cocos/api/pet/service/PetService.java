@@ -23,6 +23,7 @@ import com.cocos.cocos.db.symptom.entity.Symptom;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.external.AppDataS3Client;
+import com.cocos.cocos.external.MemberDataS3Client;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,7 @@ public class PetService {
     private final SymptomRepository symptomRepository;
     private final MemberRepository memberRepository;
     private final AppDataS3Client appDataS3Client;
+    private final MemberDataS3Client memberDataS3Client;
 
     private static final String PET_BASE_IMAGE_URL = "member/basePetImage.png";
 
@@ -186,7 +188,7 @@ public class PetService {
 
         return PetResponse.of(
                 pet.getId(),
-                appDataS3Client.getPresignedUrl(pet.getImage()),
+                memberDataS3Client.getPresignedUrl(pet.getImage()),
                 pet.getName(),
                 pet.getAge(),
                 pet.getGender(),
