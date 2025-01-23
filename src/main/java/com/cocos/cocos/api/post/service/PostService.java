@@ -45,6 +45,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -133,6 +134,7 @@ public class PostService {
                 .images(images)
                 .category(postCategory.getName())
                 .tags(tags)
+                .isWriter(Objects.equals(memberId, post.getMemberId()))
                 .isLiked(postLikeRepository.existsByMemberIdAndPostId(memberId, postId))
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
