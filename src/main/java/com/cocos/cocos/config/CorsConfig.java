@@ -19,7 +19,7 @@ public class CorsConfig {
         ArrayList<String> allowedOriginPatterns = new ArrayList<>();
         allowedOriginPatterns.add("http://localhost:5173");
         allowedOriginPatterns.add("https://www.cocos.r-e.kr/");
-        allowedOriginPatterns.add("https://cocos-pet.kr/");
+        allowedOriginPatterns.add("https://www.cocos-pet.kr/");
         configuration.setAllowedOrigins(allowedOriginPatterns);
 
         //허용하는 HTTP METHOD 지정
