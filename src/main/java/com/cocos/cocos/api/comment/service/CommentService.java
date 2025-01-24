@@ -93,6 +93,10 @@ public class CommentService {
     public CommentsAndSubCommentsResponse getPostComments(final Long postId, final Long memberId) {
         validatePostExists(postId);
 
+        final Post post = postRepository.findById(postId).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_POST)
+        );
+
         final List<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
         final List<Long> commentIds = comments.stream()
                 .map(Comment::getId)
@@ -137,7 +141,8 @@ public class CommentService {
                                             subComment.getContent(),
                                             subComment.getCreatedAt(),
                                             subComment.getMemberId().equals(memberId),
-                                            getOrDefaultNickname(subComment.getMentionedMemberId(), memberMap)
+                                            getOrDefaultNickname(subComment.getMentionedMemberId(), memberMap),
+                                            subComment.getMemberId().equals(post.getMemberId())
                                     )).toList();
 
                     return CommentAndSubCommentsResponse.of(
@@ -149,6 +154,7 @@ public class CommentService {
                             comment.getContent(),
                             comment.getCreatedAt(),
                             comment.getMemberId().equals(memberId),
+                            comment.getMemberId().equals(post.getMemberId()),
                             subCommentDtos
                     );
                 }).toList();
