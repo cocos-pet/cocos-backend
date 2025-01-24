@@ -218,7 +218,11 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public PopularPostsResponse getPopularPosts(final Long memberId) {
-        final List<Post> popularPosts = fetchPopularPosts(memberId);
+        List<Post> popularPosts = fetchPopularPosts(memberId);
+        //ToDo: 데모데이 이후 final List<Post> popularPosts로 수정 후 아래 if 문 삭제 필요
+        if (popularPosts.size() < 5) {
+            popularPosts = postRepository.findTop5ByLikeCountDesc();
+        }
         return PopularPostsResponse.of(
                 popularPosts.stream()
                         .map(popularPost -> PopularPostResponse.of(popularPost.getId(), popularPost.getTitle()))
