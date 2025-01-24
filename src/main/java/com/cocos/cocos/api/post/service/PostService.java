@@ -164,6 +164,9 @@ public class PostService {
     public PostImagesResponse addPost(final Long memberId, final Long categoryId, final String title,
                                       final String content, final List<String> images, final Long animalId,
                                       final List<Long> symptomIds, final List<Long> diseaseIds) {
+        if (!petRepository.existsByMemberId(memberId)) {
+            throw new CocosException(FailMessage.NOT_FOUND_PET);
+        }
         final Post post = postRepository.save(Post.builder()
                 .title(title)
                 .content(content)
