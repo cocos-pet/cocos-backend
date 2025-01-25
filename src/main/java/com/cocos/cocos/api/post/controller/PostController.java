@@ -62,7 +62,7 @@ public class PostController implements PostControllerSwagger {
         return SuccessResponse.success(SuccessMessage.OK, postService.getPosts(PrincipalHandler.getMemberIdFromPrincipal(), postListRequest.keyword(),
                 postListRequest.animalIds(), postListRequest.symptomIds(), postListRequest.diseaseIds(),
                 postListRequest.sortBy(), postListRequest.cursorId(), postListRequest.categoryId(),
-                postListRequest.likeCount(), postListRequest.createdAt()));
+                postListRequest.likeCount(), postListRequest.createdAt(), postListRequest.bodyId()));
     }
 
     @GetMapping("/members")
