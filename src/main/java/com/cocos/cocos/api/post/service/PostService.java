@@ -262,7 +262,7 @@ public class PostService {
     @Transactional(readOnly = true)
     public PostListResponse getPosts(final Long memberId, final String keyword, final List<Long> animalIds, final List<Long> symptomIds,
                                      final List<Long> diseaseIds, final SortCriteria sortBy, final Long cursorId,
-                                     final Long categoryId, final Long likeCount, final LocalDateTime createAt) {
+                                     final Long categoryId, final Long likeCount, final LocalDateTime createAt, final Long bodyId) {
         Specification<Post> spec = (root, query, criteriaBuilder) -> null;
         if (keyword != null) {
             spec = spec.and(PostSpecification.hasKeyword(keyword));
@@ -290,6 +290,16 @@ public class PostService {
         }
         if (categoryId != null) {
             spec = spec.and(PostSpecification.equalCategory(categoryId));
+        }
+        if (bodyId != null) {
+            final List<Long> symptomIdsByBodyId = symptomRepository.findAllByBodyId(bodyId).stream()
+                    .map(Symptom::getId)
+                    .toList();
+            final List<PostTag> postTags = postTagRepository.findAllByTagIdAndTagType(symptomIds, TagType.SYMPTOM);
+            final List<Long> postIds = postTags.stream()
+                    .map(PostTag::getPostId)
+                    .toList();
+            spec = spec.and(PostSpecification.inPostIds(postIds));
         }
 
         if (cursorId != null) {

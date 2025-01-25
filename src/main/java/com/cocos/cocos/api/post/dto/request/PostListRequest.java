@@ -24,6 +24,8 @@ public record PostListRequest(
         @Schema(description = "마지막 게시글 좋아요 수 아이디", example = "1 or null")
         Long likeCount,
         @Schema(description = "마지막 게시글 생성일", example = "YYYY-MM-DD~ or null")
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        @Schema(description = "신체 아이디", example = "1")
+        Long bodyId
 ) {
 }
