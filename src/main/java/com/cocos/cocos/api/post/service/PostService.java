@@ -295,7 +295,7 @@ public class PostService {
             final List<Long> symptomIdsByBodyId = symptomRepository.findAllByBodyId(bodyId).stream()
                     .map(Symptom::getId)
                     .toList();
-            final List<PostTag> postTags = postTagRepository.findAllByTagIdAndTagType(symptomIds, TagType.SYMPTOM);
+            final List<PostTag> postTags = postTagRepository.findAllByTagIdAndTagType(symptomIdsByBodyId, TagType.SYMPTOM);
             final List<Long> postIds = postTags.stream()
                     .map(PostTag::getPostId)
                     .toList();
