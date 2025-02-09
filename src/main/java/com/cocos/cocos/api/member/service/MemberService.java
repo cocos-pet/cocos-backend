@@ -26,16 +26,18 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final MemberDataS3Client memberDataS3Client;
-    private final AppDataS3Client appDataS3Client;
     private final KakaoLoginClient kakaoLoginClient;
     private final JwtProvider jwtProvider;
     private final MemberTokenRepository memberTokenRepository;
 
+    //ToDo: yml에 기입해야하는 지 고민 중
     private static final String MEMBER_BASE_IMAGE_URL = "member/baseProfileImage.png";
 
     @Transactional(readOnly = true)
     public MemberProfileResponse getMemberProfile(final String nickname, final Long memberId) {
+        //ToDo: ?의 역할을 findMember()라는 하나의 메소드 안에서 모두 해결 할 수 있을 것 같음
         final Long selectedMemberId = (nickname != null) ? findMemberByNickname(nickname) : memberId;
+        //ToDo: 이 부분 또한 findMember, 즉 멤버를 찾는 메소드 안에서 한 번에 처리가능할 것 같음
         final Member member = memberRepository.findById(selectedMemberId).orElseThrow(
                 () -> new CocosException(FailMessage.NOT_FOUND_MEMBER)
         );
@@ -44,6 +46,7 @@ public class MemberService {
 
     @Transactional
     public LoginResponse login(final String code) {
+        //ToDo: 코드 역할에 따라 간격 띄우는 것 필요
         final String sub = kakaoLoginClient.login(code);
         Member member = null;
         boolean isCompletedSignUp;
@@ -109,8 +112,6 @@ public class MemberService {
         }
     }
 
-    ;
-
     @Transactional
     public NicknameExistenceResponse updateMemberProfile(final String nickname, final Long memberId) {
         if (memberRepository.existsByNickname(nickname)) {
@@ -125,6 +126,7 @@ public class MemberService {
         }
     }
 
+    //ToDo: Transactional(readOnly = true)필요
     public NicknameExistenceResponse checkNickname(final String nickname) {
         if (memberRepository.existsByNickname(nickname)) {
             return NicknameExistenceResponse.of(true);

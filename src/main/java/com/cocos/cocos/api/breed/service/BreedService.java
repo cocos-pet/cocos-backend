@@ -24,6 +24,7 @@ public class BreedService {
                     .map(breed -> BreedResponse.of(breed.getId(), breed.getName()))
                     .toList());
         }
+        //ToDo: 의미 분명하게 하기 위해 else문 사용도 좋아보임
         final List<Breed> breeds = breedRepository.findAllByNameContainingAndAnimalId(breedName, animalId);
         return BreedsResponse.of(breeds.stream()
                 .map(breed -> BreedResponse.of(breed.getId(), breed.getName()))

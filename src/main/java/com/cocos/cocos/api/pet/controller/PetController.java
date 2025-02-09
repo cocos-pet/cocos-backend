@@ -23,6 +23,7 @@ public class PetController implements PetControllerSwagger {
     public ResponseEntity<BaseResponse<Void>> addPet(
             @RequestBody final PetCreateRequest petCreateRequest
     ) {
+        //ToDo: 넘길 때 DTO 자체 보단, 값을 넘기는 것이 Controller에서 사용하는 DTO의 역할을 잘 지키는 것이라고 생각함
         petService.addPet(petCreateRequest, PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.CREATED, null);
     }
@@ -32,6 +33,7 @@ public class PetController implements PetControllerSwagger {
             @PathVariable(name = "petId") final Long petId,
             @RequestBody final PetUpdateRequest petUpdateRequest
     ) {
+        //ToDo: 넘길 때 DTO 자체 보단, 값을 넘기는 것이 Controller에서 사용하는 DTO의 역할을 잘 지키는 것이라고 생각함
         petService.updatePet(petUpdateRequest, petId, PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.OK, null);
     }

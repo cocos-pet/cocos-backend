@@ -11,7 +11,7 @@ import java.util.Collections;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CorsConfig {
-
+    //ToDo: final 키워드 붙일 곳 붙여야 할 듯
     public static CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 

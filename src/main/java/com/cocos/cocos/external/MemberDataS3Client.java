@@ -25,6 +25,7 @@ public class MemberDataS3Client {
         this.s3Presigner = awsConfig.getPresigner();
     }
 
+    //ToDo: 중복되는 부분에 코드를 줄일 수 있는 방법 필요 (ex: enum을 통해 app, member data구분 등)
     public String getPresignedUrl(final String fileName) {
         if (fileName == null || fileName.equals("")) {
             return null;

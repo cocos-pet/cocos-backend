@@ -12,7 +12,7 @@ public interface MemberTokenRepository extends JpaRepository<MemberToken, Long> 
     boolean existsByMemberId(final Long memberId);
 
     void deleteByMemberId(final Long memberId);
-
+    //ToDo: 얘네 필요 없으면 삭제해도 될 듯
     MemberToken findByRefreshToken(final String refreshToken);
 
     boolean existsByRefreshToken(final String refreshToken);

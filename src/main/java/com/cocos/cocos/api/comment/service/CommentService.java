@@ -39,6 +39,7 @@ public class CommentService {
 
     @Transactional
     public void addPostComment(final Long postId, final String content, final Long memberId) {
+        //ToDo: 네이밍 통일이 필요해 보임
         validatePostExists(postId);
         validatePet(memberId);
 
@@ -53,17 +54,20 @@ public class CommentService {
 
     @Transactional
     public void deletePostComment(final Long commentId, final Long memberId) {
+        //ToDo: validateCommentExists라는 네이밍과는 역할이 조금 다른 것 같음. 댓글을 찾는 것과 유효성을 검사하는 작업은 분리가 되는 것이 더 적합해 보임(유효성을 검사하는 클래스를 따로 빼도 좋을 것 같음)
         final Comment comment = validateCommentExists(commentId);
         if (!comment.getMemberId().equals(memberId)) {
             throw new CocosException(FailMessage.FORBIDDEN_COMMENT_DELETE);
         }
         commentRepository.deleteById(commentId);
+        //ToDo: 대댓글도 다 삭제 되는 거 보다 에브리타임처럼 댓글만 삭제되고 "삭제된 댓글입니다" 표시만 나오는 거로 해야하는지
         subCommentRepository.deleteAllByCommentId(comment.getId());
     }
 
     @Transactional
     public void addPostSubComment(final Long commentId, final String nickname, final String content, final Long memberId) {
         validateCommentExists(commentId);
+        //Todo: 유효성 검사를 하는 메소드를 따로 빼는 것을 통일시키는 것도 좋아보임
         if (!memberRepository.existsByNickname(nickname)) {
             throw new CocosException(FailMessage.NOT_FOUND_MENTIONED_MEMBER);
         }
@@ -89,8 +93,9 @@ public class CommentService {
         }
         subCommentRepository.deleteById(subComment.getId());
     }
-
+    //ToDo: @Transactional(readOnly = true) 필요. -> 혹여나 이 메소드 안에서 DB 변화가 일어나는 것을 막아줌
     public CommentsAndSubCommentsResponse getPostComments(final Long postId, final Long memberId) {
+        //ToDo : validatePostExists와 아래 findById는 역할이 비슷해 보임 여기서는 validatePostExists가 없어도 좋아보임
         validatePostExists(postId);
 
         final Post post = postRepository.findById(postId).orElseThrow(
@@ -103,6 +108,7 @@ public class CommentService {
                 .toList();
 
         final List<SubComment> subComments = subCommentRepository.findByCommentIdInOrderByCreatedAtAsc(commentIds);
+        //ToDo: Map을 이용하여 한번에 stream을 돌리는 것 보단, (1) 각 comment에 대한 모든 subComments 조회, (2) subComments에 대한 정보를 담은 DTO 생성, (3) subCommentDTO를 포함하여 commentDTO생성 하면 보다 직관적이고 메소드의 수를 줄일 수 있을 것 같음
         Map<Long, List<SubComment>> subCommentsGroupedByCommentId = subComments.stream()
                 .collect(Collectors.groupingBy(SubComment::getCommentId));
         final List<Long> memberIds = Stream.concat(
@@ -162,6 +168,7 @@ public class CommentService {
         return CommentsAndSubCommentsResponse.of(commentDtos);
     }
 
+    //ToDo: @Transactional(readOnly = true) 필요. -> 혹여나 이 메소드 안에서 DB 변화가 일어나는 것을 막아줌
     public MyAllCommentsResponse getMemberComments(final String nickname, final Long memberId) {
         final Long selectedMemberId = findMemberByNickname(nickname, memberId);
 

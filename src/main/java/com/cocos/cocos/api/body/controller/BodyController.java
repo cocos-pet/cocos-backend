@@ -23,7 +23,7 @@ public class BodyController implements BodyControllerSwagger {
     @GetMapping
     public ResponseEntity<BaseResponse<BodiesResponse>> getBodies(
             @RequestParam final PetProblem petProblem
-            ) {
+    ) {
         return SuccessResponse.success(SuccessMessage.OK, bodyService.getBodies(petProblem));
     }
 }

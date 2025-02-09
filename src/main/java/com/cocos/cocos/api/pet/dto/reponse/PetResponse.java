@@ -12,7 +12,7 @@ public record PetResponse(
         String petImage,
         @Schema(description = "애완동물 이름", example = "펫이름")
         String petName,
-        @Schema(description = "애완동물 성별",example = "12")
+        @Schema(description = "애완동물 성별", example = "12")
         int petAge,
         @Schema(description = "애완동물 나이", example = "M or F")
         Gender petGender,
@@ -29,7 +29,7 @@ public record PetResponse(
         @Schema(description = "증상 리스트")
         List<PetSymptomResponse> symptoms
 ) {
-       public static PetResponse of(final Long petId, final String petImage, final String petName,final int petAge, final Gender petGender, final Long breedId, final String breed, final Long animalId, final String animal, final List<PetDiseaseResponse> diseases, final List<PetSymptomResponse> symptoms) {
-               return new PetResponse(petId, petImage, petName, petAge, petGender, breedId, breed, animalId, animal, diseases, symptoms);
-       }
+    public static PetResponse of(final Long petId, final String petImage, final String petName, final int petAge, final Gender petGender, final Long breedId, final String breed, final Long animalId, final String animal, final List<PetDiseaseResponse> diseases, final List<PetSymptomResponse> symptoms) {
+        return new PetResponse(petId, petImage, petName, petAge, petGender, breedId, breed, animalId, animal, diseases, symptoms);
+    }
 }

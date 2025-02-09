@@ -27,6 +27,7 @@ public class DiseaseService {
         return DiseasesOfBodiesResponse.of(
                 bodyIds.stream()
                         .map(bodyId -> {
+                            //ToDo: 의미에 따라 코드 간격 조절 필요 (ex: 조회하는 코드, DTO 만드는 코드, 로직 구현 코드)
                             final Body body = bodyRepository.findById(bodyId).orElseThrow(
                                     () -> new CocosException(FailMessage.NOT_FOUND_BODY)
                             );
