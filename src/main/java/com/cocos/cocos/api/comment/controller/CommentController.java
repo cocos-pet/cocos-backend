@@ -23,6 +23,7 @@ public class CommentController implements CommentControllerSwagger {
     @PostMapping("/{postId}")
     public ResponseEntity<BaseResponse<Void>> addPostComment(
             @PathVariable(name = "postId") final Long postId,
+            //ToDo: body보다 정확한 이름을 명시해주는 것이 좋아 보임. (ex: commentContentRequest)
             @RequestBody final CommentContentRequest body
     ) {
         commentService.addPostComment(postId, body.content(), PrincipalHandler.getMemberIdFromPrincipal());
@@ -40,6 +41,7 @@ public class CommentController implements CommentControllerSwagger {
     @PostMapping("/sub/{commentId}")
     public ResponseEntity<BaseResponse<Void>> addPostSubComment(
             @PathVariable(name = "commentId") final Long commentId,
+            //ToDo: body보다 정확한 이름을 명시해주는 것이 좋아 보임.
             @RequestBody final SubCommentContentRequest body
     ) {
         commentService.addPostSubComment(commentId, body.nickname(), body.content(), PrincipalHandler.getMemberIdFromPrincipal());

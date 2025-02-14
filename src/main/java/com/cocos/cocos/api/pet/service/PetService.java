@@ -41,11 +41,12 @@ public class PetService {
     private final DiseaseRepository diseaseRepository;
     private final SymptomRepository symptomRepository;
     private final MemberRepository memberRepository;
-    private final AppDataS3Client appDataS3Client;
     private final MemberDataS3Client memberDataS3Client;
 
+    //ToDo: yml에 추가하는 방향 고민 중
     private static final String PET_BASE_IMAGE_URL = "member/basePetImage.png";
 
+    //ToDo: Transactional 수정
     @Transactional()
     public void addPet(final PetCreateRequest petCreateRequest, final Long memberId) {
         if (petRepository.existsByMemberId(memberId)) {
@@ -74,7 +75,9 @@ public class PetService {
         }
     }
 
+    //ToDo: 인자에 final 키워드 필요
     private void validatePetDiseases(List<Long> diseaseIds) {
+        //ToDo: existsAllByIdIn 등 쿼리문 하나로 이 메소드의 기능을 한 번에 수행할 수 있을 것 같음
         List<Long> validDiseaseIds = diseaseRepository.findByIdIn(diseaseIds).stream()
                 .map(Disease::getId)
                 .toList();
@@ -88,7 +91,9 @@ public class PetService {
         }
     }
 
+    //ToDo: 인자에 final 키워드 필요
     private void validatePetSymptoms(List<Long> symptomIds) {
+        //ToDo: existsAllByIdIn 등 쿼리문 하나로 이 메소드의 기능을 한 번에 수행할 수 있을 것 같음
         List<Long> validSymptomIds = symptomRepository.findByIdIn(symptomIds).stream()
                 .map(Symptom::getId)
                 .toList();
@@ -104,6 +109,7 @@ public class PetService {
 
     private void savePetSymptoms(final List<Long> symptomIds, Long petId) {
         final List<PetSymptom> petSymptoms = symptomIds.stream()
+                //ToDo: Builder패턴 사용
                 .map(symptomId -> new PetSymptom(petId, symptomId))
                 .toList();
 
@@ -112,6 +118,7 @@ public class PetService {
 
     private void savePetDiseases(final List<Long> diseaseIds, Long petId) {
         final List<PetDisease> petDiseases = diseaseIds.stream()
+                //ToDo: Builder패턴 사용
                 .map(diseaseId -> new PetDisease(petId, diseaseId))
                 .toList();
 
@@ -148,11 +155,13 @@ public class PetService {
         }
     }
 
+    //ToDo: Transactional readOnly = true 추가 필요
     public PetResponse getPet(final String nickname, final Long memberId) {
         if (nickname != null && !memberRepository.existsByNickname(nickname)) {
-                throw new CocosException(FailMessage.NOT_FOUND_MEMBER);
-            }
+            throw new CocosException(FailMessage.NOT_FOUND_MEMBER);
+        }
 
+        //ToDo: 메소드로 통일시켜도 좋을 것 같음(이전 다른 곳에서 사용되었던 코드와 통일 시키는 것이 좋아보임)
         final Long selectedMemberId = (nickname != null)
                 ? memberRepository.findByNickname(nickname).getId()
                 : memberId;
@@ -173,6 +182,7 @@ public class PetService {
         final List<PetDisease> petDiseases = petDiseaseRepository.findAllByPetId(pet.getId());
         final List<Disease> diseases = petDiseases.stream()
                 .map(petDisease -> {
+                    //ToDo: return 문 제거 가능
                     return diseaseRepository.findById(petDisease.getDiseaseId()).orElseThrow(
                             () -> new CocosException(FailMessage.NOT_FOUND_DISEASE)
                     );
@@ -181,6 +191,7 @@ public class PetService {
         final List<PetSymptom> petSymptoms = petSymptomRepository.findAllByPetId(pet.getId());
         final List<Symptom> symptoms = petSymptoms.stream()
                 .map(petSymptom -> {
+                    //ToDo: return 문 제거 가능
                     return symptomRepository.findById(petSymptom.getSymptomId()).orElseThrow(
                             () -> new CocosException(FailMessage.NOT_FOUND_SYMPTOM)
                     );

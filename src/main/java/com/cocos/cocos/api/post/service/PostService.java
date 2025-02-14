@@ -91,6 +91,7 @@ public class PostService {
                 () -> new CocosException(FailMessage.NOT_FOUND_CATEGORY)
         );
 
+        //ToDo: 좋아요 수는 해도 post 내의 likeCount를 그대로 반환해도 좋을 것 같음
         final int likeCounts = postLikeRepository.countByPostId(postId);
 
         final int commentCounts = commentRepository.countByPostId(postId);
@@ -149,6 +150,7 @@ public class PostService {
         postImageRepository.deleteAllByPostId(postId);
         postTagRepository.deleteAllByPostId(postId);
         postLikeRepository.deleteAllByPostId(postId);
+        //ToDo: 유효성 검사 필요
         postRepository.deleteById(postId);
     }
 
@@ -204,6 +206,7 @@ public class PostService {
             return PostImagesResponse.of(
                     images.stream()
                             .map(image -> {
+                                //ToDo: "post"를 상수화 해도 될 듯, 파일 포맷에 이미지 이름 추가 안 해도 됫 듯
                                 final String fileName = String.format("%s/%s/%s", memberId, "post", UUID.randomUUID() + image);
                                 postImageRepository.save(
                                         PostImage.builder()
@@ -234,6 +237,7 @@ public class PostService {
     }
 
     private List<Post> fetchPopularPosts(final Long memberId) {
+        //ToDo: 코드 의미에 따른 간격 조절
         if (petRepository.existsByMemberId(memberId)) {
             final Pet pet = petRepository.findByMemberId(memberId);
             if (petDiseaseRepository.existsByPetId(pet.getId())) {
@@ -243,6 +247,7 @@ public class PostService {
                 final List<Long> postIds = postTagRepository.findAllByTagIdAndTagType(diseaseIds, TagType.DISEASE).stream()
                         .map(PostTag::getPostId)
                         .toList();
+                //ToDo: final 키워드 추가 필요
                 Pageable pageable = PageRequest.of(0, 5);
                 return postRepository.findTopPostsByPostIds(postIds, pageable);
             } else if (petSymptomRepository.existsByPetId(pet.getId())) {
@@ -264,6 +269,7 @@ public class PostService {
                                      final List<Long> diseaseIds, final SortCriteria sortBy, final Long cursorId,
                                      final Long categoryId, final Long likeCount, final LocalDateTime createAt, final Long bodyId) {
         Specification<Post> spec = (root, query, criteriaBuilder) -> null;
+        //ToDo: 각 코드 마다의 주석 필요, 의미에 따른 간격 조절 필요
         if (keyword != null) {
             spec = spec.and(PostSpecification.hasKeyword(keyword));
         }
@@ -302,6 +308,7 @@ public class PostService {
             spec = spec.and(PostSpecification.inPostIds(postIds));
         }
 
+        //ToDo: log삭제
         if (cursorId != null) {
             if (sortBy.equals(SortCriteria.RECENT)) {
                 spec = spec.and(PostSpecification.lessThanByRecentCursorId(createAt, cursorId));
@@ -311,7 +318,9 @@ public class PostService {
                 log.info("인기 순일 때 커서 이후");
             }
         }
+
         // 정렬 및 페이징
+        //ToDo: log삭제
         Sort sort;
         if (sortBy.equals(SortCriteria.POPULAR)) {
             sort = Sort.by(
@@ -327,6 +336,7 @@ public class PostService {
             );
             log.info("최신 순일 때 기준");
         } else {
+            //ToDo: 코코스 Exception으로 수정
             throw new IllegalArgumentException("Invalid sort type");
         }
 
@@ -350,6 +360,7 @@ public class PostService {
                             final Breed breed = breedRepository.findById(pet.getBreedId()).orElseThrow(
                                     () -> new CocosException(FailMessage.NOT_FOUND_BREED)
                             );
+                            //ToDo: 내 게시글 불러오는 코드와 비교하여 중복되는 부분 메소드로 분리 필요
                             final int commentCounts = commentRepository.countByPostId(post.getId());
                             final int subCommentCounts = commentRepository.findAllByPostId(post.getId()).stream()
                                     .mapToInt(comment -> subCommentRepository.countByCommentId(comment.getId()))

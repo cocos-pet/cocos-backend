@@ -14,6 +14,7 @@ import java.net.URI;
 @Slf4j
 @Component
 public class KakaoLoginClient {
+    //ToDo: log제거 및 final 키워드 및 설명 주석 추가 및 final 키워드 추가 필요
 
     @Value("${kakao.client-id}")
     private String kakaoClientId;
@@ -43,6 +44,7 @@ public class KakaoLoginClient {
         log.info(kakaoAccessTokenResponse.accessToken());
 
         KakaoInfoResponse kakaoInfoResponse = restClient.get()
+                //ToDo: uri같은 거 yml에 적용 필요
                 .uri("https://kapi.kakao.com/v2/user/me")
                 .header("Authorization", "Bearer " + kakaoAccessTokenResponse.accessToken())
                 .header("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")

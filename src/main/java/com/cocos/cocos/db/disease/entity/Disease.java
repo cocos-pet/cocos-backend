@@ -23,7 +23,6 @@ public class Disease {
     private Long bodyId;
 
     @Builder
-
     public Disease(String name, Long bodyId) {
         this.name = name;
         this.bodyId = bodyId;

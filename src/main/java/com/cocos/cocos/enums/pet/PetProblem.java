@@ -1,6 +1,5 @@
 package com.cocos.cocos.enums.pet;
 
-import com.cocos.cocos.enums.post.SortCriteria;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -19,6 +18,7 @@ public enum PetProblem {
                 return value;
             }
         }
+        //ToDo: IllegalStateException 보다 커스텀 Exception 사용이 더 좋아보임
         throw new IllegalStateException("일치하는 카테고리가 존재하지 않습니다.");
     }
 }

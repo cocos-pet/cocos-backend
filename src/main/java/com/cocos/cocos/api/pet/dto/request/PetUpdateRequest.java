@@ -8,6 +8,7 @@ import java.util.List;
 
 @Schema(description = "애완동물 수정 형식")
 public record PetUpdateRequest(
+        //ToDo: 간격 맞추기 필요
         @Schema(description = "동물 종 아이디", example = "1")
         Long breedId,
 
@@ -26,6 +27,7 @@ public record PetUpdateRequest(
         @Schema(description = "증상 아이디 리스트", example = "[1,2,3]")
         List<Long> symptomIds
 ) {
+    //ToDo: RequestDTO에는 of 제거해도 될 듯
     public static PetUpdateRequest of(final Long breedId, final String name, final Gender gender, final Integer age, final List<Long> diseaseIds, final List<Long> symptomIds) {
         return new PetUpdateRequest(breedId, name, gender, age, diseaseIds, symptomIds);
     }

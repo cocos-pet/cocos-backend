@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Configuration;
         })
 @Configuration
 public class SwaggerConfig {
-
+    //ToDo: final 키워드 필요
     private static final String SWAGGER_DESCRIPTION = """
             Cocos API Docs
             """;
