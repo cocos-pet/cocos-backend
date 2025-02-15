@@ -16,9 +16,9 @@ import com.cocos.cocos.db.post.entity.Post;
 import com.cocos.cocos.db.post.repository.PostRepository;
 import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.external.MemberDataS3Client;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -39,10 +39,6 @@ public class CommentService {
 
     @Transactional
     public void addPostComment(final Long postId, final String content, final Long memberId) {
-        //ToDo: 네이밍 통일이 필요해 보임
-        validatePostExists(postId);
-        validatePet(memberId);
-
         commentRepository.save(
                 Comment.builder()
                         .content(content)
@@ -54,25 +50,19 @@ public class CommentService {
 
     @Transactional
     public void deletePostComment(final Long commentId, final Long memberId) {
-        //ToDo: validateCommentExists라는 네이밍과는 역할이 조금 다른 것 같음. 댓글을 찾는 것과 유효성을 검사하는 작업은 분리가 되는 것이 더 적합해 보임(유효성을 검사하는 클래스를 따로 빼도 좋을 것 같음)
-        final Comment comment = validateCommentExists(commentId);
+        final Comment comment = commentRepository.findById(commentId).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_COMMENT)
+        );
+
         if (!comment.getMemberId().equals(memberId)) {
             throw new CocosException(FailMessage.FORBIDDEN_COMMENT_DELETE);
         }
         commentRepository.deleteById(commentId);
-        //ToDo: 대댓글도 다 삭제 되는 거 보다 에브리타임처럼 댓글만 삭제되고 "삭제된 댓글입니다" 표시만 나오는 거로 해야하는지
         subCommentRepository.deleteAllByCommentId(comment.getId());
     }
 
     @Transactional
     public void addPostSubComment(final Long commentId, final String nickname, final String content, final Long memberId) {
-        validateCommentExists(commentId);
-        //Todo: 유효성 검사를 하는 메소드를 따로 빼는 것을 통일시키는 것도 좋아보임
-        if (!memberRepository.existsByNickname(nickname)) {
-            throw new CocosException(FailMessage.NOT_FOUND_MENTIONED_MEMBER);
-        }
-
-        validatePet(memberId);
         subCommentRepository.save(
                 SubComment.builder()
                         .commentId(commentId)
@@ -93,11 +83,9 @@ public class CommentService {
         }
         subCommentRepository.deleteById(subComment.getId());
     }
-    //ToDo: @Transactional(readOnly = true) 필요. -> 혹여나 이 메소드 안에서 DB 변화가 일어나는 것을 막아줌
-    public CommentsAndSubCommentsResponse getPostComments(final Long postId, final Long memberId) {
-        //ToDo : validatePostExists와 아래 findById는 역할이 비슷해 보임 여기서는 validatePostExists가 없어도 좋아보임
-        validatePostExists(postId);
 
+    @Transactional(readOnly = true)
+    public CommentsAndSubCommentsResponse getPostComments(final Long postId, final Long memberId) {
         final Post post = postRepository.findById(postId).orElseThrow(
                 () -> new CocosException(FailMessage.NOT_FOUND_POST)
         );
@@ -168,7 +156,7 @@ public class CommentService {
         return CommentsAndSubCommentsResponse.of(commentDtos);
     }
 
-    //ToDo: @Transactional(readOnly = true) 필요. -> 혹여나 이 메소드 안에서 DB 변화가 일어나는 것을 막아줌
+    @Transactional(readOnly = true)
     public MyAllCommentsResponse getMemberComments(final String nickname, final Long memberId) {
         final Long selectedMemberId = findMemberByNickname(nickname, memberId);
 
@@ -214,24 +202,6 @@ public class CommentService {
                 myComments,
                 mySubComments
         );
-    }
-
-    private void validatePet(Long memberId) {
-        if (!petRepository.existsByMemberId(memberId)) {
-            throw new CocosException(FailMessage.NOT_FOUND_PET);
-        }
-    }
-
-    private Comment validateCommentExists(Long commentId) {
-        return commentRepository.findById(commentId).orElseThrow(
-                () -> new CocosException(FailMessage.NOT_FOUND_COMMENT)
-        );
-    }
-
-    private void validatePostExists(Long postId) {
-        if (!postRepository.existsById(postId)) {
-            throw new CocosException(FailMessage.NOT_FOUND_POST);
-        }
     }
 
     private String getOrDefaultNickname(Long memberId, Map<Long, Member> memberMap) {
