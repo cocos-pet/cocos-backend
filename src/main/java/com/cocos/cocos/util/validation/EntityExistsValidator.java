@@ -8,10 +8,10 @@ import com.cocos.cocos.db.member.repository.MemberRepository;
 import com.cocos.cocos.db.pet.repository.PetRepository;
 import com.cocos.cocos.db.post.repository.PostRepository;
 import com.cocos.cocos.enums.message.FailMessage;
-import com.cocos.cocos.util.annotations.Validator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
-@Validator
+@Component
 @RequiredArgsConstructor
 public class EntityExistsValidator {
 
