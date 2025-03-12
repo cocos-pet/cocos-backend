@@ -9,6 +9,7 @@ import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.common.response.SuccessResponse;
 import com.cocos.cocos.enums.message.SuccessMessage;
 import com.cocos.cocos.util.PrincipalHandler;
+import com.cocos.cocos.util.validation.EntityExistsValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,14 +20,16 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController implements CommentControllerSwagger {
 
     private final CommentService commentService;
+    private final EntityExistsValidator entityExistsValidator;
 
     @PostMapping("/{postId}")
     public ResponseEntity<BaseResponse<Void>> addPostComment(
             @PathVariable(name = "postId") final Long postId,
-            //ToDo: body보다 정확한 이름을 명시해주는 것이 좋아 보임. (ex: commentContentRequest)
-            @RequestBody final CommentContentRequest body
+            @RequestBody final CommentContentRequest commentContentRequest
     ) {
-        commentService.addPostComment(postId, body.content(), PrincipalHandler.getMemberIdFromPrincipal());
+        entityExistsValidator.validatePostByPostId(postId);
+        entityExistsValidator.validatePetByMemberId(PrincipalHandler.getMemberIdFromPrincipal());
+        commentService.addPostComment(postId, commentContentRequest.content(), PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.CREATED, null);
     }
 
@@ -34,6 +37,7 @@ public class CommentController implements CommentControllerSwagger {
     public ResponseEntity<BaseResponse<Void>> deletePostComment(
             @PathVariable(name = "commentId") final Long commentId
     ) {
+        entityExistsValidator.validateCommentByCommentId(commentId);
         commentService.deletePostComment(commentId, PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.OK, null);
     }
@@ -41,10 +45,12 @@ public class CommentController implements CommentControllerSwagger {
     @PostMapping("/sub/{commentId}")
     public ResponseEntity<BaseResponse<Void>> addPostSubComment(
             @PathVariable(name = "commentId") final Long commentId,
-            //ToDo: body보다 정확한 이름을 명시해주는 것이 좋아 보임.
-            @RequestBody final SubCommentContentRequest body
+            @RequestBody final SubCommentContentRequest subCommentContentRequest
     ) {
-        commentService.addPostSubComment(commentId, body.nickname(), body.content(), PrincipalHandler.getMemberIdFromPrincipal());
+        entityExistsValidator.validateCommentByCommentId(commentId);
+        entityExistsValidator.validateMemberByNickname(subCommentContentRequest.nickname());
+        entityExistsValidator.validatePetByMemberId(PrincipalHandler.getMemberIdFromPrincipal());
+        commentService.addPostSubComment(commentId, subCommentContentRequest.nickname(), subCommentContentRequest.content(), PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.CREATED, null);
     }
 
@@ -52,6 +58,7 @@ public class CommentController implements CommentControllerSwagger {
     public ResponseEntity<BaseResponse<Void>> deletePostSubComment(
             @PathVariable(name = "subCommentId") final Long subCommentId
     ) {
+        entityExistsValidator.validateSubCommentBySubCommentId(subCommentId);
         commentService.deletePostSubComment(subCommentId, PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.OK, null);
     }
@@ -60,8 +67,7 @@ public class CommentController implements CommentControllerSwagger {
     public ResponseEntity<BaseResponse<CommentsAndSubCommentsResponse>> getPostComments(
             @PathVariable(name = "postId") final Long postId
     ) {
-        final CommentsAndSubCommentsResponse postComments = commentService.getPostComments(postId, PrincipalHandler.getMemberIdFromPrincipal());
-        return SuccessResponse.success(SuccessMessage.OK, postComments);
+        return SuccessResponse.success(SuccessMessage.OK, commentService.getPostComments(postId, PrincipalHandler.getMemberIdFromPrincipal()));
     }
 
     @GetMapping("/members")

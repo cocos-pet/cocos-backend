@@ -8,8 +8,4 @@ public record SubCommentContentRequest(
         @Schema(description = "댓글 내용", example = "댓글의 내용입니다. ")
         String content
 ) {
-    //ToDo: 이 부분은 없어도 될 것 같음. request를 직접 만드는 경우가 없음
-    public static SubCommentContentRequest of(final String nickname, final String content) {
-        return new SubCommentContentRequest(nickname, content);
-    }
 }

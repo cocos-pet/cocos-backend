@@ -16,7 +16,6 @@ public record MyCommentResponse(
         @Schema(description = "댓글 생성일", example = "2025-01-01T00:00:00")
         LocalDateTime createdAt
 ) {
-    //ToDo: cmd + option + L로 항상 정렬 필요
     public static MyCommentResponse of(final Long id, final String content, final Long postId, final String postTitle, final LocalDateTime createdAt) {
         return new MyCommentResponse(id, content, postId, postTitle, createdAt);
     }
