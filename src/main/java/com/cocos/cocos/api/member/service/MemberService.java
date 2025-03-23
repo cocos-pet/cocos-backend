@@ -48,9 +48,6 @@ public class MemberService {
     @Transactional
     public LoginResponse login(final String code) {
         //ToDo: 코드 역할에 따라 간격 띄우는 것 필요
-        if (code == null) {
-            throw new CocosException(FailMessage.FORBIDDEN);
-        }
         final String sub = kakaoLoginClient.login(code);
         Member member = null;
         boolean isCompletedSignUp;

@@ -28,7 +28,6 @@ public class SecurityConfig {
             "/api/dev/members/refresh",
             "/v3/api-docs/**",
             "/api/dev/test/**",
-            "/api/local/members/login",
     };
 
     @Bean
