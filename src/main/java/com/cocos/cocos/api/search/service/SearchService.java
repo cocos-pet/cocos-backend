@@ -4,6 +4,7 @@ import com.cocos.cocos.api.search.dto.response.KeywordResponse;
 import com.cocos.cocos.api.search.dto.response.SearchResponse;
 import com.cocos.cocos.db.search.entity.Search;
 import com.cocos.cocos.db.search.repository.SearchRepository;
+import com.cocos.cocos.enums.search.SearchType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -17,17 +18,6 @@ public class SearchService {
 
     private final SearchRepository searchRepository;
 
-    @Transactional(readOnly = true)
-    public SearchResponse getSearch(final Long memberId) {
-        //ToDo: 검색어도 함께
-        final List<Search> searchList = searchRepository.findTop5ByMemberIdOrderByUpdatedAtDesc(memberId);
-        return SearchResponse.of(
-                searchList.stream()
-                        .map(search -> KeywordResponse.of(search.getId(), search.getKeyword()))
-                        .toList()
-        );
-    }
-
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public Void addSearch(final Long memberId, final String keyword) {
         if (searchRepository.existsByMemberIdAndKeyword(memberId, keyword)) {
@@ -37,8 +27,19 @@ public class SearchService {
             searchRepository.save(Search.builder()
                     .memberId(memberId)
                     .keyword(keyword)
+                    .searchType(SearchType.COMMUNITY)
                     .build());
         }
         return null;
+    }
+
+    @Transactional(readOnly = true)
+    public SearchResponse getSearchByType(final Long memberId, final SearchType searchType) {
+        final List<Search> searchList = searchRepository.findTop5ByMemberIdAndSearchTypeOrderByUpdatedAtDesc(memberId, searchType);
+        return SearchResponse.of(
+                searchList.stream()
+                        .map(search -> KeywordResponse.of(search.getId(), search.getKeyword()))
+                        .toList()
+        );
     }
 }

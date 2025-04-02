@@ -1,6 +1,7 @@
 package com.cocos.cocos.db.search.repository;
 
 import com.cocos.cocos.db.search.entity.Search;
+import com.cocos.cocos.enums.search.SearchType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,4 +15,6 @@ public interface SearchRepository extends JpaRepository<Search, Long> {
     boolean existsByMemberIdAndKeyword(final Long memberId, final String keyword);
 
     Search findByMemberIdAndKeyword(final Long memberId, final String keyword);
+
+    List<Search> findTop5ByMemberIdAndSearchTypeOrderByUpdatedAtDesc(final Long memberId, final SearchType searchType);
 }

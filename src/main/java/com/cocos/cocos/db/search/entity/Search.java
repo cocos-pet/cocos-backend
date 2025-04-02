@@ -24,6 +24,7 @@ public class Search extends BaseTime {
     @Column(name = "member_id", nullable = false)
     private Long memberId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "search_type", nullable = false)
     private SearchType searchType;
 
