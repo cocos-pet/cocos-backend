@@ -19,15 +19,15 @@ public class SearchService {
     private final SearchRepository searchRepository;
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public Void addSearch(final Long memberId, final String keyword) {
-        if (searchRepository.existsByMemberIdAndKeyword(memberId, keyword)) {
-            final Search search = searchRepository.findByMemberIdAndKeyword(memberId, keyword);
+    public Void addSearch(final Long memberId, final String keyword, final SearchType searchType) {
+        if (searchRepository.existsByMemberIdAndKeywordAndSearchType(memberId, keyword, searchType)) {
+            final Search search = searchRepository.findByMemberIdAndKeywordAndSearchType(memberId, keyword, searchType);
             search.updateTime();
         } else {
             searchRepository.save(Search.builder()
                     .memberId(memberId)
                     .keyword(keyword)
-                    .searchType(SearchType.COMMUNITY)
+                    .searchType(searchType)
                     .build());
         }
         return null;

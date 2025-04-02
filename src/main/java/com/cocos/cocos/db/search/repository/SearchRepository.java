@@ -10,11 +10,9 @@ import java.util.List;
 @Repository
 public interface SearchRepository extends JpaRepository<Search, Long> {
 
-    List<Search> findTop5ByMemberIdOrderByUpdatedAtDesc(final Long memberId);
+    boolean existsByMemberIdAndKeywordAndSearchType(final Long memberId, final String keyword, final SearchType searchType);
 
-    boolean existsByMemberIdAndKeyword(final Long memberId, final String keyword);
-
-    Search findByMemberIdAndKeyword(final Long memberId, final String keyword);
+    Search findByMemberIdAndKeywordAndSearchType(final Long memberId, final String keyword, final SearchType searchType);
 
     List<Search> findTop5ByMemberIdAndSearchTypeOrderByUpdatedAtDesc(final Long memberId, final SearchType searchType);
 }

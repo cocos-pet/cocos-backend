@@ -5,6 +5,7 @@ import com.cocos.cocos.api.search.dto.response.SearchResponse;
 import com.cocos.cocos.api.search.service.SearchService;
 import com.cocos.cocos.db.search.entity.Search;
 import com.cocos.cocos.db.search.repository.SearchRepository;
+import com.cocos.cocos.enums.search.SearchType;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -33,20 +34,24 @@ public class SearchServiceTest {
     private SearchRepository searchRepository;
 
     @Test
-    @DisplayName("최근에 검색한 검색어 5개를 보여줄 수 있다.")
-    void getDiseases() {
+    @DisplayName("최근에 검색한 커뮤니티 검색어 5개를 보여줄 수 있다.")
+    void getSearch() {
         //given
         final Long memberId = 1L;
         final Search search1 = Search.builder()
                 .memberId(memberId)
                 .keyword("keyword1")
+                .searchType(SearchType.COMMUNITY)
                 .build();
         final Search search2 = Search.builder()
                 .memberId(memberId)
                 .keyword("keyword1")
+                .searchType(SearchType.COMMUNITY)
                 .build();
+        final SearchType searchType = SearchType.COMMUNITY;
+
         final List<Search> searchList = new ArrayList<>(List.of(search1, search2));
-        BDDMockito.given(searchRepository.findTop5ByMemberIdOrderByUpdatedAtDesc(any())).willReturn(searchList);
+        BDDMockito.given(searchRepository.findTop5ByMemberIdAndSearchTypeOrderByUpdatedAtDesc(memberId, searchType)).willReturn(searchList);
 
         final SearchResponse expected = SearchResponse.of(
                 searchList.stream()
@@ -55,7 +60,7 @@ public class SearchServiceTest {
         );
 
         //when
-        final SearchResponse actual = searchService.getSearch(memberId);
+        final SearchResponse actual = searchService.getSearchByType(memberId, searchType);
 
         //then
         Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);

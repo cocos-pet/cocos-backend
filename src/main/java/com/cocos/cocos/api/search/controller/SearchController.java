@@ -27,11 +27,18 @@ public class SearchController implements SearchControllerSwagger {
     public ResponseEntity<BaseResponse<Void>> addSearch(
             @RequestParam(name = "keyword") final String keyword
     ) {
-        return SuccessResponse.success(SuccessMessage.OK, searchService.addSearch(PrincipalHandler.getMemberIdFromPrincipal(), keyword));
+        return SuccessResponse.success(SuccessMessage.OK, searchService.addSearch(PrincipalHandler.getMemberIdFromPrincipal(), keyword, SearchType.COMMUNITY));
     }
 
     @GetMapping("/hospital")
     public ResponseEntity<BaseResponse<SearchResponse>> getHospitalSearch() {
         return SuccessResponse.success(SuccessMessage.OK, searchService.getSearchByType(PrincipalHandler.getMemberIdFromPrincipal(), SearchType.HOSPITAL));
+    }
+
+    @PostMapping("/hospital")
+    public ResponseEntity<BaseResponse<Void>> addHospitalSearch(
+            @RequestParam(name = "keyword") final String keyword
+    ) {
+        return SuccessResponse.success(SuccessMessage.OK, searchService.addSearch(PrincipalHandler.getMemberIdFromPrincipal(), keyword, SearchType.HOSPITAL));
     }
 }
