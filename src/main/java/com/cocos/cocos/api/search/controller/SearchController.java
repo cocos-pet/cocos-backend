@@ -28,7 +28,7 @@ public class SearchController implements SearchControllerSwagger {
             @RequestParam(name = "keyword") final String keyword
     ) {
         searchService.addSearch(PrincipalHandler.getMemberIdFromPrincipal(), keyword, SearchType.COMMUNITY);
-        return SuccessResponse.success(SuccessMessage.OK, null );
+        return SuccessResponse.success(SuccessMessage.OK, null);
     }
 
     @GetMapping("/hospital")

@@ -24,7 +24,7 @@ import java.util.List;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("최근 검색어 서비스 테스트")
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-public class SearchServiceTest {
+class SearchServiceTest {
 
     @InjectMocks
     private SearchService searchService;
@@ -66,12 +66,12 @@ public class SearchServiceTest {
     }
 
     @Test
-    @DisplayName("동시에 요청해도 중복 insert 되지 않는다")
+    @DisplayName("이미 존재하는 검색어가 있을 경우 업데이트가 된다")
     void addSearch() {
         // given
-        Long memberId = 1L;
-        String keyword = "피부과";
-        SearchType searchType = SearchType.HOSPITAL;
+        final Long memberId = 1L;
+        final String keyword = "피부과";
+        final SearchType searchType = SearchType.HOSPITAL;
 
         final Search existingSearch = Mockito.mock(Search.class);
         BDDMockito.given(searchRepository.findWithLockByMemberIdAndKeywordAndSearchType(memberId, keyword, searchType))
