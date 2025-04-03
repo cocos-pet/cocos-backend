@@ -15,12 +15,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("최근 검색어 서비스 테스트")
@@ -64,5 +63,43 @@ public class SearchServiceTest {
 
         //then
         Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("동시에 요청해도 중복 insert 되지 않는다")
+    void addSearch() {
+        // given
+        Long memberId = 1L;
+        String keyword = "피부과";
+        SearchType searchType = SearchType.HOSPITAL;
+
+        final Search existingSearch = Mockito.mock(Search.class);
+        BDDMockito.given(searchRepository.findWithLockByMemberIdAndKeywordAndSearchType(memberId, keyword, searchType))
+                .willReturn(existingSearch);
+
+        // when
+        searchService.addSearch(memberId, keyword, searchType);
+
+        // then
+        Mockito.verify(existingSearch, Mockito.times(1)).updateTime();
+        Mockito.verify(searchRepository, Mockito.never()).save(Mockito.any());
+    }
+
+    @Test
+    @DisplayName("동일한 검색어가 없으면 새로 저장한다")
+    void addSearchIfSearchDoesNotExist() {
+        // given
+        final Long memberId = 1L;
+        final String keyword = "피부과";
+        final SearchType searchType = SearchType.HOSPITAL;
+
+        BDDMockito.given(searchRepository.findWithLockByMemberIdAndKeywordAndSearchType(memberId, keyword, searchType))
+                .willReturn(null);
+
+        // when
+        searchService.addSearch(memberId, keyword, searchType);
+
+        // then
+        Mockito.verify(searchRepository, Mockito.times(1)).save(Mockito.any(Search.class));
     }
 }
