@@ -7,7 +7,6 @@ import com.cocos.cocos.db.search.repository.SearchRepository;
 import com.cocos.cocos.enums.search.SearchType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -18,10 +17,11 @@ public class SearchService {
 
     private final SearchRepository searchRepository;
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    public Void addSearch(final Long memberId, final String keyword, final SearchType searchType) {
-        if (searchRepository.existsByMemberIdAndKeywordAndSearchType(memberId, keyword, searchType)) {
-            final Search search = searchRepository.findByMemberIdAndKeywordAndSearchType(memberId, keyword, searchType);
+    @Transactional
+    public void addSearch(final Long memberId, final String keyword, final SearchType searchType) {
+        final Search search = searchRepository.findWithLockByMemberIdAndKeywordAndSearchType(memberId, keyword, searchType);
+
+        if (search != null) {
             search.updateTime();
         } else {
             searchRepository.save(Search.builder()
@@ -30,7 +30,6 @@ public class SearchService {
                     .searchType(searchType)
                     .build());
         }
-        return null;
     }
 
     @Transactional(readOnly = true)

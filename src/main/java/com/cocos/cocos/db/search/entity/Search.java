@@ -10,7 +10,12 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "search")
+@Table(
+        name = "search",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"member_id", "keyword", "search_type"})
+        }
+)
 public class Search extends BaseTime {
 
     @Id

@@ -27,7 +27,8 @@ public class SearchController implements SearchControllerSwagger {
     public ResponseEntity<BaseResponse<Void>> addSearch(
             @RequestParam(name = "keyword") final String keyword
     ) {
-        return SuccessResponse.success(SuccessMessage.OK, searchService.addSearch(PrincipalHandler.getMemberIdFromPrincipal(), keyword, SearchType.COMMUNITY));
+        searchService.addSearch(PrincipalHandler.getMemberIdFromPrincipal(), keyword, SearchType.COMMUNITY);
+        return SuccessResponse.success(SuccessMessage.OK, null );
     }
 
     @GetMapping("/hospital")
@@ -39,6 +40,7 @@ public class SearchController implements SearchControllerSwagger {
     public ResponseEntity<BaseResponse<Void>> addHospitalSearch(
             @RequestParam(name = "keyword") final String keyword
     ) {
-        return SuccessResponse.success(SuccessMessage.OK, searchService.addSearch(PrincipalHandler.getMemberIdFromPrincipal(), keyword, SearchType.HOSPITAL));
+        searchService.addSearch(PrincipalHandler.getMemberIdFromPrincipal(), keyword, SearchType.HOSPITAL);
+        return SuccessResponse.success(SuccessMessage.OK, null);
     }
 }
