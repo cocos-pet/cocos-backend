@@ -1,6 +1,7 @@
 package com.cocos.cocos.search;
 
 import com.cocos.cocos.api.search.service.SearchService;
+import com.cocos.cocos.config.JpaAuditingConfig;
 import com.cocos.cocos.db.member.entity.Member;
 import com.cocos.cocos.db.member.repository.MemberRepository;
 import com.cocos.cocos.db.search.repository.SearchRepository;
@@ -22,7 +23,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @DataJpaTest
-@Import(SearchService.class)
+@Import({SearchService.class,JpaAuditingConfig.class })
 @ActiveProfiles("test")
 class SearchConcurrencyTest {
 
