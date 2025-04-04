@@ -12,6 +12,7 @@ import java.util.List;
 @Repository
 public interface SearchRepository extends JpaRepository<Search, Long> {
 
+    //TODO: 안정적인 상황 확인 후 동시성 제어 제거
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Search findWithLockByMemberIdAndKeywordAndSearchType(final Long memberId, final String keyword, final SearchType searchType);
 
