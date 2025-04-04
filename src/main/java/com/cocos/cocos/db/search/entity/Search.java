@@ -1,6 +1,7 @@
 package com.cocos.cocos.db.search.entity;
 
 import com.cocos.cocos.db.BaseTime;
+import com.cocos.cocos.enums.search.SearchType;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,7 +10,12 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "search")
+@Table(
+        name = "search",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"member_id", "keyword", "search_type"})
+        }
+)
 public class Search extends BaseTime {
 
     @Id
@@ -23,9 +29,14 @@ public class Search extends BaseTime {
     @Column(name = "member_id", nullable = false)
     private Long memberId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "search_type", nullable = false)
+    private SearchType searchType;
+
     @Builder
-    public Search(String keyword, Long memberId) {
+    public Search(String keyword, Long memberId, SearchType searchType) {
         this.keyword = keyword;
         this.memberId = memberId;
+        this.searchType = searchType;
     }
 }
