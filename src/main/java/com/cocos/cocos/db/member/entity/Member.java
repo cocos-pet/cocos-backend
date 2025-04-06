@@ -1,6 +1,7 @@
 package com.cocos.cocos.db.member.entity;
 
 import com.cocos.cocos.db.BaseTime;
+import com.cocos.cocos.enums.location.LocationType;
 import com.cocos.cocos.enums.member.Platform;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -37,17 +38,35 @@ public class Member extends BaseTime {
     @Column(name = "is_admin", nullable = false)
     private boolean isAdmin;
 
+    @Column(name = "current_address", nullable = false)
+    private String currentAddress;
+
+    @Column(name = "town_id", nullable = false)
+    private Long townId;
+
+    @Column(name = "location_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private LocationType locationType;
+
     @Builder
-    public Member(final String nickname, final String email, final String image, final Platform platform, final String sub, final boolean isAdmin) {
+    public Member(final String nickname, final String email, final String image, final Platform platform, final String sub, final boolean isAdmin, final String currentAddress, final Long townId, final LocationType locationType) {
         this.nickname = nickname;
         this.email = email;
         this.image = image;
         this.platform = platform;
         this.sub = sub;
         this.isAdmin = isAdmin;
+        this.currentAddress = currentAddress;
+        this.townId = townId;
+        this.locationType = locationType;
     }
 
-    public void updateFields(final String nickname) {
+    public void updateNickname(final String nickname) {
         if (nickname != null) this.nickname = nickname;
+    }
+
+    public void updateLocation(final LocationType locationType, final Long townId) {
+        this.locationType = locationType;
+        this.townId = townId;
     }
 }

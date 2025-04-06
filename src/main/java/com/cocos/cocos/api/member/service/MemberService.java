@@ -7,10 +7,13 @@ import com.cocos.cocos.api.member.dto.response.TokenResponse;
 import com.cocos.cocos.auth.JwtProvider;
 import com.cocos.cocos.api.member.dto.response.NicknameExistenceResponse;
 import com.cocos.cocos.common.exception.CocosException;
+import com.cocos.cocos.db.city.repository.CityRepository;
+import com.cocos.cocos.db.district.repository.DistrictRepository;
 import com.cocos.cocos.db.member.entity.Member;
 import com.cocos.cocos.db.member.entity.MemberToken;
 import com.cocos.cocos.db.member.repository.MemberRepository;
 import com.cocos.cocos.db.member.repository.MemberTokenRepository;
+import com.cocos.cocos.enums.location.LocationType;
 import com.cocos.cocos.enums.member.Platform;
 import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.external.KakaoLoginClient;
@@ -28,6 +31,8 @@ public class MemberService {
     private final KakaoLoginClient kakaoLoginClient;
     private final JwtProvider jwtProvider;
     private final MemberTokenRepository memberTokenRepository;
+    private final CityRepository cityRepository;
+    private final DistrictRepository districtRepository;
 
     //ToDo: yml에 기입해야하는 지 고민 중
     private static final String MEMBER_BASE_IMAGE_URL = "member/baseProfileImage.png";
@@ -64,6 +69,9 @@ public class MemberService {
                     .isAdmin(false)
                     .platform(Platform.KAKAO)
                     .sub(sub)
+                    .townId(1L)
+                    .locationType(LocationType.CITY)
+                    .currentAddress("현재 주소를 업데이트 해주세요!")
                     .build()
             );
             isCompletedSignUp = false;
@@ -112,20 +120,33 @@ public class MemberService {
     }
 
     @Transactional
-    public NicknameExistenceResponse updateMemberProfile(final String nickname, final Long memberId) {
+    public NicknameExistenceResponse updateMemberProfile(final Long memberId, final String nickname, final LocationType locationType, final Long townId) {
+        final Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_MEMBER)
+        );
+        updateCurrentAddress(member, locationType, townId);
         if (memberRepository.existsByNickname(nickname)) {
             return NicknameExistenceResponse.of(true);
         } else {
-            final Member member = memberRepository.findById(memberId).orElseThrow(
-                    () -> new CocosException(FailMessage.NOT_FOUND_MEMBER)
-            );
-            member.updateFields(nickname);
+            member.updateNickname(nickname);
             return NicknameExistenceResponse.of(false);
 
         }
     }
 
-    //ToDo: Transactional(readOnly = true)필요
+    private void updateCurrentAddress(final Member member, final LocationType locationType, final Long townId) {
+        if (locationType != null && townId != null) {
+            if (locationType.equals(LocationType.CITY) && !cityRepository.existsById(townId)) {
+                throw new CocosException((FailMessage.NOT_FOUND_CITY));
+            }
+            if (locationType.equals(LocationType.DISTRICT) && !districtRepository.existsById(townId)) {
+                throw new CocosException((FailMessage.NOT_FOUND_DISTRICT));
+            }
+            member.updateLocation(locationType, townId);
+        }
+    }
+
+    @Transactional(readOnly = true)
     public NicknameExistenceResponse checkNickname(final String nickname) {
         if (memberRepository.existsByNickname(nickname)) {
             return NicknameExistenceResponse.of(true);

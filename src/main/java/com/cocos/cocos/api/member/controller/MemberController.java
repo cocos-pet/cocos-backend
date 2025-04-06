@@ -1,6 +1,7 @@
 package com.cocos.cocos.api.member.controller;
 
 import com.cocos.cocos.api.member.dto.request.LoginRequest;
+import com.cocos.cocos.api.member.dto.request.MemberProfileUpdateRequest;
 import com.cocos.cocos.api.member.dto.response.LoginResponse;
 import com.cocos.cocos.api.member.dto.response.MemberProfileResponse;
 import com.cocos.cocos.api.member.dto.response.ReissueTokenResponse;
@@ -10,8 +11,10 @@ import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.common.response.SuccessResponse;
 import com.cocos.cocos.enums.message.SuccessMessage;
 import com.cocos.cocos.util.PrincipalHandler;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,9 +37,9 @@ public class MemberController implements MemberControllerSwagger {
 
     @PatchMapping
     public ResponseEntity<BaseResponse<NicknameExistenceResponse>> updateMemberProfile(
-            @RequestParam(name = "nickname") final String nickname
+            @RequestBody @Valid final MemberProfileUpdateRequest memberProfileUpdateRequest
     ) {
-        final NicknameExistenceResponse nicknameExistenceResponse = memberService.updateMemberProfile(nickname, PrincipalHandler.getMemberIdFromPrincipal());
+        final NicknameExistenceResponse nicknameExistenceResponse = memberService.updateMemberProfile(PrincipalHandler.getMemberIdFromPrincipal(), memberProfileUpdateRequest.nickname(), memberProfileUpdateRequest.locationType(), memberProfileUpdateRequest.townId());
         return SuccessResponse.success(SuccessMessage.OK, nicknameExistenceResponse);
     }
 

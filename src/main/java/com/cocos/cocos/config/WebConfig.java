@@ -1,5 +1,6 @@
 package com.cocos.cocos.config;
 
+import com.cocos.cocos.util.LocationTypeEnumConverter;
 import com.cocos.cocos.util.PetProblemEnumConverter;
 import com.cocos.cocos.util.SortCriteriaEnumConverter;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addFormatters(FormatterRegistry registry) {
         registry.addConverter(new SortCriteriaEnumConverter());
         registry.addConverter(new PetProblemEnumConverter());
+        registry.addConverter(new LocationTypeEnumConverter());
     }
 
     @Override

@@ -16,6 +16,7 @@ public enum FailMessage {
     BAD_REQUEST_MISSING_PARAM(HttpStatus.BAD_REQUEST, 40002, "필수 param이 없습니다. "),
     BAD_REQUEST_METHOD_ARGUMENT_TYPE(HttpStatus.BAD_REQUEST, 40003, "메서드 인자타입이 잘못되었습니다. "),
     BAD_REQUEST_NOT_READABLE(HttpStatus.BAD_REQUEST, 40004, "json 오류 혹은 reqeust body 필드 오류 입니다. "),
+    BAD_REQUEST_NOT_EXISTS_DTO_FIELD(HttpStatus.BAD_REQUEST, 40005, "해당하는 DTO 필드가 존재하지 않습니다."),
 
     /**
      * 401
@@ -31,6 +32,8 @@ public enum FailMessage {
     FORBIDDEN(HttpStatus.FORBIDDEN, 40300, "권한이 없습니다. "),
     FORBIDDEN_COMMENT_DELETE(HttpStatus.FORBIDDEN, 40301, "댓글을 삭제할 권한이 없습니다. "),
     FORBIDDEN_PET_UPDATE(HttpStatus.FORBIDDEN, 40302, "애완동물 정보를 수정할 권리가 없습니다. "),
+    FORBIDDEN_FIELD(HttpStatus.FORBIDDEN, 40302, "해당 필드에 접근할 수 없습니다."),
+
     /**
      * 404
      */
@@ -51,6 +54,9 @@ public enum FailMessage {
     NOT_FOUND_SUB_COMMENT(HttpStatus.NOT_FOUND, 40414, "대댓글을 찾을 수 없습니다."),
     NOT_FOUND_PET(HttpStatus.NOT_FOUND, 40415, "애완동물을 찾을 수 없습니다. "),
     NOT_FOUND_MENTIONED_MEMBER(HttpStatus.NOT_FOUND, 40416, "언급된 사용자를 찾을 수 없습니다. "),
+    NOT_FOUND_LOCATION_TYPE(HttpStatus.BAD_REQUEST, 40417, "지역 종류를 찾을 수 없습니다."),
+    NOT_FOUND_CITY(HttpStatus.BAD_REQUEST, 40418, "시/도를 찾을 수 없습니다."),
+    NOT_FOUND_DISTRICT(HttpStatus.BAD_REQUEST, 40419, "시/군/구를 찾을 수 없습니다."),
 
     /**
      * 405

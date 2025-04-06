@@ -1,6 +1,7 @@
 package com.cocos.cocos.api.member.controller;
 
 import com.cocos.cocos.api.member.dto.request.LoginRequest;
+import com.cocos.cocos.api.member.dto.request.MemberProfileUpdateRequest;
 import com.cocos.cocos.api.member.dto.response.LoginResponse;
 import com.cocos.cocos.api.member.dto.response.MemberProfileResponse;
 import com.cocos.cocos.api.member.dto.response.ReissueTokenResponse;
@@ -45,7 +46,9 @@ public interface MemberControllerSwagger {
     @ApiResponse(
             responseCode = "200",
             description = "요청에 성공했습니다. ")
-    public ResponseEntity<BaseResponse<NicknameExistenceResponse>> updateMemberProfile(@RequestParam final String nickname);
+    public ResponseEntity<BaseResponse<NicknameExistenceResponse>> updateMemberProfile(
+            final MemberProfileUpdateRequest memberProfileUpdateRequest
+    );
 
     @Operation(summary = "닉네임 중복 조회 API", description = "중복된 닉네임이 있는지 검사합니다. ")
     @ApiResponse(

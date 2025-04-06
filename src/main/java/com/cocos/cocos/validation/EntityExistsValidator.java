@@ -1,7 +1,6 @@
-package com.cocos.cocos.util.validation;
+package com.cocos.cocos.validation;
 
 import com.cocos.cocos.common.exception.CocosException;
-import com.cocos.cocos.db.breed.repository.BreedRepository;
 import com.cocos.cocos.db.comment.repository.CommentRepository;
 import com.cocos.cocos.db.comment.repository.SubCommentRepository;
 import com.cocos.cocos.db.member.repository.MemberRepository;
@@ -19,7 +18,6 @@ public class EntityExistsValidator {
     private final SubCommentRepository subCommentRepository;
     private final MemberRepository memberRepository;
     private final PetRepository petRepository;
-    private final BreedRepository breedRepository;
     private final PostRepository postRepository;
 
     public void validatePostByPostId(final Long postId) {

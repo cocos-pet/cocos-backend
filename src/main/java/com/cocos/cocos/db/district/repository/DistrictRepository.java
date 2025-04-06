@@ -10,4 +10,6 @@ import java.util.List;
 public interface DistrictRepository extends JpaRepository<District, Long> {
 
     List<District> findByCityId(final Long cityId);
+
+    boolean existsById(final Long id);
 }
