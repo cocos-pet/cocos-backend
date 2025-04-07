@@ -6,7 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MemberAddressRepository extends JpaRepository<MemberAddress, Long> {
-    boolean existsByMemberId(final Long memberId);
-
     MemberAddress findByMemberId(final Long memberId);
 }
