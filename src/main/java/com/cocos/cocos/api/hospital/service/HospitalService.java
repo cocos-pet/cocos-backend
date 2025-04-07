@@ -7,6 +7,7 @@ import com.cocos.cocos.db.hospital.entity.Hospital;
 import com.cocos.cocos.db.hospital.repository.HospitalRepository;
 import com.cocos.cocos.enums.hospital.HospitalSortCriteria;
 import com.cocos.cocos.enums.message.FailMessage;
+import com.cocos.cocos.util.SortConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +32,7 @@ public class HospitalService {
             final HospitalSortCriteria hospitalSortCriteria,
             final Integer cursorReviewCount
     ) {
-        List<Hospital> hospitals = getHospitalsByKeywordAndCursor(size, townId, keyword, cursorId, cursorReviewCount, hospitalSortCriteria);
+        final List<Hospital> hospitals = getHospitalsByKeywordAndCursor(size, townId, keyword, cursorId, cursorReviewCount, hospitalSortCriteria);
         final Long nextCursorId = hospitals.isEmpty() ? null : hospitals.getLast().getId();
         final Integer nextCursorReviewCount = hospitals.isEmpty() ? null : hospitals.getLast().getReviewCount();
 
@@ -48,16 +49,16 @@ public class HospitalService {
         );
     }
 
-    private List<Hospital> getHospitalsByKeywordAndCursor(int size, Long townId, String keyword, Long cursorId, Integer cursorReviewCount, HospitalSortCriteria hospitalSortCriteria) {
+    private List<Hospital> getHospitalsByKeywordAndCursor(final int size, final Long townId, final String keyword, final Long cursorId, final Integer cursorReviewCount, final HospitalSortCriteria hospitalSortCriteria) {
         if (keyword != null && !keyword.isBlank()) {
             Pageable pageable = PageRequest.of(0, size, Sort.by(
-                    Sort.Order.desc("id")
+                    SortConstants.ID_DESC
             ));
             return (cursorId != null) ? hospitalRepository.findAllByNameContainingAndTownIdAndIdLessThan(keyword, townId, cursorId, pageable) : hospitalRepository.findAllByNameContainingAndTownId(keyword, townId, pageable);
         } else {
             Pageable pageable = PageRequest.of(0, size, Sort.by(
                     Sort.Order.desc(hospitalSortCriteria.getFieldName()),
-                    Sort.Order.desc("id")
+                    SortConstants.ID_DESC
             ));
             if (hospitalSortCriteria == HospitalSortCriteria.REVIEW) {
                 if (cursorId == null) {
