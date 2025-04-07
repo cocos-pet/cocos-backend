@@ -7,7 +7,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum HospitalSortCriteria {
-    @Schema(description = "리뷰 많은 순", example = "REVIEW")
     REVIEW("리뷰 많은 순", "reviewCount");
 
     private final String sortBy;
