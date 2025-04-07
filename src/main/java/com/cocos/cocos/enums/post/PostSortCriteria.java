@@ -1,11 +1,13 @@
 package com.cocos.cocos.enums.post;
 
+import com.cocos.cocos.common.exception.CocosException;
+import com.cocos.cocos.enums.message.FailMessage;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum SortCriteria {
+public enum PostSortCriteria {
 
     RECENT("최신순", "createdAt"),
     POPULAR("인기순", "likeCount");
@@ -13,13 +15,12 @@ public enum SortCriteria {
     private final String sortBy;
     private final String fieldName;
 
-    public static SortCriteria create(String requestCategory) {
-        for (SortCriteria value : SortCriteria.values()) {
+    public static PostSortCriteria create(String requestCategory) {
+        for (PostSortCriteria value : PostSortCriteria.values()) {
             if (value.toString().equals(requestCategory)) {
                 return value;
             }
         }
-        //ToDo: 코코스 Exception을 사용하는 것이 좋아보임
-        throw new IllegalStateException("일치하는 카테고리가 존재하지 않습니다.");
+        throw new CocosException(FailMessage.BAD_REQUEST_INVALID_SORT_CRITERIA);
     }
 }
