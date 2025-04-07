@@ -5,6 +5,7 @@ import com.cocos.cocos.api.member.dto.response.LoginResponse;
 import com.cocos.cocos.api.member.dto.response.MemberProfileResponse;
 import com.cocos.cocos.api.member.dto.response.ReissueTokenResponse;
 import com.cocos.cocos.api.member.dto.response.NicknameExistenceResponse;
+import com.cocos.cocos.api.member.dto.response.MemberLocationResponse;
 import com.cocos.cocos.api.member.service.MemberService;
 import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.common.response.SuccessResponse;
@@ -63,5 +64,10 @@ public class MemberController implements MemberControllerSwagger {
     @GetMapping("/refresh")
     public ResponseEntity<BaseResponse<ReissueTokenResponse>> reIssueToken() {
         return SuccessResponse.success(SuccessMessage.OK, memberService.reIssueToken(PrincipalHandler.getMemberIdFromPrincipal()));
+    }
+
+    @GetMapping("/location")
+    public ResponseEntity<BaseResponse<MemberLocationResponse>> getMemberLocation() {
+        return SuccessResponse.success(SuccessMessage.OK, memberService.getMemberLocation(PrincipalHandler.getMemberIdFromPrincipal()));
     }
 }

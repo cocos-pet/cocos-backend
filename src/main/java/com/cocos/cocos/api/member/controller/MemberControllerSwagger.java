@@ -5,6 +5,7 @@ import com.cocos.cocos.api.member.dto.response.LoginResponse;
 import com.cocos.cocos.api.member.dto.response.MemberProfileResponse;
 import com.cocos.cocos.api.member.dto.response.ReissueTokenResponse;
 import com.cocos.cocos.api.member.dto.response.NicknameExistenceResponse;
+import com.cocos.cocos.api.member.dto.response.MemberLocationResponse;
 import com.cocos.cocos.common.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -52,4 +53,11 @@ public interface MemberControllerSwagger {
             responseCode = "200",
             description = "요청에 성공했습니다. ")
     public ResponseEntity<BaseResponse<NicknameExistenceResponse>> checkNickname(@RequestParam final String nickname);
+
+    @Operation(summary = "사용자 위치 조회 API", description = "사용자위치에 등록된 동 정보를 반환합니다.")
+    @ApiResponse(
+            responseCode = "200",
+            description = "요청에 성공했습니다. "
+    )
+    public ResponseEntity<BaseResponse<MemberLocationResponse>> getMemberLocation();
 }

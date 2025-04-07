@@ -1,16 +1,14 @@
 package com.cocos.cocos.api.member.service;
 
-import com.cocos.cocos.api.member.dto.response.LoginResponse;
-import com.cocos.cocos.api.member.dto.response.MemberProfileResponse;
-import com.cocos.cocos.api.member.dto.response.ReissueTokenResponse;
-import com.cocos.cocos.api.member.dto.response.TokenResponse;
+import com.cocos.cocos.api.member.dto.response.*;
 import com.cocos.cocos.auth.JwtProvider;
-import com.cocos.cocos.api.member.dto.response.NicknameExistenceResponse;
 import com.cocos.cocos.common.exception.CocosException;
 import com.cocos.cocos.db.member.entity.Member;
 import com.cocos.cocos.db.member.entity.MemberToken;
 import com.cocos.cocos.db.member.repository.MemberRepository;
 import com.cocos.cocos.db.member.repository.MemberTokenRepository;
+import com.cocos.cocos.db.town.entity.Town;
+import com.cocos.cocos.db.town.repository.TownRepository;
 import com.cocos.cocos.enums.member.Platform;
 import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.external.KakaoLoginClient;
@@ -28,18 +26,14 @@ public class MemberService {
     private final KakaoLoginClient kakaoLoginClient;
     private final JwtProvider jwtProvider;
     private final MemberTokenRepository memberTokenRepository;
+    private final TownRepository townRepository;
 
     //ToDo: yml에 기입해야하는 지 고민 중
     private static final String MEMBER_BASE_IMAGE_URL = "member/baseProfileImage.png";
 
     @Transactional(readOnly = true)
     public MemberProfileResponse getMemberProfile(final String nickname, final Long memberId) {
-        //ToDo: ?의 역할을 findMember()라는 하나의 메소드 안에서 모두 해결 할 수 있을 것 같음
-        final Long selectedMemberId = (nickname != null) ? findMemberByNickname(nickname) : memberId;
-        //ToDo: 이 부분 또한 findMember, 즉 멤버를 찾는 메소드 안에서 한 번에 처리가능할 것 같음
-        final Member member = memberRepository.findById(selectedMemberId).orElseThrow(
-                () -> new CocosException(FailMessage.NOT_FOUND_MEMBER)
-        );
+        final Member member = findMember(nickname, memberId);
         return MemberProfileResponse.of(member.getNickname(), memberDataS3Client.getPresignedUrl(member.getImage()));
     }
 
@@ -99,18 +93,6 @@ public class MemberService {
         return null;
     }
 
-    private Long findMemberByNickname(String nickname) {
-        if (nickname != null) {
-            final Member member = memberRepository.findByNickname(nickname);
-            if (member == null) {
-                throw new CocosException((FailMessage.NOT_FOUND_MEMBER));
-            }
-            return member.getId();
-        } else {
-            return null;
-        }
-    }
-
     @Transactional
     public NicknameExistenceResponse updateMemberProfile(final String nickname, final Long memberId) {
         if (memberRepository.existsByNickname(nickname)) {
@@ -125,13 +107,24 @@ public class MemberService {
         }
     }
 
-    //ToDo: Transactional(readOnly = true)필요
+    @Transactional(readOnly = true)
     public NicknameExistenceResponse checkNickname(final String nickname) {
-        if (memberRepository.existsByNickname(nickname)) {
-            return NicknameExistenceResponse.of(true);
-        } else {
-            return NicknameExistenceResponse.of(false);
+        return NicknameExistenceResponse.of(memberRepository.existsByNickname(nickname));
+    }
 
+    @Transactional(readOnly = true)
+    public MemberLocationResponse getMemberLocation(final Long memberId) {
+        final Member member = memberRepository.findById(memberId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
+        final Town town = townRepository.findById(member.getTownId()).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_TOWN));
+        return MemberLocationResponse.of(
+                town.getId(), town.getName()
+        );
+    }
+
+    private Member findMember(final String nickname, final Long memberId) {
+        if (nickname != null) {
+            return memberRepository.findByNickname(nickname).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
         }
+        return memberRepository.findById(memberId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
     }
 }

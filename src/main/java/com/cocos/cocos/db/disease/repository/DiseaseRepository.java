@@ -10,5 +10,6 @@ import java.util.List;
 public interface DiseaseRepository extends JpaRepository<Disease, Long> {
 
     List<Disease> findAllByBodyId(final Long bodyId);
-    List<Disease> findByIdIn(final List<Long> ids);
+
+    long countByIdIn(final List<Long> ids);
 }

@@ -22,9 +22,8 @@ import com.cocos.cocos.db.pet.repository.PetSymptomRepository;
 import com.cocos.cocos.db.symptom.entity.Symptom;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.message.FailMessage;
-import com.cocos.cocos.external.AppDataS3Client;
 import com.cocos.cocos.external.MemberDataS3Client;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -75,52 +74,30 @@ public class PetService {
         }
     }
 
-    //ToDo: 인자에 final 키워드 필요
-    private void validatePetDiseases(List<Long> diseaseIds) {
-        //ToDo: existsAllByIdIn 등 쿼리문 하나로 이 메소드의 기능을 한 번에 수행할 수 있을 것 같음
-        List<Long> validDiseaseIds = diseaseRepository.findByIdIn(diseaseIds).stream()
-                .map(Disease::getId)
-                .toList();
-
-        List<Long> invalidDiseaseIds = diseaseIds.stream()
-                .filter(diseaseId -> !validDiseaseIds.contains(diseaseId))
-                .toList();
-
-        if (!invalidDiseaseIds.isEmpty()) {
+    private void validatePetDiseases(final List<Long> diseaseIds) {
+        final long diseaseCount = diseaseRepository.countByIdIn(diseaseIds);
+        if (diseaseCount != diseaseIds.size()) {
             throw new CocosException(FailMessage.NOT_FOUND_DISEASE);
         }
     }
 
-    //ToDo: 인자에 final 키워드 필요
-    private void validatePetSymptoms(List<Long> symptomIds) {
-        //ToDo: existsAllByIdIn 등 쿼리문 하나로 이 메소드의 기능을 한 번에 수행할 수 있을 것 같음
-        List<Long> validSymptomIds = symptomRepository.findByIdIn(symptomIds).stream()
-                .map(Symptom::getId)
-                .toList();
-
-        List<Long> invalidSymptomIds = symptomIds.stream()
-                .filter(symptomId -> !validSymptomIds.contains(symptomId))
-                .toList();
-
-        if (!invalidSymptomIds.isEmpty()) {
+    private void validatePetSymptoms(final List<Long> symptomIds) {
+        final long symptomCount = symptomRepository.countByIdIn(symptomIds);
+        if (symptomCount != symptomIds.size()) {
             throw new CocosException(FailMessage.NOT_FOUND_SYMPTOM);
         }
     }
 
     private void savePetSymptoms(final List<Long> symptomIds, Long petId) {
         final List<PetSymptom> petSymptoms = symptomIds.stream()
-                //ToDo: Builder패턴 사용
-                .map(symptomId -> new PetSymptom(petId, symptomId))
-                .toList();
+                .map(symptomId -> PetSymptom.builder().petId(petId).symptomId(symptomId).build()).toList();
 
         petSymptomRepository.saveAll(petSymptoms);
     }
 
     private void savePetDiseases(final List<Long> diseaseIds, Long petId) {
         final List<PetDisease> petDiseases = diseaseIds.stream()
-                //ToDo: Builder패턴 사용
-                .map(diseaseId -> new PetDisease(petId, diseaseId))
-                .toList();
+                .map(diseaseId -> PetDisease.builder().petId(petId).diseaseId(diseaseId).build()).toList();
 
         petDiseaseRepository.saveAll(petDiseases);
     }
@@ -155,7 +132,7 @@ public class PetService {
         }
     }
 
-    //ToDo: Transactional readOnly = true 추가 필요
+    @Transactional(readOnly = true)
     public PetResponse getPet(final String nickname, final Long memberId) {
         if (nickname != null && !memberRepository.existsByNickname(nickname)) {
             throw new CocosException(FailMessage.NOT_FOUND_MEMBER);
@@ -163,7 +140,7 @@ public class PetService {
 
         //ToDo: 메소드로 통일시켜도 좋을 것 같음(이전 다른 곳에서 사용되었던 코드와 통일 시키는 것이 좋아보임)
         final Long selectedMemberId = (nickname != null)
-                ? memberRepository.findByNickname(nickname).getId()
+                ? memberRepository.findByNickname(nickname).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER)).getId()
                 : memberId;
 
         final Pet pet = petRepository.findByMemberId(selectedMemberId);
@@ -181,21 +158,19 @@ public class PetService {
 
         final List<PetDisease> petDiseases = petDiseaseRepository.findAllByPetId(pet.getId());
         final List<Disease> diseases = petDiseases.stream()
-                .map(petDisease -> {
-                    //ToDo: return 문 제거 가능
-                    return diseaseRepository.findById(petDisease.getDiseaseId()).orElseThrow(
-                            () -> new CocosException(FailMessage.NOT_FOUND_DISEASE)
-                    );
-                }).toList();
+                .map(petDisease ->
+                        diseaseRepository.findById(petDisease.getDiseaseId()).orElseThrow(
+                                () -> new CocosException(FailMessage.NOT_FOUND_DISEASE)
+                        )
+                ).toList();
 
         final List<PetSymptom> petSymptoms = petSymptomRepository.findAllByPetId(pet.getId());
         final List<Symptom> symptoms = petSymptoms.stream()
-                .map(petSymptom -> {
-                    //ToDo: return 문 제거 가능
-                    return symptomRepository.findById(petSymptom.getSymptomId()).orElseThrow(
-                            () -> new CocosException(FailMessage.NOT_FOUND_SYMPTOM)
-                    );
-                }).toList();
+                .map(petSymptom ->
+                        symptomRepository.findById(petSymptom.getSymptomId()).orElseThrow(
+                                () -> new CocosException(FailMessage.NOT_FOUND_SYMPTOM)
+                        )
+                ).toList();
 
         return PetResponse.of(
                 pet.getId(),

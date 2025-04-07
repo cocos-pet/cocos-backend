@@ -435,12 +435,7 @@ public class PostService {
 
     private Member findMember(final Long memberId, final String nickname) {
         if (nickname != null) {
-            final Member member = memberRepository.findByNickname(nickname);
-            if (member == null) {
-                throw new CocosException(FailMessage.NOT_FOUND_MEMBER);
-            } else {
-                return member;
-            }
+            return memberRepository.findByNickname(nickname).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
         }
         return memberRepository.findById(memberId).orElseThrow(
                 () -> new CocosException(FailMessage.NOT_FOUND_MEMBER)

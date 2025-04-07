@@ -37,14 +37,18 @@ public class Member extends BaseTime {
     @Column(name = "is_admin", nullable = false)
     private boolean isAdmin;
 
+    @Column(name = "town_id", nullable = false)
+    private Long townId;
+
     @Builder
-    public Member(final String nickname, final String email, final String image, final Platform platform, final String sub, final boolean isAdmin) {
+    public Member(final String nickname, final String email, final String image, final Platform platform, final String sub, final boolean isAdmin, final Long townId) {
         this.nickname = nickname;
         this.email = email;
         this.image = image;
         this.platform = platform;
         this.sub = sub;
         this.isAdmin = isAdmin;
+        this.townId = townId;
     }
 
     public void updateFields(final String nickname) {

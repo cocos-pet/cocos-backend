@@ -39,6 +39,7 @@ public class CommentService {
 
     @Transactional
     public void addPostComment(final Long postId, final String content, final Long memberId) {
+        //TODO: pet이 없는 member는 댓글을 달지 못함.
         commentRepository.save(
                 Comment.builder()
                         .content(content)
@@ -63,10 +64,12 @@ public class CommentService {
 
     @Transactional
     public void addPostSubComment(final Long commentId, final String nickname, final String content, final Long memberId) {
+        //TODO: pet이 없는 member는 대댓글을 달지 못함.
+        final Member member = memberRepository.findByNickname(nickname).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
         subCommentRepository.save(
                 SubComment.builder()
                         .commentId(commentId)
-                        .mentionedMemberId(memberRepository.findByNickname(nickname).getId())
+                        .mentionedMemberId(member.getId())
                         .content(content)
                         .memberId(memberId)
                         .build()
@@ -233,10 +236,7 @@ public class CommentService {
 
     private Long findMemberByNickname(final String nickname, final Long memberId) {
         if (nickname != null) {
-            final Member member = memberRepository.findByNickname(nickname);
-            if (member == null) {
-                throw new CocosException((FailMessage.NOT_FOUND_MEMBER));
-            }
+            final Member member = memberRepository.findByNickname(nickname).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
             return member.getId();
         } else {
             return memberId;
