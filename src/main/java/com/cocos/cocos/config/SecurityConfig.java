@@ -30,6 +30,7 @@ public class SecurityConfig {
             "/api/dev/test/**",
             "/api/dev/locations",
             "/api/local/hospitals",
+            "/api/dev/hospitals",
             "api/local/members/login"
     };
 
