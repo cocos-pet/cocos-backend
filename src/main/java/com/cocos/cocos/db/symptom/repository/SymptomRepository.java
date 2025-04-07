@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface SymptomRepository extends JpaRepository<Symptom, Long> {
 
-    List<Symptom> findAllByBodyId(final Long BodyId);
+    List<Symptom> findAllByBodyId(final Long bodyId);
 
     long countByIdIn(final List<Long> ids);
 }
