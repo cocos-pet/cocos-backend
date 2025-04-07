@@ -1,0 +1,18 @@
+package com.cocos.cocos.enums.hospital;
+
+import com.cocos.cocos.common.exception.CocosException;
+import com.cocos.cocos.enums.message.FailMessage;
+import com.cocos.cocos.enums.post.PostSortCriteria;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
+public enum HospitalSortCriteria {
+    @Schema(description = "리뷰 많은 순", example = "REVIEW")
+    REVIEW("리뷰 많은 순", "reviewCount");
+
+    private final String sortBy;
+    private final String fieldName;
+}
