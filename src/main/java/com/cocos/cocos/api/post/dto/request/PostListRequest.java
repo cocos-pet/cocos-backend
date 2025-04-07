@@ -1,6 +1,6 @@
 package com.cocos.cocos.api.post.dto.request;
 
-import com.cocos.cocos.enums.post.SortCriteria;
+import com.cocos.cocos.enums.post.PostSortCriteria;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
@@ -16,7 +16,7 @@ public record PostListRequest(
         @Schema(description = "질병 아이디 리스트", example = "[1, 2] or null")
         List<Long> diseaseIds,
         @Schema(description = "정렬 기준", example = "RECENT or POPULAR")
-        SortCriteria sortBy,
+        PostSortCriteria sortBy,
         @Schema(description = "마지막 게시글 아이디", example = "1 or null")
         Long cursorId,
         @Schema(description = "마지막 게시글 카테고리 아이디", example = "1 or null")

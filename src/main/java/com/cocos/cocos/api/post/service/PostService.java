@@ -28,7 +28,7 @@ import com.cocos.cocos.db.search.repository.SearchRepository;
 import com.cocos.cocos.db.symptom.entity.Symptom;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.message.FailMessage;
-import com.cocos.cocos.enums.post.SortCriteria;
+import com.cocos.cocos.enums.post.PostSortCriteria;
 import com.cocos.cocos.enums.tag.TagType;
 import com.cocos.cocos.external.AppDataS3Client;
 import com.cocos.cocos.external.MemberDataS3Client;
@@ -266,7 +266,7 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public PostListResponse getPosts(final Long memberId, final String keyword, final List<Long> animalIds, final List<Long> symptomIds,
-                                     final List<Long> diseaseIds, final SortCriteria sortBy, final Long cursorId,
+                                     final List<Long> diseaseIds, final PostSortCriteria sortBy, final Long cursorId,
                                      final Long categoryId, final Long likeCount, final LocalDateTime createAt, final Long bodyId) {
         Specification<Post> spec = (root, query, criteriaBuilder) -> null;
         //ToDo: 각 코드 마다의 주석 필요, 의미에 따른 간격 조절 필요
@@ -310,10 +310,10 @@ public class PostService {
 
         //ToDo: log삭제
         if (cursorId != null) {
-            if (sortBy.equals(SortCriteria.RECENT)) {
+            if (sortBy.equals(PostSortCriteria.RECENT)) {
                 spec = spec.and(PostSpecification.lessThanByRecentCursorId(createAt, cursorId));
                 log.info("최신 순일 때 커서 이후");
-            } else if (sortBy.equals(SortCriteria.POPULAR)) {
+            } else if (sortBy.equals(PostSortCriteria.POPULAR)) {
                 spec = spec.and(PostSpecification.lessThanByPostLikeCursorId(likeCount, createAt, cursorId));
                 log.info("인기 순일 때 커서 이후");
             }
@@ -322,14 +322,14 @@ public class PostService {
         // 정렬 및 페이징
         //ToDo: log삭제
         Sort sort;
-        if (sortBy.equals(SortCriteria.POPULAR)) {
+        if (sortBy.equals(PostSortCriteria.POPULAR)) {
             sort = Sort.by(
                     Sort.Order.desc("likeCount"),
                     Sort.Order.desc("createdAt"),
                     Sort.Order.desc("id")
             );
             log.info("인기 순일 때 기준");
-        } else if (sortBy.equals(SortCriteria.RECENT)) {
+        } else if (sortBy.equals(PostSortCriteria.RECENT)) {
             sort = Sort.by(
                     Sort.Order.desc("createdAt"),
                     Sort.Order.desc("id")

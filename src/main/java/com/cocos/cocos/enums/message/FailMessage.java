@@ -16,7 +16,8 @@ public enum FailMessage {
     BAD_REQUEST_MISSING_PARAM(HttpStatus.BAD_REQUEST, 40002, "필수 param이 없습니다. "),
     BAD_REQUEST_METHOD_ARGUMENT_TYPE(HttpStatus.BAD_REQUEST, 40003, "메서드 인자타입이 잘못되었습니다. "),
     BAD_REQUEST_NOT_READABLE(HttpStatus.BAD_REQUEST, 40004, "json 오류 혹은 reqeust body 필드 오류 입니다. "),
-
+    BAD_REQUEST_INVALID_SORT_CRITERIA(HttpStatus.BAD_REQUEST, 40005, "유효하지 않은 정렬 기준입니다."),
+    BAD_REQUEST_INVALID_TOKEN(HttpStatus.BAD_REQUEST, 40006, "유효하지 않은 인증정보입니다."),
     /**
      * 401
      */
@@ -77,6 +78,7 @@ public enum FailMessage {
     INTERNAL_SERVER_ERROR_BREED_ID(HttpStatus.INTERNAL_SERVER_ERROR, 50001, "서버에 유효하지 않은 breedId가 존재합니다. "),
     INTERNAL_SERVER_ERROR_PET_ID_FOR_MEMBER(HttpStatus.INTERNAL_SERVER_ERROR, 50002, "서버에 유효하지 않은 petId가 존재합니다. "),
     INTERNAL_SERVER_ERROR_PET_AGE(HttpStatus.INTERNAL_SERVER_ERROR, 50003, "서버에 유효하지 않은 petAge가 존재합니다. "),
+    INTERNAL_SERVER_ERROR_UNSUPPORTED_OPERATION(HttpStatus.INTERNAL_SERVER_ERROR, 50004, "유틸 클래스입니다. "),
     /**
      * 503
      */
