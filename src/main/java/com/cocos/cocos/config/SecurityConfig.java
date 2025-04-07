@@ -29,7 +29,8 @@ public class SecurityConfig {
             "/v3/api-docs/**",
             "/api/dev/test/**",
             "/api/dev/locations",
-            "/api/local/locations",
+            "/api/local/hospitals",
+            "api/local/members/login"
     };
 
     @Bean
@@ -57,7 +58,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    @Profile("local")
+    @Profile({"local", "test"})
     SecurityFilterChain securityFilterChainLocal(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
