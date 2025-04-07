@@ -1,8 +1,5 @@
 package com.cocos.cocos.enums.hospital;
 
-import com.cocos.cocos.common.exception.CocosException;
-import com.cocos.cocos.enums.message.FailMessage;
-import com.cocos.cocos.enums.post.PostSortCriteria;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
