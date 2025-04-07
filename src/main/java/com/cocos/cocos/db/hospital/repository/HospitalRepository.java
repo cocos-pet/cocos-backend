@@ -16,6 +16,7 @@ public interface HospitalRepository extends JpaRepository<Hospital, Long> {
 
     List<Hospital> findAllByNameContainingAndTownId(final String name, final Long townId, final Pageable pageable);
 
+    //TODO: 추후 queryDSL 도입 고민 필요
     @Query("""
             SELECT h FROM Hospital h
             WHERE h.townId = :townId
