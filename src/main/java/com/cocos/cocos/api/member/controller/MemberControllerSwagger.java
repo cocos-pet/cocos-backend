@@ -1,6 +1,7 @@
 package com.cocos.cocos.api.member.controller;
 
 import com.cocos.cocos.api.member.dto.request.LoginRequest;
+import com.cocos.cocos.api.member.dto.request.ProfileUpdateRequest;
 import com.cocos.cocos.api.member.dto.response.LoginResponse;
 import com.cocos.cocos.api.member.dto.response.MemberProfileResponse;
 import com.cocos.cocos.api.member.dto.response.ReissueTokenResponse;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "Member Controller", description = "사용자 관련 API")
@@ -46,7 +48,7 @@ public interface MemberControllerSwagger {
     @ApiResponse(
             responseCode = "200",
             description = "요청에 성공했습니다. ")
-    public ResponseEntity<BaseResponse<NicknameExistenceResponse>> updateMemberProfile(@RequestParam final String nickname);
+    public ResponseEntity<BaseResponse<NicknameExistenceResponse>> updateMemberProfile(@RequestBody final ProfileUpdateRequest profileUpdateRequest);
 
     @Operation(summary = "닉네임 중복 조회 API", description = "중복된 닉네임이 있는지 검사합니다. ")
     @ApiResponse(
