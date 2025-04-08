@@ -141,7 +141,9 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public MemberLocationResponse getMemberLocation(final Long memberId) {
-        final MemberAddress memberAddress = memberAddressRepository.findByMemberId(memberId);
+        final MemberAddress memberAddress = memberAddressRepository.findByMemberId(memberId).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_MEMBER_ADDRESS)
+        );
         final Town town = townRepository.findById(memberAddress.getTownId()).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_TOWN));
         return MemberLocationResponse.of(
                 town.getId(), town.getName()
@@ -158,13 +160,15 @@ public class MemberService {
     private void updateMemberLocation(final Long memberId, final String address, final String roadAddress,
                                       final String cityName, final String districtName, final String townName,
                                       final Double latitude, final Double longitude) {
-        final MemberAddress memberAddress = memberAddressRepository.findByMemberId(memberId);
+        final MemberAddress memberAddress = memberAddressRepository.findByMemberId(memberId).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_MEMBER_ADDRESS)
+        );
         memberAddress.updateAddress(address, roadAddress, findTown(townName, districtName, cityName), latitude, longitude);
     }
 
     private Long findTown(final String townName, final String districtName, final String cityName) {
         final City city = cityRepository.findByName(cityName);
-        final District district = districtRepository.findDistrictByNameAndCityId(districtName, city.getId());
+        final District district = districtRepository.findByNameAndCityId(districtName, city.getId());
         return townRepository.findByNameAndDistrictId(townName, district.getId()).getId();
     }
 }
