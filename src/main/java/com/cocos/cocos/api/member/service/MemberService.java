@@ -128,7 +128,7 @@ public class MemberService {
         if (memberRepository.existsByNickname(nickname)) {
             return NicknameExistenceResponse.of(true);
         } else {
-            member.updateFields(nickname);
+            member.updateNickname(nickname);
             return NicknameExistenceResponse.of(false);
 
         }

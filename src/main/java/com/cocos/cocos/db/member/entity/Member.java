@@ -48,7 +48,7 @@ public class Member extends BaseTime {
         this.isAdmin = isAdmin;
     }
 
-    public void updateFields(final String nickname) {
+    public void updateNickname(final String nickname) {
         if (nickname != null) this.nickname = nickname;
     }
 }
