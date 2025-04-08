@@ -16,22 +16,22 @@ public class MemberAddress {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "member_id", unique = true)
+    @Column(name = "member_id", nullable = false)
     private Long memberId;
 
-    @Column(name = "address", unique = true)
+    @Column(name = "address", nullable = false)
     private String address;
 
-    @Column(name = "road_address", unique = true)
+    @Column(name = "road_address", nullable = false)
     private String roadAddress;
 
-    @Column(name = "town_id", unique = true)
+    @Column(name = "town_id", nullable = false)
     private Long townId;
 
-    @Column(name = "latitude", unique = true)
+    @Column(name = "latitude", nullable = false)
     private Double latitude;
 
-    @Column(name = "longitude", unique = true)
+    @Column(name = "longitude", nullable = false)
     private Double longitude;
 
     @Builder
