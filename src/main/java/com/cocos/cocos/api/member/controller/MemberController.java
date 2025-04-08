@@ -1,6 +1,7 @@
 package com.cocos.cocos.api.member.controller;
 
 import com.cocos.cocos.api.member.dto.request.LoginRequest;
+import com.cocos.cocos.api.member.dto.request.ProfileUpdateRequest;
 import com.cocos.cocos.api.member.dto.response.LoginResponse;
 import com.cocos.cocos.api.member.dto.response.MemberProfileResponse;
 import com.cocos.cocos.api.member.dto.response.ReissueTokenResponse;
@@ -35,9 +36,19 @@ public class MemberController implements MemberControllerSwagger {
 
     @PatchMapping
     public ResponseEntity<BaseResponse<NicknameExistenceResponse>> updateMemberProfile(
-            @RequestParam(name = "nickname") final String nickname
+            @RequestBody final ProfileUpdateRequest profileUpdateRequest
     ) {
-        final NicknameExistenceResponse nicknameExistenceResponse = memberService.updateMemberProfile(nickname, PrincipalHandler.getMemberIdFromPrincipal());
+        final NicknameExistenceResponse nicknameExistenceResponse = memberService.updateMemberProfile(
+                PrincipalHandler.getMemberIdFromPrincipal(),
+                profileUpdateRequest.nickname(),
+                profileUpdateRequest.address(),
+                profileUpdateRequest.roadAddress(),
+                profileUpdateRequest.cityName(),
+                profileUpdateRequest.districtName(),
+                profileUpdateRequest.townName(),
+                profileUpdateRequest.latitude(),
+                profileUpdateRequest.longitude()
+        );
         return SuccessResponse.success(SuccessMessage.OK, nicknameExistenceResponse);
     }
 

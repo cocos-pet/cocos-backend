@@ -53,6 +53,7 @@ public enum FailMessage {
     NOT_FOUND_PET(HttpStatus.NOT_FOUND, 40415, "애완동물을 찾을 수 없습니다. "),
     NOT_FOUND_MENTIONED_MEMBER(HttpStatus.NOT_FOUND, 40416, "언급된 사용자를 찾을 수 없습니다. "),
     NOT_FOUND_TOWN(HttpStatus.NOT_FOUND, 40417, "동을 찾을 수 없습니다. "),
+    NOT_FOUND_MEMBER_ADDRESS(HttpStatus.NOT_FOUND, 40418, "사용자 위치를 찾을 수 없습니다."),
 
     /**
      * 405

@@ -3,8 +3,14 @@ package com.cocos.cocos.api.member.service;
 import com.cocos.cocos.api.member.dto.response.*;
 import com.cocos.cocos.auth.JwtProvider;
 import com.cocos.cocos.common.exception.CocosException;
+import com.cocos.cocos.db.city.entity.City;
+import com.cocos.cocos.db.city.repository.CityRepository;
+import com.cocos.cocos.db.district.entity.District;
+import com.cocos.cocos.db.district.repository.DistrictRepository;
 import com.cocos.cocos.db.member.entity.Member;
+import com.cocos.cocos.db.member.entity.MemberAddress;
 import com.cocos.cocos.db.member.entity.MemberToken;
+import com.cocos.cocos.db.member.repository.MemberAddressRepository;
 import com.cocos.cocos.db.member.repository.MemberRepository;
 import com.cocos.cocos.db.member.repository.MemberTokenRepository;
 import com.cocos.cocos.db.town.entity.Town;
@@ -27,9 +33,17 @@ public class MemberService {
     private final JwtProvider jwtProvider;
     private final MemberTokenRepository memberTokenRepository;
     private final TownRepository townRepository;
+    private final MemberAddressRepository memberAddressRepository;
+    private final CityRepository cityRepository;
+    private final DistrictRepository districtRepository;
 
     //ToDo: yml에 기입해야하는 지 고민 중
     private static final String MEMBER_BASE_IMAGE_URL = "member/baseProfileImage.png";
+    private static final Long DEFAULT_TOWN_ID = 1L;
+    private static final String DEFAULT_ADDRESS = "주소를 설정해주세요!";
+    private static final String DEFAULT_ROAD_ADDRESS = "도로명 주소를 설정해주세요!";
+    private static final Double DEFAULT_LATITUDE = 0.0;
+    private static final Double DEFAULT_LONGITUDE = 0.0;
 
     @Transactional(readOnly = true)
     public MemberProfileResponse getMemberProfile(final String nickname, final Long memberId) {
@@ -70,6 +84,9 @@ public class MemberService {
         } else {
             memberTokenRepository.save(MemberToken.builder().memberId(member.getId()).refreshToken(refreshToken).kakaoRefreshToken("").build());
         }
+        memberAddressRepository.save(
+                MemberAddress.createDefaultMemberAddress(member.getId(), DEFAULT_ADDRESS, DEFAULT_ROAD_ADDRESS, DEFAULT_TOWN_ID, DEFAULT_LATITUDE, DEFAULT_LONGITUDE)
+        );
         return LoginResponse.of(TokenResponse.of(accessToken, refreshToken), isCompletedSignUp);
     }
 
@@ -94,14 +111,24 @@ public class MemberService {
     }
 
     @Transactional
-    public NicknameExistenceResponse updateMemberProfile(final String nickname, final Long memberId) {
+    public NicknameExistenceResponse updateMemberProfile(final Long memberId, final String nickname,
+                                                         final String address, final String roadAddress,
+                                                         final String cityName, final String districtName, final String townName,
+                                                         final Double latitude, final Double longitude) {
+
+        final Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_MEMBER)
+        );
+
+        if (address != null && roadAddress != null) {
+            updateMemberLocation(memberId, address, roadAddress, cityName, districtName, townName, latitude, longitude);
+
+        }
+
         if (memberRepository.existsByNickname(nickname)) {
             return NicknameExistenceResponse.of(true);
         } else {
-            final Member member = memberRepository.findById(memberId).orElseThrow(
-                    () -> new CocosException(FailMessage.NOT_FOUND_MEMBER)
-            );
-            member.updateFields(nickname);
+            member.updateNickname(nickname);
             return NicknameExistenceResponse.of(false);
 
         }
@@ -114,8 +141,10 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public MemberLocationResponse getMemberLocation(final Long memberId) {
-        final Member member = memberRepository.findById(memberId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
-        final Town town = townRepository.findById(member.getTownId()).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_TOWN));
+        final MemberAddress memberAddress = memberAddressRepository.findByMemberId(memberId).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_MEMBER_ADDRESS)
+        );
+        final Town town = townRepository.findById(memberAddress.getTownId()).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_TOWN));
         return MemberLocationResponse.of(
                 town.getId(), town.getName()
         );
@@ -126,5 +155,20 @@ public class MemberService {
             return memberRepository.findByNickname(nickname).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
         }
         return memberRepository.findById(memberId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
+    }
+
+    private void updateMemberLocation(final Long memberId, final String address, final String roadAddress,
+                                      final String cityName, final String districtName, final String townName,
+                                      final Double latitude, final Double longitude) {
+        final MemberAddress memberAddress = memberAddressRepository.findByMemberId(memberId).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_MEMBER_ADDRESS)
+        );
+        memberAddress.updateAddress(address, roadAddress, findTown(townName, districtName, cityName), latitude, longitude);
+    }
+
+    private Long findTown(final String townName, final String districtName, final String cityName) {
+        final City city = cityRepository.findByName(cityName);
+        final District district = districtRepository.findByNameAndCityId(districtName, city.getId());
+        return townRepository.findByNameAndDistrictId(townName, district.getId()).getId();
     }
 }
