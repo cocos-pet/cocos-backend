@@ -40,6 +40,10 @@ public class MemberService {
     //ToDo: yml에 기입해야하는 지 고민 중
     private static final String MEMBER_BASE_IMAGE_URL = "member/baseProfileImage.png";
     private static final Long DEFAULT_TOWN_ID = 1L;
+    private static final String DEFAULT_ADDRESS = "주소를 설정해주세요!";
+    private static final String DEFAULT_ROAD_ADDRESS = "도로명 주소를 설정해주세요!";
+    private static final Double DEFAULT_LATITUDE = 0.0;
+    private static final Double DEFAULT_LONGITUDE = 0.0;
 
     @Transactional(readOnly = true)
     public MemberProfileResponse getMemberProfile(final String nickname, final Long memberId) {
@@ -81,14 +85,7 @@ public class MemberService {
             memberTokenRepository.save(MemberToken.builder().memberId(member.getId()).refreshToken(refreshToken).kakaoRefreshToken("").build());
         }
         memberAddressRepository.save(
-                MemberAddress.builder()
-                        .memberId(member.getId())
-                        .address("주소를 설정해주세요!")
-                        .roadAddress("도로명 주소를 설정해주세요!")
-                        .latitude(0.0)
-                        .longitude(0.0)
-                        .townId(DEFAULT_TOWN_ID)
-                        .build()
+                MemberAddress.createDefaultMemberAddress(member.getId(), DEFAULT_ADDRESS, DEFAULT_ROAD_ADDRESS, DEFAULT_TOWN_ID, DEFAULT_LATITUDE, DEFAULT_LONGITUDE)
         );
         return LoginResponse.of(TokenResponse.of(accessToken, refreshToken), isCompletedSignUp);
     }

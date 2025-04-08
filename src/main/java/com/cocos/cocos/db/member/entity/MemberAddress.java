@@ -51,4 +51,15 @@ public class MemberAddress {
         this.latitude = latitude;
         this.longitude = longitude;
     }
+
+    public static MemberAddress createDefaultMemberAddress(final Long memberId, final String address, final String roadAddress, final Long townId, final Double latitude, final Double longitude) {
+        return MemberAddress.builder()
+                .memberId(memberId)
+                .address(address)
+                .roadAddress(roadAddress)
+                .latitude(latitude)
+                .longitude(longitude)
+                .townId(townId)
+                .build();
+    }
 }
