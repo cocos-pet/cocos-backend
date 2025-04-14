@@ -1,5 +1,6 @@
 package com.cocos.cocos.api.member.dto.request;
 
+import com.cocos.cocos.enums.location.LocationType;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record ProfileUpdateRequest(
@@ -18,6 +19,10 @@ public record ProfileUpdateRequest(
         @Schema(description = "위도", example = "35.xxxx")
         Double latitude,
         @Schema(description = "경도", example = "128.xxx")
-        Double longitude
+        Double longitude,
+        @Schema(description = "위치 아이디", example = "1")
+        Long locationId,
+        @Schema(description = "위치 종류", example = "CITY | DISTRICT")
+        LocationType locationType
 ) {
 }
