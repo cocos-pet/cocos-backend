@@ -3,14 +3,16 @@ package com.cocos.cocos.api.member.service;
 import com.cocos.cocos.api.member.dto.response.*;
 import com.cocos.cocos.auth.JwtProvider;
 import com.cocos.cocos.common.exception.CocosException;
+import com.cocos.cocos.db.city.entity.City;
+import com.cocos.cocos.db.city.repository.CityRepository;
+import com.cocos.cocos.db.district.entity.District;
+import com.cocos.cocos.db.district.repository.DistrictRepository;
 import com.cocos.cocos.db.member.entity.Member;
 import com.cocos.cocos.db.member.entity.MemberAddress;
 import com.cocos.cocos.db.member.entity.MemberToken;
 import com.cocos.cocos.db.member.repository.MemberAddressRepository;
 import com.cocos.cocos.db.member.repository.MemberRepository;
 import com.cocos.cocos.db.member.repository.MemberTokenRepository;
-import com.cocos.cocos.db.town.entity.Town;
-import com.cocos.cocos.db.town.repository.TownRepository;
 import com.cocos.cocos.enums.location.LocationType;
 import com.cocos.cocos.enums.member.Platform;
 import com.cocos.cocos.enums.message.FailMessage;
@@ -29,8 +31,9 @@ public class MemberService {
     private final KakaoLoginClient kakaoLoginClient;
     private final JwtProvider jwtProvider;
     private final MemberTokenRepository memberTokenRepository;
-    private final TownRepository townRepository;
     private final MemberAddressRepository memberAddressRepository;
+    private final CityRepository cityRepository;
+    private final DistrictRepository districtRepository;
 
     //ToDo: yml에 기입해야하는 지 고민 중
     private static final String MEMBER_BASE_IMAGE_URL = "member/baseProfileImage.png";
@@ -140,10 +143,18 @@ public class MemberService {
         final MemberAddress memberAddress = memberAddressRepository.findByMemberId(memberId).orElseThrow(
                 () -> new CocosException(FailMessage.NOT_FOUND_MEMBER_ADDRESS)
         );
-        final Town town = townRepository.findById(memberAddress.getLocationId()).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_TOWN));
-        return MemberLocationResponse.of(
-                town.getId(), town.getName()
-        );
+        if (memberAddress.getLocationType().equals(LocationType.CITY)) {
+            final City city = cityRepository.findById(memberAddress.getLocationId()).orElseThrow(
+                    () -> new CocosException(FailMessage.NOT_FOUND_CITY)
+            );
+            return MemberLocationResponse.of(city.getId(), city.getName(), LocationType.CITY.toString());
+        } else if (memberAddress.getLocationType().equals(LocationType.DISTRICT)) {
+            final District district = districtRepository.findById(memberAddress.getLocationId()).orElseThrow(
+                    () -> new CocosException(FailMessage.NOT_FOUND_DISTRICT)
+            );
+            return MemberLocationResponse.of(district.getId(), district.getName(), LocationType.DISTRICT.toString());
+        }
+        throw new CocosException(FailMessage.BAD_REQUEST);
     }
 
     private Member findMember(final String nickname, final Long memberId) {
