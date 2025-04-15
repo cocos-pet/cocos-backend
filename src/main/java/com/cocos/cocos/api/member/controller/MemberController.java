@@ -43,9 +43,8 @@ public class MemberController implements MemberControllerSwagger {
                 profileUpdateRequest.nickname(),
                 profileUpdateRequest.address(),
                 profileUpdateRequest.roadAddress(),
-                profileUpdateRequest.cityName(),
-                profileUpdateRequest.districtName(),
-                profileUpdateRequest.townName(),
+                profileUpdateRequest.locationId(),
+                profileUpdateRequest.locationType(),
                 profileUpdateRequest.latitude(),
                 profileUpdateRequest.longitude()
         );

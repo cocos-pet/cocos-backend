@@ -18,6 +18,8 @@ public enum FailMessage {
     BAD_REQUEST_NOT_READABLE(HttpStatus.BAD_REQUEST, 40004, "json 오류 혹은 reqeust body 필드 오류 입니다. "),
     BAD_REQUEST_INVALID_SORT_CRITERIA(HttpStatus.BAD_REQUEST, 40005, "유효하지 않은 정렬 기준입니다."),
     BAD_REQUEST_INVALID_TOKEN(HttpStatus.BAD_REQUEST, 40006, "유효하지 않은 인증정보입니다."),
+    BAD_REQUEST_INVALID_LOCATION_TYPE(HttpStatus.BAD_REQUEST, 40007, "유효하지 않은 위치 타입입니다."),
+
     /**
      * 401
      */
@@ -54,6 +56,8 @@ public enum FailMessage {
     NOT_FOUND_MENTIONED_MEMBER(HttpStatus.NOT_FOUND, 40416, "언급된 사용자를 찾을 수 없습니다. "),
     NOT_FOUND_TOWN(HttpStatus.NOT_FOUND, 40417, "동을 찾을 수 없습니다. "),
     NOT_FOUND_MEMBER_ADDRESS(HttpStatus.NOT_FOUND, 40418, "사용자 위치를 찾을 수 없습니다."),
+    NOT_FOUND_CITY(HttpStatus.NOT_FOUND, 40419, "시/도를 찾을 수 없습니다."),
+    NOT_FOUND_DISTRICT(HttpStatus.NOT_FOUND, 40420, "시/군/구를 찾을 수 없습니다."),
 
     /**
      * 405
