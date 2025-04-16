@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface MemberAddressRepository extends JpaRepository<MemberAddress, Long> {
     Optional<MemberAddress> findByMemberId(final Long memberId);
+
+    boolean existsByMemberId(final Long memberId);
 }
