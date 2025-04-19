@@ -21,6 +21,6 @@ public class HospitalController implements HospitalControllerSwagger {
     @PostMapping
     public ResponseEntity<BaseResponse<HospitalListResponse>> getHospitals(
             @Valid @RequestBody HospitalListRequest hospitalListRequest) {
-        return SuccessResponse.success(SuccessMessage.OK, hospitalService.getHospitals(hospitalListRequest.townId(), hospitalListRequest.cursorId(), hospitalListRequest.size(), hospitalListRequest.keyword(), hospitalListRequest.sortBy(), hospitalListRequest.cursorReviewCount()));
+        return SuccessResponse.success(SuccessMessage.OK, hospitalService.getHospitals(hospitalListRequest.locationId(), hospitalListRequest.locationType(), hospitalListRequest.cursorId(), hospitalListRequest.size(), hospitalListRequest.keyword(), hospitalListRequest.sortBy(), hospitalListRequest.cursorReviewCount()));
     }
 }

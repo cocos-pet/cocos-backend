@@ -1,6 +1,7 @@
 package com.cocos.cocos.api.hospital.dto.request;
 
 import com.cocos.cocos.enums.hospital.HospitalSortCriteria;
+import com.cocos.cocos.enums.location.LocationType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -10,8 +11,11 @@ import lombok.Builder;
 @Builder
 public record HospitalListRequest(
 
+        @Schema(description = "지역 타입",nullable = true, example = "CITY")
+        LocationType locationType,
+
         @Schema(description = "지역 아이디", nullable = true, example = "1")
-        Long townId,
+        Long locationId,
 
         @Schema(description = "마지막으로 조회된 병원 아이디 (첫 요청을 제외하고 필수로 보내야 합니다.)", nullable = true, example = "1")
         Long cursorId,
