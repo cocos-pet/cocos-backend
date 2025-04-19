@@ -22,6 +22,9 @@ public class Hospital {
     @Column(name = "address", nullable = false)
     private String address;
 
+    @Column(name = "road_address", nullable = false)
+    private String roadAddress;
+
     @Column(name = "image", nullable = false)
     private String image;
 
@@ -37,15 +40,24 @@ public class Hospital {
     @Column(name = "town_id", nullable = false)
     private Long townId;
 
+    @Column(name = "phone_number", nullable = false)
+    private String phoneNumber;
+
+    @Column(name = "introduction", nullable = false)
+    private String introduction;
+
     @Builder
-    public Hospital(final String name, final String address, final String image, final Double latitude, final Double longitude, final int reviewCount, final Long townId) {
+    public Hospital(final String name, final String address, final String roadAddress, final String image, final Double latitude, final Double longitude, final int reviewCount, final Long townId, final String phoneNumber, final String introduction) {
         this.name = name;
         this.address = address;
+        this.roadAddress = roadAddress;
         this.image = image;
         this.latitude = latitude;
         this.longitude = longitude;
         this.reviewCount = reviewCount;
         this.townId = townId;
+        this.phoneNumber = phoneNumber;
+        this.introduction = introduction;
     }
 
     public void addReview() {

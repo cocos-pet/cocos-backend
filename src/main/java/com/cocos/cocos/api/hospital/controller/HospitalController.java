@@ -1,6 +1,7 @@
 package com.cocos.cocos.api.hospital.controller;
 
 import com.cocos.cocos.api.hospital.dto.request.HospitalListRequest;
+import com.cocos.cocos.api.hospital.dto.response.HospitalDetailResponse;
 import com.cocos.cocos.api.hospital.dto.response.HospitalListResponse;
 import com.cocos.cocos.api.hospital.service.HospitalService;
 import com.cocos.cocos.common.response.BaseResponse;
@@ -22,5 +23,12 @@ public class HospitalController implements HospitalControllerSwagger {
     public ResponseEntity<BaseResponse<HospitalListResponse>> getHospitals(
             @Valid @RequestBody HospitalListRequest hospitalListRequest) {
         return SuccessResponse.success(SuccessMessage.OK, hospitalService.getHospitals(hospitalListRequest.townId(), hospitalListRequest.cursorId(), hospitalListRequest.size(), hospitalListRequest.keyword(), hospitalListRequest.sortBy(), hospitalListRequest.cursorReviewCount()));
+    }
+
+    @GetMapping("/{hospitalId}")
+    public ResponseEntity<BaseResponse<HospitalDetailResponse>> getHospitalDetail(
+            @PathVariable(name = "hospitalId") final Long hospitalId
+    ) {
+        return SuccessResponse.success(SuccessMessage.OK, hospitalService.getHospitalDetail(hospitalId));
     }
 }
