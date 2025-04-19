@@ -86,9 +86,7 @@ public class HospitalService {
                 () -> new CocosException(FailMessage.NOT_FOUND_HOSPITAL)
         );
         final List<Long> hospitalTagIds = getHospitalTagIds(hospitalId);
-        final List<String> hospitalTags = hospitalTagRepository.findAllByIdIn(hospitalTagIds).stream()
-                .map(HospitalTag::getLabel)
-                .toList();
+        final List<String> hospitalTags = getHospitalTagLabels(hospitalTagIds);
 
         return HospitalDetailResponse.of(
                 hospital.getName(),
@@ -104,6 +102,12 @@ public class HospitalService {
     private List<Long> getHospitalTagIds(final Long hospitalId) {
         return hospitalTagMappingRepository.findAllByHospitalId(hospitalId).stream()
                 .map(HospitalTagMapping::getHospitalTagId)
+                .toList();
+    }
+
+    private List<String> getHospitalTagLabels(final List<Long> hospitalTagIds) {
+        return hospitalTagRepository.findAllByIdIn(hospitalTagIds).stream()
+                .map(HospitalTag::getLabel)
                 .toList();
     }
 }
