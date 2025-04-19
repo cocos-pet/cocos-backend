@@ -85,9 +85,7 @@ public class HospitalService {
         final Hospital hospital = hospitalRepository.findById(hospitalId).orElseThrow(
                 () -> new CocosException(FailMessage.NOT_FOUND_HOSPITAL)
         );
-        final List<Long> hospitalTagIds = hospitalTagMappingRepository.findAllByHospitalId(hospitalId).stream()
-                .map(HospitalTagMapping::getHospitalTagId)
-                .toList();
+        final List<Long> hospitalTagIds = getHospitalTagIds(hospitalId);
         final List<String> hospitalTags = hospitalTagRepository.findAllByIdIn(hospitalTagIds).stream()
                 .map(HospitalTag::getLabel)
                 .toList();
@@ -101,5 +99,11 @@ public class HospitalService {
                 hospital.getRoadAddress(),
                 appDataS3Client.getPresignedUrl(hospital.getImage())
         );
+    }
+
+    private List<Long> getHospitalTagIds(final Long hospitalId) {
+        return hospitalTagMappingRepository.findAllByHospitalId(hospitalId).stream()
+                .map(HospitalTagMapping::getHospitalTagId)
+                .toList();
     }
 }
