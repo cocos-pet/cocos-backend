@@ -9,7 +9,7 @@ public record HospitalDetailResponse(
         String name,
         @Schema(description = "병원 전화번호", example = "02-1234-5671")
         String phoneNumber,
-        @Schema(description = "병원 태그", example = "{강아지, 심장병}")
+        @Schema(description = "병원 태그", example = "[강아지, 심장병]")
         List<String> tags,
         @Schema(description = "병원 소개", example = "이 동물병원은 지상 최고의 동물병원입니다.")
         String introduction,
