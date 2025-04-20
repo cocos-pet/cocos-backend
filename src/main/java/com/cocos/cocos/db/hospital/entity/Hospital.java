@@ -19,10 +19,10 @@ public class Hospital {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "address", nullable = false)
+    @Column(name = "address", nullable = true)
     private String address;
 
-    @Column(name = "road_address", nullable = false)
+    @Column(name = "road_address", nullable = true)
     private String roadAddress;
 
     @Column(name = "image", nullable = false)
