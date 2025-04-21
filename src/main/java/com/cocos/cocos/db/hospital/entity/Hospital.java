@@ -25,13 +25,13 @@ public class Hospital {
     @Column(name = "road_address", nullable = true)
     private String roadAddress;
 
-    @Column(name = "image", nullable = false)
+    @Column(name = "image", nullable = true)
     private String image;
 
-    @Column(name = "latitude", nullable = false)
+    @Column(name = "latitude", nullable = true)
     private Double latitude;
 
-    @Column(name = "longitude", nullable = false)
+    @Column(name = "longitude", nullable = true)
     private Double longitude;
 
     @Column(name = "review_count", nullable = false)
@@ -40,10 +40,10 @@ public class Hospital {
     @Column(name = "town_id", nullable = false)
     private Long townId;
 
-    @Column(name = "phone_number", nullable = false)
+    @Column(name = "phone_number", nullable = true)
     private String phoneNumber;
 
-    @Column(name = "introduction", nullable = false)
+    @Column(name = "introduction", nullable = true)
     private String introduction;
 
     @Builder
