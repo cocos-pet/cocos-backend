@@ -38,8 +38,8 @@ public class HospitalService {
             final HospitalSortCriteria hospitalSortCriteria,
             final Integer cursorReviewCount
     ) {
-        final List<Long> locationIds = getLocationIds(locationId, locationType);
-        final List<Hospital> hospitals = getHospitalsByKeywordAndCursor(size, locationIds, keyword, cursorId, cursorReviewCount, hospitalSortCriteria);
+        final List<Long> districtIds = getDistrictIds(locationId, locationType);
+        final List<Hospital> hospitals = getHospitalsByKeywordAndCursor(size, districtIds, keyword, cursorId, cursorReviewCount, hospitalSortCriteria);
         final Long nextCursorId = hospitals.isEmpty() ? null : hospitals.getLast().getId();
         final Integer nextCursorReviewCount = hospitals.isEmpty() ? null : hospitals.getLast().getReviewCount();
 
@@ -56,19 +56,19 @@ public class HospitalService {
         );
     }
 
-    private List<Long> getLocationIds(final Long locationId, final LocationType locationType) {
+    private List<Long> getDistrictIds(final Long locationId, final LocationType locationType) {
         if (locationType == LocationType.CITY) {
             return districtRepository.findByCityId(locationId).stream().map(District::getId).toList();
         }
         return List.of(locationId);
     }
 
-    private List<Hospital> getHospitalsByKeywordAndCursor(final int size, final List<Long> locationIds, final String keyword, final Long cursorId, final Integer cursorReviewCount, final HospitalSortCriteria hospitalSortCriteria) {
+    private List<Hospital> getHospitalsByKeywordAndCursor(final int size, final List<Long> districtIds, final String keyword, final Long cursorId, final Integer cursorReviewCount, final HospitalSortCriteria hospitalSortCriteria) {
         if (keyword != null && !keyword.isBlank()) {
             Pageable pageable = PageRequest.of(0, size, Sort.by(
                     SortConstants.ID_DESC
             ));
-            return (cursorId != null) ? hospitalRepository.findAllByNameContainingAndLocationIdInAndIdLessThan(keyword, locationIds, cursorId, pageable) : hospitalRepository.findAllByNameContainingAndLocationIdIn(keyword, locationIds, pageable);
+            return (cursorId != null) ? hospitalRepository.findAllByNameContainingAndDistrictIdInAndIdLessThan(keyword, districtIds, cursorId, pageable) : hospitalRepository.findAllByNameContainingAndDistrictIdIn(keyword, districtIds, pageable);
         } else {
             Pageable pageable = PageRequest.of(0, size, Sort.by(
                     Sort.Order.desc(hospitalSortCriteria.getFieldName()),
@@ -76,9 +76,9 @@ public class HospitalService {
             ));
             if (hospitalSortCriteria == HospitalSortCriteria.REVIEW) {
                 if (cursorId == null) {
-                    return hospitalRepository.findAllByLocationIdIn(locationIds, pageable);
+                    return hospitalRepository.findAllByDistrictIdIn(districtIds, pageable);
                 } else {
-                    return hospitalRepository.findAllByLocationIdInWithCursor(locationIds, cursorId, cursorReviewCount, pageable);
+                    return hospitalRepository.findAllByDistrictIdInWithCursor(districtIds, cursorId, cursorReviewCount, pageable);
                 }
             }
             throw new CocosException(FailMessage.BAD_REQUEST_INVALID_SORT_CRITERIA);

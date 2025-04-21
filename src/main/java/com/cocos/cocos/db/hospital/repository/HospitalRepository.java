@@ -12,20 +12,20 @@ import java.util.List;
 @Repository
 public interface HospitalRepository extends JpaRepository<Hospital, Long> {
 
-    List<Hospital> findAllByNameContainingAndLocationIdInAndIdLessThan(final String name, final List<Long> locationId, final Long id, final Pageable pageable);
+    List<Hospital> findAllByNameContainingAndDistrictIdInAndIdLessThan(final String name, final List<Long> districtIds, final Long id, final Pageable pageable);
 
-    List<Hospital> findAllByNameContainingAndLocationIdIn(final String name, final List<Long> locationId, final Pageable pageable);
+    List<Hospital> findAllByNameContainingAndDistrictIdIn(final String name, final List<Long> districtIds, final Pageable pageable);
 
     //TODO: 추후 queryDSL 도입 고민 필요
     @Query("""
             SELECT h FROM Hospital h
-            WHERE h.locationId IN :locationId
+            WHERE h.districtId IN :districtId
               AND (
                 h.reviewCount < :reviewCount
                 OR (h.reviewCount = :reviewCount AND h.id < :cursorId)
               )
             """)
-    List<Hospital> findAllByLocationIdInWithCursor(@Param("locationId") final List<Long> locationId, @Param("cursorId") final Long cursorId, @Param("reviewCount") final Integer reviewCount, final Pageable pageable);
+    List<Hospital> findAllByDistrictIdInWithCursor(@Param("districtId") final List<Long> districtId, @Param("cursorId") final Long cursorId, @Param("reviewCount") final Integer reviewCount, final Pageable pageable);
 
-    List<Hospital> findAllByLocationIdIn(final List<Long> locationId, final Pageable pageable);
+    List<Hospital> findAllByDistrictIdIn(final List<Long> districtIds, final Pageable pageable);
 }
