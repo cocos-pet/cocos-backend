@@ -58,6 +58,7 @@ public enum FailMessage {
     NOT_FOUND_MEMBER_ADDRESS(HttpStatus.NOT_FOUND, 40418, "사용자 위치를 찾을 수 없습니다."),
     NOT_FOUND_CITY(HttpStatus.NOT_FOUND, 40419, "시/도를 찾을 수 없습니다."),
     NOT_FOUND_DISTRICT(HttpStatus.NOT_FOUND, 40420, "시/군/구를 찾을 수 없습니다."),
+    NOT_FOUND_HOSPITAL(HttpStatus.NOT_FOUND, 40421, "병원을 찾을 수 없습니다."),
 
     /**
      * 405
