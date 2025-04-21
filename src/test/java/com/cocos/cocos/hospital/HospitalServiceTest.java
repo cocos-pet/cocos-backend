@@ -47,8 +47,8 @@ public class HospitalServiceTest {
     private AppDataS3Client appDataS3Client;
 
     @Test
-    @DisplayName("병원 상세 정보를 조회할 수 있다.")
-    void getHospitalDetail() {
+    @DisplayName("도로명 주소가 있는 병원 상세 정보를 조회할 수 있다.")
+    void getHospitalDetailWithRoadAddress() {
         //given
         final Long hospitalId = 1L;
         final Long hospitalTagId1 = 2L;
@@ -92,8 +92,64 @@ public class HospitalServiceTest {
                 "병원 전화번호",
                 new ArrayList<>(List.of("라벨1")),
                 "병원 소개",
-                "병원 주소",
                 "병원 도로명주소",
+                "병원 이미지"
+        );
+
+        //when
+        final HospitalDetailResponse actual = hospitalService.getHospitalDetail(hospitalId);
+
+        //then
+        Assertions.assertThat(actual).usingRecursiveAssertion().isEqualTo(expected);
+        Assertions.assertThat(actual.address()).isEqualTo("병원 도로명주소");
+    }
+
+    @Test
+    @DisplayName("도로명 주소가 없는 병원 상세 정보를 조회할 수 있다.")
+    void getHospitalDetailWithoutRoadAddress() {
+        //given
+        final Long hospitalId = 1L;
+        final Long hospitalTagId1 = 2L;
+
+        final Hospital hospital = Hospital.builder()
+                .name("병원 이름")
+                .image("병원 이미지")
+                .introduction("병원 소개")
+                .phoneNumber("병원 전화번호")
+                .address("병원 주소")
+                .latitude(35.0)
+                .longitude(128.0)
+                .reviewCount(0)
+                .townId(1L)
+                .build();
+
+        final HospitalTag hospitalTag1 = HospitalTag.builder()
+                .label("라벨1")
+                .build();
+
+        final HospitalTag hospitalTag2 = HospitalTag.builder()
+                .label("라벨2")
+                .build();
+
+        final HospitalTagMapping hospitalTagMapping = HospitalTagMapping.builder()
+                .hospitalTagId(hospitalTagId1)
+                .hospitalId(hospitalId)
+                .build();
+
+        final List<HospitalTagMapping> hospitalTagMappings = new ArrayList<>(List.of(hospitalTagMapping));
+        final List<HospitalTag> hospitalTags = new ArrayList<>(List.of(hospitalTag1));
+
+        BDDMockito.given(hospitalRepository.findById(any())).willReturn(Optional.ofNullable(hospital));
+        BDDMockito.given(hospitalTagMappingRepository.findAllByHospitalId(any())).willReturn(hospitalTagMappings);
+        BDDMockito.given(hospitalTagRepository.findAllByIdIn(any())).willReturn(hospitalTags);
+        BDDMockito.given(appDataS3Client.getPresignedUrl(any())).willReturn(hospital.getImage());
+
+        final HospitalDetailResponse expected = HospitalDetailResponse.of(
+                "병원 이름",
+                "병원 전화번호",
+                new ArrayList<>(List.of("라벨1")),
+                "병원 소개",
+                "병원 주소",
                 "병원 이미지"
         );
 

@@ -93,8 +93,7 @@ public class HospitalService {
                 hospital.getPhoneNumber(),
                 hospitalTags,
                 hospital.getIntroduction(),
-                hospital.getAddress(),
-                hospital.getRoadAddress(),
+                getHospitalAddress(hospital),
                 appDataS3Client.getPresignedUrl(hospital.getImage())
         );
     }
@@ -109,5 +108,12 @@ public class HospitalService {
         return hospitalTagRepository.findAllByIdIn(hospitalTagIds).stream()
                 .map(HospitalTag::getLabel)
                 .toList();
+    }
+
+    private String getHospitalAddress(final Hospital hospital) {
+        if (hospital.getRoadAddress() == null) {
+            return hospital.getAddress();
+        }
+        return hospital.getRoadAddress();
     }
 }

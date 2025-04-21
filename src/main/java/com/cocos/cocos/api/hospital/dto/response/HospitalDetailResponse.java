@@ -15,12 +15,10 @@ public record HospitalDetailResponse(
         String introduction,
         @Schema(description = "병원 주소", example = "서울특별시 강남구 논현동")
         String address,
-        @Schema(description = "병원 도로명 주소", example = "서울특별시 강남구 테헤란로")
-        String roadAddress,
         @Schema(description = "병원 이미지", example = "https://www.~~")
         String image
 ) {
-    public static HospitalDetailResponse of(final String name, final String phoneNumber, final List<String> tags, final String introduction, final String address, final String roadAddress, final String image) {
-        return new HospitalDetailResponse(name, phoneNumber, tags, introduction, address, roadAddress, image);
+    public static HospitalDetailResponse of(final String name, final String phoneNumber, final List<String> tags, final String introduction, final String address, final String image) {
+        return new HospitalDetailResponse(name, phoneNumber, tags, introduction, address, image);
     }
 }
