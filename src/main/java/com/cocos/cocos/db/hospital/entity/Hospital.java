@@ -67,4 +67,8 @@ public class Hospital {
     public void deleteReview() {
         this.reviewCount--;
     }
+
+    public String getDisplayAddress() {
+        return roadAddress != null ? roadAddress : address;
+    }
 }

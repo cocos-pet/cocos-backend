@@ -7,6 +7,7 @@ import com.cocos.cocos.db.city.entity.City;
 import com.cocos.cocos.db.city.repository.CityRepository;
 import com.cocos.cocos.db.district.entity.District;
 import com.cocos.cocos.db.district.repository.DistrictRepository;
+import com.cocos.cocos.db.hospital.entity.Hospital;
 import com.cocos.cocos.db.hospital.repository.HospitalRepository;
 import com.cocos.cocos.db.member.entity.Member;
 import com.cocos.cocos.db.member.entity.MemberAddress;
@@ -160,6 +161,17 @@ public class MemberService {
         memberHospitalRepository.save(
                 MemberHospital.builder().hospitalId(hospitalId).memberId(memberId).build()
         );
+    }
+
+    @Transactional(readOnly = true)
+    public MemberHospitalResponse getMemberHospital(final Long memberId) {
+        final MemberHospital memberHospital = memberHospitalRepository.findByMemberId(memberId);
+        if (memberHospital == null) {
+            return null;
+        }
+
+        final Hospital hospital = hospitalRepository.findById(memberHospital.getHospitalId()).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_HOSPITAL));
+        return MemberHospitalResponse.of(memberHospital.getHospitalId(), hospital.getName(), hospital.getDisplayAddress());
     }
 
     private Member findMember(final String nickname, final Long memberId) {

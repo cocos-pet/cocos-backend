@@ -2,11 +2,7 @@ package com.cocos.cocos.api.member.controller;
 
 import com.cocos.cocos.api.member.dto.request.LoginRequest;
 import com.cocos.cocos.api.member.dto.request.ProfileUpdateRequest;
-import com.cocos.cocos.api.member.dto.response.LoginResponse;
-import com.cocos.cocos.api.member.dto.response.MemberProfileResponse;
-import com.cocos.cocos.api.member.dto.response.ReissueTokenResponse;
-import com.cocos.cocos.api.member.dto.response.NicknameExistenceResponse;
-import com.cocos.cocos.api.member.dto.response.MemberLocationResponse;
+import com.cocos.cocos.api.member.dto.response.*;
 import com.cocos.cocos.common.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -72,4 +68,11 @@ public interface MemberControllerSwagger {
     public ResponseEntity<BaseResponse<Void>> addMemberHospital(
             @PathVariable(name = "hospitalId") final Long hospitalId
     );
+
+    @Operation(summary = "사용자 즐겨찾는 병원 조회 API", description = "사용자의 즐겨찾는 병원을 조회합니다. 없으면 보내지 않습니다. ")
+    @ApiResponse(
+            responseCode = "200",
+            description = "요청에 성공했습니다."
+    )
+    public ResponseEntity<BaseResponse<MemberHospitalResponse>> getMemberHospital();
 }

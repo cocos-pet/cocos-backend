@@ -2,11 +2,7 @@ package com.cocos.cocos.api.member.controller;
 
 import com.cocos.cocos.api.member.dto.request.LoginRequest;
 import com.cocos.cocos.api.member.dto.request.ProfileUpdateRequest;
-import com.cocos.cocos.api.member.dto.response.LoginResponse;
-import com.cocos.cocos.api.member.dto.response.MemberProfileResponse;
-import com.cocos.cocos.api.member.dto.response.ReissueTokenResponse;
-import com.cocos.cocos.api.member.dto.response.NicknameExistenceResponse;
-import com.cocos.cocos.api.member.dto.response.MemberLocationResponse;
+import com.cocos.cocos.api.member.dto.response.*;
 import com.cocos.cocos.api.member.service.MemberService;
 import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.common.response.SuccessResponse;
@@ -85,5 +81,10 @@ public class MemberController implements MemberControllerSwagger {
     public ResponseEntity<BaseResponse<Void>> addMemberHospital(@PathVariable(name = "hospitalId") final Long hospitalId) {
         memberService.addMemberHospital(hospitalId, PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.OK, null);
+    }
+
+    @GetMapping("/hospitals")
+    public ResponseEntity<BaseResponse<MemberHospitalResponse>> getMemberHospital() {
+        return SuccessResponse.success(SuccessMessage.OK,  memberService.getMemberHospital(PrincipalHandler.getMemberIdFromPrincipal()));
     }
 }
