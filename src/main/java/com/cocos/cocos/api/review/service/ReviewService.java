@@ -1,7 +1,6 @@
 package com.cocos.cocos.api.review.service;
 
 import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
-import com.cocos.cocos.db.post.entity.PostImage;
 import com.cocos.cocos.db.review.db.Review;
 import com.cocos.cocos.db.review.db.ReviewImage;
 import com.cocos.cocos.db.review.db.ReviewSummary;
@@ -33,9 +32,9 @@ public class ReviewService {
 
     @Transactional
     public ReviewAddResponse addReview(final Long memberId, final Long hospitalId, final Long breedId, final Gender gender,
-                                final Integer weight, final String visitedAt, final String content,
-                                final Long purposeId, final Long diseaseId, final List<Long> symptomIds,
-                                final List<Long> goodReviewIds, final List<Long> badReviewIds, final List<String> images) {
+                                       final Integer weight, final String visitedAt, final String content,
+                                       final Long purposeId, final Long diseaseId, final List<Long> symptomIds,
+                                       final List<Long> goodReviewIds, final List<Long> badReviewIds, final List<String> images) {
         final Review review = reviewRepository.save(Review.builder()
                 .breedId(breedId)
                 .gender(gender)
@@ -48,21 +47,8 @@ public class ReviewService {
                 .diseaseId(diseaseId)
                 .build());
 
-        goodReviewIds.forEach(goodReviewId -> reviewSummaryRepository.save(
-                        ReviewSummary.builder()
-                                .reviewId(review.getId())
-                                .reviewSummaryOptionId(goodReviewId)
-                                .build()
-                )
-        );
-
-        badReviewIds.forEach(badReviewId -> reviewSummaryRepository.save(
-                        ReviewSummary.builder()
-                                .reviewId(review.getId())
-                                .reviewSummaryOptionId(badReviewId)
-                                .build()
-                )
-        );
+        addReviewSummary(review.getId(), goodReviewIds);
+        addReviewSummary(review.getId(), badReviewIds);
 
         symptomIds.forEach(symptomId -> reviewSymptomRepository.save(
                 ReviewSymptom.builder()
@@ -91,5 +77,15 @@ public class ReviewService {
         }
 
         return ReviewAddResponse.of(null);
+    }
+
+    private void addReviewSummary(final Long reviewId, final List<Long> reviewSummaryIds) {
+        reviewSummaryIds.forEach(reviewSummaryId -> reviewSummaryRepository.save(
+                        ReviewSummary.builder()
+                                .reviewId(reviewId)
+                                .reviewSummaryOptionId(reviewSummaryId)
+                                .build()
+                )
+        );
     }
 }
