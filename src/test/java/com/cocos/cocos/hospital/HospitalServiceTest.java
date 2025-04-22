@@ -63,7 +63,7 @@ public class HospitalServiceTest {
                 .latitude(35.0)
                 .longitude(128.0)
                 .reviewCount(0)
-                .townId(1L)
+                .districtId(1L)
                 .build();
 
         final HospitalTag hospitalTag1 = HospitalTag.builder()
@@ -120,7 +120,7 @@ public class HospitalServiceTest {
                 .latitude(35.0)
                 .longitude(128.0)
                 .reviewCount(0)
-                .townId(1L)
+                .districtId(1L)
                 .build();
 
         final HospitalTag hospitalTag1 = HospitalTag.builder()
