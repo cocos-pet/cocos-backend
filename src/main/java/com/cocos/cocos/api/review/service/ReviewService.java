@@ -3,12 +3,15 @@ package com.cocos.cocos.api.review.service;
 import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
 import com.cocos.cocos.db.post.entity.PostImage;
 import com.cocos.cocos.db.review.db.Review;
+import com.cocos.cocos.db.review.db.ReviewImage;
 import com.cocos.cocos.db.review.db.ReviewSummary;
 import com.cocos.cocos.db.review.db.ReviewSymptom;
+import com.cocos.cocos.db.review.repository.ReviewImageRepository;
 import com.cocos.cocos.db.review.repository.ReviewRepository;
 import com.cocos.cocos.db.review.repository.ReviewSummaryRepository;
 import com.cocos.cocos.db.review.repository.ReviewSymptomRepository;
 import com.cocos.cocos.enums.pet.Gender;
+import com.cocos.cocos.external.MemberDataS3Client;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +26,10 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ReviewSummaryRepository reviewSummaryRepository;
     private final ReviewSymptomRepository reviewSymptomRepository;
+    private final ReviewImageRepository reviewImageRepository;
+    private final MemberDataS3Client memberDataS3Client;
+
+    private static final String REVIEW_IMAGE_PACKAGE = "reviewImage";
 
     @Transactional
     public ReviewAddResponse of(final Long memberId, final Long hospitalId, final Long breedId, final Gender gender,
@@ -64,6 +71,25 @@ public class ReviewService {
                         .build()
         ));
 
-        return null;
+        if (images != null && !images.isEmpty()) {
+            return ReviewAddResponse.of(images.stream()
+                    .map(image -> {
+                        // TODO: 파일 포맷, 이름 등을 ENUM에 모아두는 것도 좋아보임
+                        final String fileName = String.format("%s/%s/%s", memberId, REVIEW_IMAGE_PACKAGE, UUID.randomUUID() + image);
+
+                        reviewImageRepository.save(
+                                ReviewImage.builder()
+                                        .image(fileName)
+                                        .reviewId(review.getId())
+                                        .build()
+                        );
+
+                        return memberDataS3Client.putPresignedUrl(fileName);
+                    })
+                    .toList()
+            );
+        }
+
+        return ReviewAddResponse.of(null);
     }
 }
