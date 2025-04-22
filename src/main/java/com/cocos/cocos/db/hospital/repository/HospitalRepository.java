@@ -19,13 +19,13 @@ public interface HospitalRepository extends JpaRepository<Hospital, Long> {
     //TODO: 추후 queryDSL 도입 고민 필요
     @Query("""
             SELECT h FROM Hospital h
-            WHERE h.districtId IN :districtId
+            WHERE h.districtId IN :districtIds
               AND (
                 h.reviewCount < :reviewCount
                 OR (h.reviewCount = :reviewCount AND h.id < :cursorId)
               )
             """)
-    List<Hospital> findAllByDistrictIdInWithCursor(@Param("districtId") final List<Long> districtId, @Param("cursorId") final Long cursorId, @Param("reviewCount") final Integer reviewCount, final Pageable pageable);
+    List<Hospital> findAllByDistrictIdInWithCursor(@Param("districtIds") final List<Long> districtIds, @Param("cursorId") final Long cursorId, @Param("reviewCount") final Integer reviewCount, final Pageable pageable);
 
     List<Hospital> findAllByDistrictIdIn(final List<Long> districtIds, final Pageable pageable);
 }
