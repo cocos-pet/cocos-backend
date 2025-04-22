@@ -2,7 +2,9 @@ package com.cocos.cocos.api.review.service;
 
 import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
 import com.cocos.cocos.db.review.db.Review;
+import com.cocos.cocos.db.review.db.ReviewSummary;
 import com.cocos.cocos.db.review.repository.ReviewRepository;
+import com.cocos.cocos.db.review.repository.ReviewSummaryRepository;
 import com.cocos.cocos.enums.pet.Gender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import java.util.List;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
+    private final ReviewSummaryRepository reviewSummaryRepository;
 
     @Transactional
     public ReviewAddResponse of(final Long memberId, final Long hospitalId, final Long breedId, final Gender gender,
@@ -32,6 +35,22 @@ public class ReviewService {
                 .visitedAt(visitedAt)
                 .diseaseId(diseaseId)
                 .build());
+
+        goodReviewIds.forEach(goodReviewId -> reviewSummaryRepository.save(
+                        ReviewSummary.builder()
+                                .reviewId(review.getId())
+                                .reviewSummaryOptionId(goodReviewId)
+                                .build()
+                )
+        );
+
+        badReviewIds.forEach(badReviewId -> reviewSummaryRepository.save(
+                        ReviewSummary.builder()
+                                .reviewId(review.getId())
+                                .reviewSummaryOptionId(badReviewId)
+                                .build()
+                )
+        );
 
 
         return null;
