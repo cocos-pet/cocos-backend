@@ -61,14 +61,7 @@ public class MemberService {
                 isCompletedSignUp = true;
             }
         } else {
-            member = memberRepository.save(Member.builder()
-                    .email("")
-                    .image(MEMBER_BASE_IMAGE_URL)
-                    .isAdmin(false)
-                    .platform(Platform.KAKAO)
-                    .sub(sub)
-                    .build()
-            );
+            member = memberRepository.save(Member.createDefaultMember(sub, Platform.KAKAO));
             isCompletedSignUp = false;
         }
         final String accessToken = jwtProvider.generateAccessToken(member.getId());
@@ -81,7 +74,7 @@ public class MemberService {
         }
         if (!memberAddressRepository.existsByMemberId(member.getId())) {
             memberAddressRepository.save(
-                    MemberAddress.createDefaultMemberAddress(member.getId(), DEFAULT_ADDRESS, DEFAULT_ROAD_ADDRESS, DEFAULT_LOCATION_ID, DEFAULT_LATITUDE, DEFAULT_LONGITUDE, DEFAULT_LOCATION_TYPE)
+                    MemberAddress.createDefaultMemberAddress(member.getId())
             );
         }
 

@@ -1,5 +1,6 @@
 package com.cocos.cocos.db.member.entity;
 
+import com.cocos.cocos.api.member.constant.MemberDefaults;
 import com.cocos.cocos.db.BaseTime;
 import com.cocos.cocos.enums.member.Platform;
 import jakarta.persistence.*;
@@ -46,6 +47,16 @@ public class Member extends BaseTime {
         this.platform = platform;
         this.sub = sub;
         this.isAdmin = isAdmin;
+    }
+
+    public static Member createDefaultMember(final String sub, final Platform platform) {
+        return Member.builder()
+                .email("")
+                .image(MemberDefaults.MEMBER_BASE_IMAGE_URL)
+                .isAdmin(false)
+                .platform(platform)
+                .sub(sub)
+                .build();
     }
 
     public void updateNickname(final String nickname) {

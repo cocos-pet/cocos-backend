@@ -1,5 +1,6 @@
 package com.cocos.cocos.db.member.entity;
 
+import com.cocos.cocos.api.member.constant.MemberDefaults;
 import com.cocos.cocos.enums.location.LocationType;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -59,15 +60,15 @@ public class MemberAddress {
         this.locationType = locationType;
     }
 
-    public static MemberAddress createDefaultMemberAddress(final Long memberId, final String address, final String roadAddress, final Long locationId, final Double latitude, final Double longitude, final LocationType locationType) {
+    public static MemberAddress createDefaultMemberAddress(final Long memberId) {
         return MemberAddress.builder()
                 .memberId(memberId)
-                .address(address)
-                .roadAddress(roadAddress)
-                .latitude(latitude)
-                .longitude(longitude)
-                .locationId(locationId)
-                .locationType(locationType)
+                .address(MemberDefaults.DEFAULT_ADDRESS)
+                .roadAddress(MemberDefaults.DEFAULT_ROAD_ADDRESS)
+                .latitude(MemberDefaults.DEFAULT_LATITUDE)
+                .longitude(MemberDefaults.DEFAULT_LONGITUDE)
+                .locationId(MemberDefaults.DEFAULT_LOCATION_ID)
+                .locationType(MemberDefaults.DEFAULT_LOCATION_TYPE)
                 .build();
     }
 }
