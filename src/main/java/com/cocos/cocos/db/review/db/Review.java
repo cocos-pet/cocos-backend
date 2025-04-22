@@ -43,8 +43,11 @@ public class Review extends BaseTime {
     @Column(name = "breed_id", nullable = false)
     private Long breedId;
 
+    @Column(name = "disease_id", nullable = false)
+    private Long diseaseId;
+
     @Builder
-    public Review(final String visitedAt, final Gender gender, final int weight, final Long purposeId, final String content, final Long hospitalId, final Long memberId, final Long breedId) {
+    public Review(final String visitedAt, final Gender gender, final int weight, final Long purposeId, final String content, final Long hospitalId, final Long memberId, final Long breedId, final Long diseaseId) {
         this.visitedAt = visitedAt;
         this.gender = gender;
         this.weight = weight;
@@ -53,5 +56,6 @@ public class Review extends BaseTime {
         this.hospitalId = hospitalId;
         this.memberId = memberId;
         this.breedId = breedId;
+        this.diseaseId = diseaseId;
     }
 }

@@ -30,7 +30,9 @@ public class ReviewService {
                 .hospitalId(hospitalId)
                 .memberId(memberId)
                 .visitedAt(visitedAt)
+                .diseaseId(diseaseId)
                 .build());
+
 
         return null;
     }
