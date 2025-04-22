@@ -1,6 +1,7 @@
 package com.cocos.cocos.api.review.service;
 
 import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
+import com.cocos.cocos.db.post.entity.PostImage;
 import com.cocos.cocos.db.review.db.Review;
 import com.cocos.cocos.db.review.db.ReviewSummary;
 import com.cocos.cocos.db.review.db.ReviewSymptom;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
