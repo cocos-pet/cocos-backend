@@ -2,6 +2,7 @@ package com.cocos.cocos.db.member.entity;
 
 import com.cocos.cocos.db.BaseTime;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,4 +22,10 @@ public class MemberHospital extends BaseTime {
 
     @Column(name = "member_id", nullable = false)
     private Long memberId;
+
+    @Builder
+    public MemberHospital(final Long hospitalId, final Long memberId) {
+        this.hospitalId = hospitalId;
+        this.memberId = memberId;
+    }
 }

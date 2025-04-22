@@ -80,4 +80,10 @@ public class MemberController implements MemberControllerSwagger {
     public ResponseEntity<BaseResponse<MemberLocationResponse>> getMemberLocation() {
         return SuccessResponse.success(SuccessMessage.OK, memberService.getMemberLocation(PrincipalHandler.getMemberIdFromPrincipal()));
     }
+
+    @PostMapping("/hospitals/{hospitalId}")
+    public ResponseEntity<BaseResponse<Void>> addMemberHospital(@PathVariable(name = "hospitalId") final Long hospitalId) {
+        memberService.addMemberHospital(hospitalId, PrincipalHandler.getMemberIdFromPrincipal());
+        return SuccessResponse.success(SuccessMessage.OK, null);
+    }
 }

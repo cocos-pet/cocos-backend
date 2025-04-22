@@ -7,10 +7,13 @@ import com.cocos.cocos.db.city.entity.City;
 import com.cocos.cocos.db.city.repository.CityRepository;
 import com.cocos.cocos.db.district.entity.District;
 import com.cocos.cocos.db.district.repository.DistrictRepository;
+import com.cocos.cocos.db.hospital.repository.HospitalRepository;
 import com.cocos.cocos.db.member.entity.Member;
 import com.cocos.cocos.db.member.entity.MemberAddress;
+import com.cocos.cocos.db.member.entity.MemberHospital;
 import com.cocos.cocos.db.member.entity.MemberToken;
 import com.cocos.cocos.db.member.repository.MemberAddressRepository;
+import com.cocos.cocos.db.member.repository.MemberHospitalRepository;
 import com.cocos.cocos.db.member.repository.MemberRepository;
 import com.cocos.cocos.db.member.repository.MemberTokenRepository;
 import com.cocos.cocos.enums.location.LocationType;
@@ -34,15 +37,8 @@ public class MemberService {
     private final MemberAddressRepository memberAddressRepository;
     private final CityRepository cityRepository;
     private final DistrictRepository districtRepository;
-
-    //ToDo: yml에 기입해야하는 지 고민 중
-    private static final String MEMBER_BASE_IMAGE_URL = "member/baseProfileImage.png";
-    private static final Long DEFAULT_LOCATION_ID = 1L;
-    private static final String DEFAULT_ADDRESS = "주소를 설정해주세요!";
-    private static final String DEFAULT_ROAD_ADDRESS = "도로명 주소를 설정해주세요!";
-    private static final Double DEFAULT_LATITUDE = 0.0;
-    private static final Double DEFAULT_LONGITUDE = 0.0;
-    private static final LocationType DEFAULT_LOCATION_TYPE = LocationType.DISTRICT;
+    private final MemberHospitalRepository memberHospitalRepository;
+    private final HospitalRepository hospitalRepository;
 
     @Transactional(readOnly = true)
     public MemberProfileResponse getMemberProfile(final String nickname, final Long memberId) {
@@ -158,6 +154,16 @@ public class MemberService {
             return MemberLocationResponse.of(district.getId(), district.getName(), LocationType.DISTRICT.toString());
         }
         throw new CocosException(FailMessage.BAD_REQUEST);
+    }
+
+    @Transactional
+    public void addMemberHospital(final Long hospitalId, final Long memberId) {
+        if (!hospitalRepository.existsById(hospitalId)) {
+            throw new CocosException(FailMessage.NOT_FOUND_HOSPITAL);
+        }
+        memberHospitalRepository.save(
+                MemberHospital.builder().hospitalId(hospitalId).memberId(memberId).build()
+        );
     }
 
     private Member findMember(final String nickname, final Long memberId) {
