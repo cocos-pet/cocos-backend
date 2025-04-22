@@ -6,7 +6,7 @@ import lombok.Builder;
 import java.util.List;
 
 @Builder
-public record ReviewRequest(
+public record ReviewAddRequest(
         Long breedId,
         Gender gender,
         Integer weight,
@@ -19,10 +19,10 @@ public record ReviewRequest(
         List<Long> badReviewIds,
         List<String> images
 ) {
-    public static ReviewRequest of(final Long breedId, final Gender gender, final Integer weight,
-                                   final String visitedAt, final String content, final Long purposeId, final Long diseaseId,
-                                   final List<Long> symptomIds, final List<Long> goodReviewIds, final List<Long> badReviewIds, final List<String> images) {
-        return ReviewRequest.builder()
+    public static ReviewAddRequest of(final Long breedId, final Gender gender, final Integer weight,
+                                      final String visitedAt, final String content, final Long purposeId, final Long diseaseId,
+                                      final List<Long> symptomIds, final List<Long> goodReviewIds, final List<Long> badReviewIds, final List<String> images) {
+        return ReviewAddRequest.builder()
                 .breedId(breedId)
                 .gender(gender)
                 .weight(weight)
