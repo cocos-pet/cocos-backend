@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "review")
+@Table(name = "review_summary_option")
 public class ReviewSummaryOption extends BaseTime {
 
     @Id
