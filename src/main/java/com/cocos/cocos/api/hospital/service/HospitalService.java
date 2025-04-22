@@ -1,15 +1,21 @@
 package com.cocos.cocos.api.hospital.service;
 
+import com.cocos.cocos.api.hospital.dto.response.HospitalDetailResponse;
 import com.cocos.cocos.api.hospital.dto.response.HospitalListResponse;
 import com.cocos.cocos.api.hospital.dto.response.HospitalResponse;
 import com.cocos.cocos.common.exception.CocosException;
 import com.cocos.cocos.db.district.entity.District;
 import com.cocos.cocos.db.district.repository.DistrictRepository;
 import com.cocos.cocos.db.hospital.entity.Hospital;
+import com.cocos.cocos.db.hospital.entity.HospitalTag;
+import com.cocos.cocos.db.hospital.entity.HospitalTagMapping;
 import com.cocos.cocos.db.hospital.repository.HospitalRepository;
+import com.cocos.cocos.db.hospital.repository.HospitalTagMappingRepository;
+import com.cocos.cocos.db.hospital.repository.HospitalTagRepository;
 import com.cocos.cocos.enums.hospital.HospitalSortCriteria;
 import com.cocos.cocos.enums.location.LocationType;
 import com.cocos.cocos.enums.message.FailMessage;
+import com.cocos.cocos.external.AppDataS3Client;
 import com.cocos.cocos.util.SortConstants;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +33,9 @@ public class HospitalService {
 
     private final HospitalRepository hospitalRepository;
     private final DistrictRepository districtRepository;
+    private final HospitalTagRepository hospitalTagRepository;
+    private final HospitalTagMappingRepository hospitalTagMappingRepository;
+    private final AppDataS3Client appDataS3Client;
 
     @Transactional(readOnly = true)
     public HospitalListResponse getHospitals(
@@ -49,7 +58,7 @@ public class HospitalService {
                 hospitals.stream().map(hospital -> HospitalResponse.of(
                         hospital.getId(),
                         hospital.getName(),
-                        hospital.getAddress(),
+                        getHospitalAddress(hospital),
                         hospital.getReviewCount(),
                         hospital.getImage()
                 )).toList()
@@ -83,5 +92,42 @@ public class HospitalService {
             }
             throw new CocosException(FailMessage.BAD_REQUEST_INVALID_SORT_CRITERIA);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public HospitalDetailResponse getHospitalDetail(final Long hospitalId) {
+        final Hospital hospital = hospitalRepository.findById(hospitalId).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_HOSPITAL)
+        );
+        final List<Long> hospitalTagIds = getHospitalTagIds(hospitalId);
+        final List<String> hospitalTags = getHospitalTagLabels(hospitalTagIds);
+
+        return HospitalDetailResponse.of(
+                hospital.getName(),
+                hospital.getPhoneNumber(),
+                hospitalTags,
+                hospital.getIntroduction(),
+                getHospitalAddress(hospital),
+                appDataS3Client.getPresignedUrl(hospital.getImage())
+        );
+    }
+
+    private List<Long> getHospitalTagIds(final Long hospitalId) {
+        return hospitalTagMappingRepository.findAllByHospitalId(hospitalId).stream()
+                .map(HospitalTagMapping::getHospitalTagId)
+                .toList();
+    }
+
+    private List<String> getHospitalTagLabels(final List<Long> hospitalTagIds) {
+        return hospitalTagRepository.findAllByIdIn(hospitalTagIds).stream()
+                .map(HospitalTag::getLabel)
+                .toList();
+    }
+
+    private String getHospitalAddress(final Hospital hospital) {
+        if (hospital.getRoadAddress() == null) {
+            return hospital.getAddress();
+        }
+        return hospital.getRoadAddress();
     }
 }

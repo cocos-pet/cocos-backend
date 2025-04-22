@@ -19,16 +19,19 @@ public class Hospital {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "address", nullable = false)
+    @Column(name = "address", nullable = true)
     private String address;
 
-    @Column(name = "image", nullable = false)
+    @Column(name = "road_address", nullable = true)
+    private String roadAddress;
+
+    @Column(name = "image", nullable = true)
     private String image;
 
-    @Column(name = "latitude", nullable = false)
+    @Column(name = "latitude", nullable = true)
     private Double latitude;
 
-    @Column(name = "longitude", nullable = false)
+    @Column(name = "longitude", nullable = true)
     private Double longitude;
 
     @Column(name = "review_count", nullable = false)
@@ -37,14 +40,23 @@ public class Hospital {
     @Column(name = "district_id", nullable = false)
     private Long districtId;
 
+    @Column(name = "phone_number", nullable = true)
+    private String phoneNumber;
+
+    @Column(name = "introduction", nullable = true)
+    private String introduction;
+
     @Builder
-    public Hospital(final String name, final String address, final String image, final Double latitude, final Double longitude, final int reviewCount, final Long districtId) {
+    public Hospital(final String name, final String address, final String roadAddress, final String image, final Double latitude, final Double longitude, final int reviewCount, final Long districtId, final String phoneNumber, final String introduction) {
         this.name = name;
         this.address = address;
+        this.roadAddress = roadAddress;
         this.image = image;
         this.latitude = latitude;
         this.longitude = longitude;
         this.reviewCount = reviewCount;
+        this.phoneNumber = phoneNumber;
+        this.introduction = introduction;
         this.districtId = districtId;
     }
 
