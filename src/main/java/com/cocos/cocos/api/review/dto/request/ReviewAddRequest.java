@@ -1,7 +1,6 @@
 package com.cocos.cocos.api.review.dto.request;
 
 import com.cocos.cocos.enums.pet.Gender;
-import lombok.Builder;
 
 import java.util.List;
 
