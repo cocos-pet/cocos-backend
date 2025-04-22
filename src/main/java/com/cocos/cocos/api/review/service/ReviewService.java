@@ -50,6 +50,7 @@ public class ReviewService {
         addReviewSummary(review.getId(), goodReviewIds);
         addReviewSummary(review.getId(), badReviewIds);
 
+        // ToDo: 리뷰 요약 추가 로직과 비슷하기 때문에 이 부분 enum으로 구분하고 하나의 로직으로 합치는 것 고려
         symptomIds.forEach(symptomId -> reviewSymptomRepository.save(
                 ReviewSymptom.builder()
                         .reviewId(review.getId())
