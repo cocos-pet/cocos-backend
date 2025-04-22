@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -62,4 +63,13 @@ public interface MemberControllerSwagger {
             description = "요청에 성공했습니다. "
     )
     public ResponseEntity<BaseResponse<MemberLocationResponse>> getMemberLocation();
+
+    @Operation(summary = "사용자 즐겨찾는 병원 추가 API", description = "사용자의 즐겨찾는 병원을 추가합니다. ")
+    @ApiResponse(
+            responseCode = "200",
+            description = "요청에 성공했습니다."
+    )
+    public ResponseEntity<BaseResponse<Void>> addMemberHospital(
+            @PathVariable(name = "hospitalId") final Long hospitalId
+    );
 }
