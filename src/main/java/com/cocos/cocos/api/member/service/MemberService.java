@@ -154,6 +154,9 @@ public class MemberService {
         if (!hospitalRepository.existsById(hospitalId)) {
             throw new CocosException(FailMessage.NOT_FOUND_HOSPITAL);
         }
+        if (memberHospitalRepository.existsByMemberId(memberId)){
+            throw new CocosException(FailMessage.CONFLICT_MEMBER_HOSPITAL);
+        }
         memberHospitalRepository.save(
                 MemberHospital.builder().hospitalId(hospitalId).memberId(memberId).build()
         );

@@ -72,6 +72,7 @@ public enum FailMessage {
     INTEGRITY_CONFLICT(HttpStatus.CONFLICT, 40901, "데이터 무결성 위반입니다."),
     CONFLICT_POSTLIKE(HttpStatus.CONFLICT, 40902, "이미 존재하는 게시글 공감입니다."),
     CONFLICT_PET(HttpStatus.CONFLICT, 40903, "이미 사용자의 애완동물이 존재합니다. "),
+    CONFLICT_MEMBER_HOSPITAL(HttpStatus.CONFLICT, 40904, "이미 사용자의 즐겨찾는 병원이 존재합니다. "),
 
     /**
      * 422

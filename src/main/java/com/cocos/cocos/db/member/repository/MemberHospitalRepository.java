@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MemberHospitalRepository extends JpaRepository<MemberHospital, Long> {
+
+    boolean existsByMemberId(final Long memberId);
 }
