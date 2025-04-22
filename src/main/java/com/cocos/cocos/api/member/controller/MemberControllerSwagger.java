@@ -75,4 +75,13 @@ public interface MemberControllerSwagger {
             description = "요청에 성공했습니다."
     )
     public ResponseEntity<BaseResponse<MemberHospitalResponse>> getMemberHospital();
+
+    @Operation(summary = "사용자 즐겨찾는 병원 변경 API", description = "사용자의 즐겨찾는 병원을 변경합니다. 이전에 등록된 병원이 없는 경우 추가합니다. ")
+    @ApiResponse(
+            responseCode = "200",
+            description = "요청에 성공했습니다."
+    )
+    public ResponseEntity<BaseResponse<Void>> updateMemberHospital(
+            @PathVariable(name = "hospitalId") final Long hospitalId
+    );
 }

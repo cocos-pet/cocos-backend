@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Objects;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -27,5 +29,10 @@ public class MemberHospital extends BaseTime {
     public MemberHospital(final Long hospitalId, final Long memberId) {
         this.hospitalId = hospitalId;
         this.memberId = memberId;
+    }
+
+    public void updateHospitalId(Long hospitalId) {
+        if (Objects.equals(this.hospitalId, hospitalId)) return;
+        this.hospitalId = hospitalId;
     }
 }

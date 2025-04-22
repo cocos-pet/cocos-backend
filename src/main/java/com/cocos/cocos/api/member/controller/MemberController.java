@@ -87,4 +87,10 @@ public class MemberController implements MemberControllerSwagger {
     public ResponseEntity<BaseResponse<MemberHospitalResponse>> getMemberHospital() {
         return SuccessResponse.success(SuccessMessage.OK,  memberService.getMemberHospital(PrincipalHandler.getMemberIdFromPrincipal()));
     }
+
+    @PatchMapping("/hospitals/{hospitalId}")
+    public ResponseEntity<BaseResponse<Void>> updateMemberHospital(@PathVariable(name = "hospitalId") final Long hospitalId) {
+        memberService.updateMemberHospital(hospitalId, PrincipalHandler.getMemberIdFromPrincipal());
+        return SuccessResponse.success(SuccessMessage.OK, null);
+    }
 }
