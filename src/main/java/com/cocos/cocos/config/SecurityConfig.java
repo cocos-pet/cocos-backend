@@ -31,7 +31,7 @@ public class SecurityConfig {
             "/api/dev/locations",
             "/api/local/hospitals/**",
             "/api/dev/hospitals/**",
-            "api/local/members/login",
+            "/api/local/members/login",
     };
 
     @Bean
