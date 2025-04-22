@@ -37,8 +37,8 @@ public class Hospital {
     @Column(name = "review_count", nullable = false)
     private int reviewCount = 0;
 
-    @Column(name = "town_id", nullable = false)
-    private Long townId;
+    @Column(name = "district_id", nullable = false)
+    private Long districtId;
 
     @Column(name = "phone_number", nullable = true)
     private String phoneNumber;
@@ -47,7 +47,7 @@ public class Hospital {
     private String introduction;
 
     @Builder
-    public Hospital(final String name, final String address, final String roadAddress, final String image, final Double latitude, final Double longitude, final int reviewCount, final Long townId, final String phoneNumber, final String introduction) {
+    public Hospital(final String name, final String address, final String roadAddress, final String image, final Double latitude, final Double longitude, final int reviewCount, final Long districtId, final String phoneNumber, final String introduction) {
         this.name = name;
         this.address = address;
         this.roadAddress = roadAddress;
@@ -55,9 +55,9 @@ public class Hospital {
         this.latitude = latitude;
         this.longitude = longitude;
         this.reviewCount = reviewCount;
-        this.townId = townId;
         this.phoneNumber = phoneNumber;
         this.introduction = introduction;
+        this.districtId = districtId;
     }
 
     public void addReview() {

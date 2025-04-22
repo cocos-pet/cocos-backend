@@ -2,11 +2,11 @@ package com.cocos.cocos.api.member.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(description = "회원 위치 응답 예시", example = "{\"townId\": 1, \"townName\": \"논현동\"}")
+@Schema(description = "회원 위치 응답 예시", example = "{\"locationId\": 1, \"locationName\": \"서울특별시\",\"locationType\": \"CITY\" }")
 public record MemberLocationResponse(
         @Schema(description = "위치 아이디", example = "1")
         Long locationId,
-        @Schema(description = "위치 이름", example = "강남구")
+        @Schema(description = "위치 이름", example = "서울특별시")
         String locationName,
         @Schema(description = "위치 타입", example = "CITY | DISTRICT")
         String locationType

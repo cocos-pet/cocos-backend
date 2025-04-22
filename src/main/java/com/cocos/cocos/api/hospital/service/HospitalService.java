@@ -4,6 +4,8 @@ import com.cocos.cocos.api.hospital.dto.response.HospitalDetailResponse;
 import com.cocos.cocos.api.hospital.dto.response.HospitalListResponse;
 import com.cocos.cocos.api.hospital.dto.response.HospitalResponse;
 import com.cocos.cocos.common.exception.CocosException;
+import com.cocos.cocos.db.district.entity.District;
+import com.cocos.cocos.db.district.repository.DistrictRepository;
 import com.cocos.cocos.db.hospital.entity.Hospital;
 import com.cocos.cocos.db.hospital.entity.HospitalTag;
 import com.cocos.cocos.db.hospital.entity.HospitalTagMapping;
@@ -11,9 +13,11 @@ import com.cocos.cocos.db.hospital.repository.HospitalRepository;
 import com.cocos.cocos.db.hospital.repository.HospitalTagMappingRepository;
 import com.cocos.cocos.db.hospital.repository.HospitalTagRepository;
 import com.cocos.cocos.enums.hospital.HospitalSortCriteria;
+import com.cocos.cocos.enums.location.LocationType;
 import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.external.AppDataS3Client;
 import com.cocos.cocos.util.SortConstants;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,20 +32,23 @@ import java.util.List;
 public class HospitalService {
 
     private final HospitalRepository hospitalRepository;
+    private final DistrictRepository districtRepository;
     private final HospitalTagRepository hospitalTagRepository;
     private final HospitalTagMappingRepository hospitalTagMappingRepository;
     private final AppDataS3Client appDataS3Client;
 
     @Transactional(readOnly = true)
     public HospitalListResponse getHospitals(
-            final Long townId,
+            final Long locationId,
+            final LocationType locationType,
             final Long cursorId,
             final int size,
             final String keyword,
             final HospitalSortCriteria hospitalSortCriteria,
             final Integer cursorReviewCount
     ) {
-        final List<Hospital> hospitals = getHospitalsByKeywordAndCursor(size, townId, keyword, cursorId, cursorReviewCount, hospitalSortCriteria);
+        final List<Long> districtIds = getDistrictIds(locationId, locationType);
+        final List<Hospital> hospitals = getHospitalsByKeywordAndCursor(size, districtIds, keyword, cursorId, cursorReviewCount, hospitalSortCriteria);
         final Long nextCursorId = hospitals.isEmpty() ? null : hospitals.getLast().getId();
         final Integer nextCursorReviewCount = hospitals.isEmpty() ? null : hospitals.getLast().getReviewCount();
 
@@ -51,19 +58,26 @@ public class HospitalService {
                 hospitals.stream().map(hospital -> HospitalResponse.of(
                         hospital.getId(),
                         hospital.getName(),
-                        hospital.getAddress(),
+                        getHospitalAddress(hospital),
                         hospital.getReviewCount(),
                         hospital.getImage()
                 )).toList()
         );
     }
 
-    private List<Hospital> getHospitalsByKeywordAndCursor(final int size, final Long townId, final String keyword, final Long cursorId, final Integer cursorReviewCount, final HospitalSortCriteria hospitalSortCriteria) {
+    private List<Long> getDistrictIds(final Long locationId, final LocationType locationType) {
+        if (locationType == LocationType.CITY) {
+            return districtRepository.findByCityId(locationId).stream().map(District::getId).toList();
+        }
+        return List.of(locationId);
+    }
+
+    private List<Hospital> getHospitalsByKeywordAndCursor(final int size, final List<Long> districtIds, final String keyword, final Long cursorId, final Integer cursorReviewCount, final HospitalSortCriteria hospitalSortCriteria) {
         if (keyword != null && !keyword.isBlank()) {
             Pageable pageable = PageRequest.of(0, size, Sort.by(
                     SortConstants.ID_DESC
             ));
-            return (cursorId != null) ? hospitalRepository.findAllByNameContainingAndTownIdAndIdLessThan(keyword, townId, cursorId, pageable) : hospitalRepository.findAllByNameContainingAndTownId(keyword, townId, pageable);
+            return (cursorId != null) ? hospitalRepository.findAllByNameContainingAndDistrictIdInAndIdLessThan(keyword, districtIds, cursorId, pageable) : hospitalRepository.findAllByNameContainingAndDistrictIdIn(keyword, districtIds, pageable);
         } else {
             Pageable pageable = PageRequest.of(0, size, Sort.by(
                     Sort.Order.desc(hospitalSortCriteria.getFieldName()),
@@ -71,9 +85,9 @@ public class HospitalService {
             ));
             if (hospitalSortCriteria == HospitalSortCriteria.REVIEW) {
                 if (cursorId == null) {
-                    return hospitalRepository.findAllByTownId(townId, pageable);
+                    return hospitalRepository.findAllByDistrictIdIn(districtIds, pageable);
                 } else {
-                    return hospitalRepository.findAllByTownIdWithCursor(townId, cursorId, cursorReviewCount, pageable);
+                    return hospitalRepository.findAllByDistrictIdInWithCursor(districtIds, cursorId, cursorReviewCount, pageable);
                 }
             }
             throw new CocosException(FailMessage.BAD_REQUEST_INVALID_SORT_CRITERIA);
