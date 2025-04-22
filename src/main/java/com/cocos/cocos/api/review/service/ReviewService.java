@@ -32,7 +32,7 @@ public class ReviewService {
     private static final String REVIEW_IMAGE_PACKAGE = "reviewImage";
 
     @Transactional
-    public ReviewAddResponse of(final Long memberId, final Long hospitalId, final Long breedId, final Gender gender,
+    public ReviewAddResponse addReview(final Long memberId, final Long hospitalId, final Long breedId, final Gender gender,
                                 final Integer weight, final String visitedAt, final String content,
                                 final Long purposeId, final Long diseaseId, final List<Long> symptomIds,
                                 final List<Long> goodReviewIds, final List<Long> badReviewIds, final List<String> images) {
