@@ -18,7 +18,7 @@ public class ReviewController implements ReviewControllerSwagger {
 
     private final ReviewService reviewService;
 
-    @GetMapping("/{hospitalId}")
+    @PostMapping("/{hospitalId}")
     public ResponseEntity<BaseResponse<ReviewAddResponse>> addReview(
             @PathVariable(name = "hospitalId") final Long hospitalId,
             @RequestBody final ReviewAddRequest reviewAddRequest
