@@ -35,6 +35,7 @@ public class ReviewService {
                                        final Integer weight, final String visitedAt, final String content,
                                        final Long purposeId, final Long diseaseId, final List<Long> symptomIds,
                                        final List<Long> goodReviewIds, final List<Long> badReviewIds, final List<String> images) {
+        //ToDo: id 검증 로직 필요
         final Review review = reviewRepository.save(Review.builder()
                 .breedId(breedId)
                 .gender(gender)
