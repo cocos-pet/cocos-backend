@@ -24,7 +24,7 @@ public class Member extends BaseTime {
     @Column(name = "nickname", unique = true)
     private String nickname;
 
-    @Column(name = "email", nullable = true)
+    @Column(name = "email")
     private String email;
 
     @Column(name = "image", nullable = false)
@@ -42,7 +42,7 @@ public class Member extends BaseTime {
     @ColumnDefault("false")
     private boolean isAdmin;
 
-    @Column(name = "my_hospital_id", nullable = true)
+    @Column(name = "my_hospital_id")
     private Long myHospitalId;
 
 
