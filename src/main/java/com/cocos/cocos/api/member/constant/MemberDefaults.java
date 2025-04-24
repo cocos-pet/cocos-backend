@@ -1,11 +1,11 @@
 package com.cocos.cocos.api.member.constant;
 
 import com.cocos.cocos.enums.location.LocationType;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MemberDefaults {
-
-    private MemberDefaults() {
-    }
 
     public static final String MEMBER_BASE_IMAGE_URL = "member/baseProfileImage.png";
     public static final Long DEFAULT_LOCATION_ID = 1L;

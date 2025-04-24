@@ -11,10 +11,8 @@ import com.cocos.cocos.db.hospital.entity.Hospital;
 import com.cocos.cocos.db.hospital.repository.HospitalRepository;
 import com.cocos.cocos.db.member.entity.Member;
 import com.cocos.cocos.db.member.entity.MemberAddress;
-import com.cocos.cocos.db.member.entity.MemberHospital;
 import com.cocos.cocos.db.member.entity.MemberToken;
 import com.cocos.cocos.db.member.repository.MemberAddressRepository;
-import com.cocos.cocos.db.member.repository.MemberHospitalRepository;
 import com.cocos.cocos.db.member.repository.MemberRepository;
 import com.cocos.cocos.db.member.repository.MemberTokenRepository;
 import com.cocos.cocos.enums.location.LocationType;
@@ -38,7 +36,6 @@ public class MemberService {
     private final MemberAddressRepository memberAddressRepository;
     private final CityRepository cityRepository;
     private final DistrictRepository districtRepository;
-    private final MemberHospitalRepository memberHospitalRepository;
     private final HospitalRepository hospitalRepository;
 
     @Transactional(readOnly = true)
@@ -150,31 +147,15 @@ public class MemberService {
         throw new CocosException(FailMessage.BAD_REQUEST);
     }
 
-    @Transactional
-    public void addMemberHospital(final Long hospitalId, final Long memberId) {
-        if (!hospitalRepository.existsById(hospitalId)) {
-            throw new CocosException(FailMessage.NOT_FOUND_HOSPITAL);
-        }
-        if (memberHospitalRepository.existsByMemberId(memberId)) {
-            throw new CocosException(FailMessage.CONFLICT_MEMBER_HOSPITAL);
-        }
-        memberHospitalRepository.save(
-                MemberHospital.builder()
-                        .hospitalId(hospitalId)
-                        .memberId(memberId)
-                        .build()
-        );
-    }
-
     @Transactional(readOnly = true)
     public MemberHospitalResponse getMemberHospital(final Long memberId) {
-        final MemberHospital memberHospital = memberHospitalRepository.findByMemberId(memberId);
-        if (memberHospital == null) {
+        final Member member = memberRepository.findById(memberId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
+        if (member.getMyHospitalId() == null) {
             return null;
         }
 
-        final Hospital hospital = hospitalRepository.findById(memberHospital.getHospitalId()).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_HOSPITAL));
-        return MemberHospitalResponse.of(memberHospital.getHospitalId(), hospital.getName(), hospital.getDisplayAddress());
+        final Hospital hospital = hospitalRepository.findById(member.getMyHospitalId()).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_HOSPITAL));
+        return MemberHospitalResponse.of(hospital.getId(), hospital.getName(), hospital.getDisplayAddress());
     }
 
     @Transactional
@@ -182,17 +163,8 @@ public class MemberService {
         if (!hospitalRepository.existsById(hospitalId)) {
             throw new CocosException(FailMessage.NOT_FOUND_HOSPITAL);
         }
-        final MemberHospital memberHospital = memberHospitalRepository.findByMemberId(memberId);
-        if (memberHospital == null) {
-            memberHospitalRepository.save(
-                    MemberHospital.builder()
-                    .memberId(memberId)
-                    .hospitalId(hospitalId)
-                    .build()
-            );
-            return;
-        }
-        memberHospital.updateHospitalId(hospitalId);
+        final Member member = memberRepository.findById(memberId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
+        member.updateMyHospitalId(hospitalId);
     }
 
     private Member findMember(final String nickname, final Long memberId) {

@@ -60,15 +60,6 @@ public interface MemberControllerSwagger {
     )
     public ResponseEntity<BaseResponse<MemberLocationResponse>> getMemberLocation();
 
-    @Operation(summary = "사용자 즐겨찾는 병원 추가 API", description = "사용자의 즐겨찾는 병원을 추가합니다. ")
-    @ApiResponse(
-            responseCode = "200",
-            description = "요청에 성공했습니다."
-    )
-    public ResponseEntity<BaseResponse<Void>> addMemberHospital(
-            @PathVariable(name = "hospitalId") final Long hospitalId
-    );
-
     @Operation(summary = "사용자 즐겨찾는 병원 조회 API", description = "사용자의 즐겨찾는 병원을 조회합니다. 없으면 보내지 않습니다. ")
     @ApiResponse(
             responseCode = "200",
@@ -76,7 +67,7 @@ public interface MemberControllerSwagger {
     )
     public ResponseEntity<BaseResponse<MemberHospitalResponse>> getMemberHospital();
 
-    @Operation(summary = "사용자 즐겨찾는 병원 변경 API", description = "사용자의 즐겨찾는 병원을 변경합니다. 이전에 등록된 병원이 없는 경우 추가합니다. ")
+    @Operation(summary = "사용자 즐겨찾는 병원 추가&수정 API", description = "사용자의 즐겨찾는 병원을 수정합니다. 이전에 등록된 병원이 없는 경우 추가합니다. ")
     @ApiResponse(
             responseCode = "200",
             description = "요청에 성공했습니다."

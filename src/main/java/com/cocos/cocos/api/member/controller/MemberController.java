@@ -77,12 +77,6 @@ public class MemberController implements MemberControllerSwagger {
         return SuccessResponse.success(SuccessMessage.OK, memberService.getMemberLocation(PrincipalHandler.getMemberIdFromPrincipal()));
     }
 
-    @PostMapping("/hospitals/{hospitalId}")
-    public ResponseEntity<BaseResponse<Void>> addMemberHospital(@PathVariable(name = "hospitalId") final Long hospitalId) {
-        memberService.addMemberHospital(hospitalId, PrincipalHandler.getMemberIdFromPrincipal());
-        return SuccessResponse.success(SuccessMessage.OK, null);
-    }
-
     @GetMapping("/hospitals")
     public ResponseEntity<BaseResponse<MemberHospitalResponse>> getMemberHospital() {
         return SuccessResponse.success(SuccessMessage.OK,  memberService.getMemberHospital(PrincipalHandler.getMemberIdFromPrincipal()));
