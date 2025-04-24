@@ -28,7 +28,7 @@ public class ReviewService {
     private final ReviewImageRepository reviewImageRepository;
     private final MemberDataS3Client memberDataS3Client;
 
-    private static final String REVIEW_IMAGE_PACKAGE = "reviewImage";
+    private static final String REVIEW_IMAGE_S3_PREFIX = "reviewImage";
 
     @Transactional
     public ReviewAddResponse addReview(final Long memberId, final Long hospitalId, final Long breedId, final Gender gender,
@@ -62,7 +62,7 @@ public class ReviewService {
             return ReviewAddResponse.of(images.stream()
                     .map(image -> {
                         // TODO: 파일 포맷, 이름 등을 ENUM에 모아두는 것도 좋아보임
-                        final String fileName = String.format("%s/%s/%s", memberId, REVIEW_IMAGE_PACKAGE, UUID.randomUUID() + image);
+                        final String fileName = String.format("%s/%s/%s", memberId, REVIEW_IMAGE_S3_PREFIX, UUID.randomUUID() + image);
 
                         reviewImageRepository.save(
                                 ReviewImage.builder()
