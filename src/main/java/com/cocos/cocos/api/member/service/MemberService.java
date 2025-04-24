@@ -148,8 +148,8 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public MemberHospitalResponse getMemberHospital(final Long memberId) {
-        final Member member = memberRepository.findById(memberId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
+    public MemberHospitalResponse getMemberHospital(final String nickname, final Long memberId) {
+        final Member member = findMember(nickname, memberId);
         if (member.getMyHospitalId() == null) {
             return null;
         }

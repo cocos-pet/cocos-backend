@@ -65,7 +65,9 @@ public interface MemberControllerSwagger {
             responseCode = "200",
             description = "요청에 성공했습니다."
     )
-    public ResponseEntity<BaseResponse<MemberHospitalResponse>> getMemberHospital();
+    public ResponseEntity<BaseResponse<MemberHospitalResponse>> getMemberHospital(
+            @RequestParam(name = "nickname", required = false) final String nickname
+    );
 
     @Operation(summary = "사용자 즐겨찾는 병원 추가&수정 API", description = "사용자의 즐겨찾는 병원을 수정합니다. 이전에 등록된 병원이 없는 경우 추가합니다. ")
     @ApiResponse(

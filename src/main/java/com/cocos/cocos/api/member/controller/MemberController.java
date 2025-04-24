@@ -78,8 +78,10 @@ public class MemberController implements MemberControllerSwagger {
     }
 
     @GetMapping("/hospitals")
-    public ResponseEntity<BaseResponse<MemberHospitalResponse>> getMemberHospital() {
-        return SuccessResponse.success(SuccessMessage.OK,  memberService.getMemberHospital(PrincipalHandler.getMemberIdFromPrincipal()));
+    public ResponseEntity<BaseResponse<MemberHospitalResponse>> getMemberHospital(
+            @RequestParam(name = "nickname", required = false) final String nickname
+    ) {
+        return SuccessResponse.success(SuccessMessage.OK, memberService.getMemberHospital(nickname, PrincipalHandler.getMemberIdFromPrincipal()));
     }
 
     @PatchMapping("/hospitals/{hospitalId}")
