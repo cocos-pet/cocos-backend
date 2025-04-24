@@ -58,7 +58,7 @@ public class HospitalService {
                 hospitals.stream().map(hospital -> HospitalResponse.of(
                         hospital.getId(),
                         hospital.getName(),
-                        getHospitalAddress(hospital),
+                        hospital.getDisplayAddress(),
                         hospital.getReviewCount(),
                         hospital.getImage()
                 )).toList()
@@ -107,7 +107,7 @@ public class HospitalService {
                 hospital.getPhoneNumber(),
                 hospitalTags,
                 hospital.getIntroduction(),
-                getHospitalAddress(hospital),
+                hospital.getDisplayAddress(),
                 appDataS3Client.getPresignedUrl(hospital.getImage())
         );
     }
@@ -122,12 +122,5 @@ public class HospitalService {
         return hospitalTagRepository.findAllByIdIn(hospitalTagIds).stream()
                 .map(HospitalTag::getLabel)
                 .toList();
-    }
-
-    private String getHospitalAddress(final Hospital hospital) {
-        if (hospital.getRoadAddress() == null) {
-            return hospital.getAddress();
-        }
-        return hospital.getRoadAddress();
     }
 }

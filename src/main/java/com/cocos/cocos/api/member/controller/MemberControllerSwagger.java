@@ -2,16 +2,13 @@ package com.cocos.cocos.api.member.controller;
 
 import com.cocos.cocos.api.member.dto.request.LoginRequest;
 import com.cocos.cocos.api.member.dto.request.ProfileUpdateRequest;
-import com.cocos.cocos.api.member.dto.response.LoginResponse;
-import com.cocos.cocos.api.member.dto.response.MemberProfileResponse;
-import com.cocos.cocos.api.member.dto.response.ReissueTokenResponse;
-import com.cocos.cocos.api.member.dto.response.NicknameExistenceResponse;
-import com.cocos.cocos.api.member.dto.response.MemberLocationResponse;
+import com.cocos.cocos.api.member.dto.response.*;
 import com.cocos.cocos.common.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -62,4 +59,22 @@ public interface MemberControllerSwagger {
             description = "요청에 성공했습니다. "
     )
     public ResponseEntity<BaseResponse<MemberLocationResponse>> getMemberLocation();
+
+    @Operation(summary = "사용자 즐겨찾는 병원 조회 API", description = "사용자의 즐겨찾는 병원을 조회합니다. 없으면 보내지 않습니다. ")
+    @ApiResponse(
+            responseCode = "200",
+            description = "요청에 성공했습니다."
+    )
+    public ResponseEntity<BaseResponse<MemberHospitalResponse>> getMemberHospital(
+            @RequestParam(name = "nickname", required = false) final String nickname
+    );
+
+    @Operation(summary = "사용자 즐겨찾는 병원 추가&수정 API", description = "사용자의 즐겨찾는 병원을 수정합니다. 이전에 등록된 병원이 없는 경우 추가합니다. ")
+    @ApiResponse(
+            responseCode = "200",
+            description = "요청에 성공했습니다."
+    )
+    public ResponseEntity<BaseResponse<Void>> updateMemberHospital(
+            @PathVariable(name = "hospitalId") final Long hospitalId
+    );
 }

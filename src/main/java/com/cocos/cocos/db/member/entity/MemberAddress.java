@@ -5,10 +5,13 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 @Entity
 @Getter
 @NoArgsConstructor
+@DynamicInsert
 @Table(name = "member_address")
 public class MemberAddress {
 
@@ -21,22 +24,28 @@ public class MemberAddress {
     private Long memberId;
 
     @Column(name = "address", nullable = false)
+    @ColumnDefault("'주소를 설정해주세요!'")
     private String address;
 
     @Column(name = "road_address", nullable = false)
+    @ColumnDefault("'도로명 주소를 설정해주세요!'")
     private String roadAddress;
 
     @Column(name = "location_id", nullable = false)
+    @ColumnDefault("1")
     private Long locationId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "locatoin_type", nullable = false)
+    @Column(name = "location_type", nullable = false)
+    @ColumnDefault("'DISTRICT'")
     private LocationType locationType;
 
     @Column(name = "latitude", nullable = false)
+    @ColumnDefault("0.0")
     private Double latitude;
 
     @Column(name = "longitude", nullable = false)
+    @ColumnDefault("0.0")
     private Double longitude;
 
     @Builder
@@ -59,15 +68,9 @@ public class MemberAddress {
         this.locationType = locationType;
     }
 
-    public static MemberAddress createDefaultMemberAddress(final Long memberId, final String address, final String roadAddress, final Long locationId, final Double latitude, final Double longitude, final LocationType locationType) {
+    public static MemberAddress createDefaultMemberAddress(final Long memberId) {
         return MemberAddress.builder()
                 .memberId(memberId)
-                .address(address)
-                .roadAddress(roadAddress)
-                .latitude(latitude)
-                .longitude(longitude)
-                .locationId(locationId)
-                .locationType(locationType)
                 .build();
     }
 }

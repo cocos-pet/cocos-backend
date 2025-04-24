@@ -7,6 +7,8 @@ import com.cocos.cocos.db.city.entity.City;
 import com.cocos.cocos.db.city.repository.CityRepository;
 import com.cocos.cocos.db.district.entity.District;
 import com.cocos.cocos.db.district.repository.DistrictRepository;
+import com.cocos.cocos.db.hospital.entity.Hospital;
+import com.cocos.cocos.db.hospital.repository.HospitalRepository;
 import com.cocos.cocos.db.member.entity.Member;
 import com.cocos.cocos.db.member.entity.MemberAddress;
 import com.cocos.cocos.db.member.entity.MemberToken;
@@ -34,15 +36,7 @@ public class MemberService {
     private final MemberAddressRepository memberAddressRepository;
     private final CityRepository cityRepository;
     private final DistrictRepository districtRepository;
-
-    //ToDo: yml에 기입해야하는 지 고민 중
-    private static final String MEMBER_BASE_IMAGE_URL = "member/baseProfileImage.png";
-    private static final Long DEFAULT_LOCATION_ID = 1L;
-    private static final String DEFAULT_ADDRESS = "주소를 설정해주세요!";
-    private static final String DEFAULT_ROAD_ADDRESS = "도로명 주소를 설정해주세요!";
-    private static final Double DEFAULT_LATITUDE = 0.0;
-    private static final Double DEFAULT_LONGITUDE = 0.0;
-    private static final LocationType DEFAULT_LOCATION_TYPE = LocationType.DISTRICT;
+    private final HospitalRepository hospitalRepository;
 
     @Transactional(readOnly = true)
     public MemberProfileResponse getMemberProfile(final String nickname, final Long memberId) {
@@ -65,14 +59,7 @@ public class MemberService {
                 isCompletedSignUp = true;
             }
         } else {
-            member = memberRepository.save(Member.builder()
-                    .email("")
-                    .image(MEMBER_BASE_IMAGE_URL)
-                    .isAdmin(false)
-                    .platform(Platform.KAKAO)
-                    .sub(sub)
-                    .build()
-            );
+            member = memberRepository.save(Member.createDefaultMember(sub, Platform.KAKAO));
             isCompletedSignUp = false;
         }
         final String accessToken = jwtProvider.generateAccessToken(member.getId());
@@ -85,7 +72,7 @@ public class MemberService {
         }
         if (!memberAddressRepository.existsByMemberId(member.getId())) {
             memberAddressRepository.save(
-                    MemberAddress.createDefaultMemberAddress(member.getId(), DEFAULT_ADDRESS, DEFAULT_ROAD_ADDRESS, DEFAULT_LOCATION_ID, DEFAULT_LATITUDE, DEFAULT_LONGITUDE, DEFAULT_LOCATION_TYPE)
+                    MemberAddress.createDefaultMemberAddress(member.getId())
             );
         }
 
@@ -158,6 +145,26 @@ public class MemberService {
             return MemberLocationResponse.of(district.getId(), district.getName(), LocationType.DISTRICT.toString());
         }
         throw new CocosException(FailMessage.BAD_REQUEST);
+    }
+
+    @Transactional(readOnly = true)
+    public MemberHospitalResponse getMemberHospital(final String nickname, final Long memberId) {
+        final Member member = findMember(nickname, memberId);
+        if (member.getMyHospitalId() == null) {
+            return null;
+        }
+
+        final Hospital hospital = hospitalRepository.findById(member.getMyHospitalId()).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_HOSPITAL));
+        return MemberHospitalResponse.of(hospital.getId(), hospital.getName(), hospital.getDisplayAddress());
+    }
+
+    @Transactional
+    public void updateMemberHospital(final Long hospitalId, final Long memberId) {
+        if (!hospitalRepository.existsById(hospitalId)) {
+            throw new CocosException(FailMessage.NOT_FOUND_HOSPITAL);
+        }
+        final Member member = memberRepository.findById(memberId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
+        member.updateMyHospitalId(hospitalId);
     }
 
     private Member findMember(final String nickname, final Long memberId) {

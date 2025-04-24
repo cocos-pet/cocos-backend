@@ -6,10 +6,13 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 @Entity
 @Getter
 @NoArgsConstructor
+@DynamicInsert
 @Table(name = "member")
 public class Member extends BaseTime {
 
@@ -21,10 +24,11 @@ public class Member extends BaseTime {
     @Column(name = "nickname", unique = true)
     private String nickname;
 
-    @Column(name = "email", nullable = false)
+    @Column(name = "email")
     private String email;
 
     @Column(name = "image", nullable = false)
+    @ColumnDefault("'member/baseProfileImage.png'")
     private String image;
 
     @Column(name = "platform", nullable = false)
@@ -35,20 +39,38 @@ public class Member extends BaseTime {
     private String sub;
 
     @Column(name = "is_admin", nullable = false)
+    @ColumnDefault("false")
     private boolean isAdmin;
+
+    @Column(name = "my_hospital_id")
+    private Long myHospitalId;
 
 
     @Builder
-    public Member(final String nickname, final String email, final String image, final Platform platform, final String sub, final boolean isAdmin) {
+    public Member(final String nickname, final String email, final String image, final Platform platform, final String sub, final boolean isAdmin, final Long myHospitalId) {
         this.nickname = nickname;
         this.email = email;
         this.image = image;
         this.platform = platform;
         this.sub = sub;
         this.isAdmin = isAdmin;
+        this.myHospitalId = myHospitalId;
+    }
+
+    public static Member createDefaultMember(final String sub, final Platform platform) {
+        return Member.builder()
+                .platform(platform)
+                .sub(sub)
+                .build();
     }
 
     public void updateNickname(final String nickname) {
         if (nickname != null) this.nickname = nickname;
+    }
+
+    public  void updateMyHospitalId(final Long myHospitalId) {
+        if (myHospitalId != null) {
+            this.myHospitalId = myHospitalId;
+        }
     }
 }
