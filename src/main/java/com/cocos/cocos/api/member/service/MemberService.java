@@ -159,7 +159,10 @@ public class MemberService {
             throw new CocosException(FailMessage.CONFLICT_MEMBER_HOSPITAL);
         }
         memberHospitalRepository.save(
-                MemberHospital.builder().hospitalId(hospitalId).memberId(memberId).build()
+                MemberHospital.builder()
+                        .hospitalId(hospitalId)
+                        .memberId(memberId)
+                        .build()
         );
     }
 
@@ -181,7 +184,12 @@ public class MemberService {
         }
         final MemberHospital memberHospital = memberHospitalRepository.findByMemberId(memberId);
         if (memberHospital == null) {
-            memberHospitalRepository.save(MemberHospital.builder().memberId(memberId).hospitalId(hospitalId).build());
+            memberHospitalRepository.save(
+                    MemberHospital.builder()
+                    .memberId(memberId)
+                    .hospitalId(hospitalId)
+                    .build()
+            );
             return;
         }
         memberHospital.updateHospitalId(hospitalId);
