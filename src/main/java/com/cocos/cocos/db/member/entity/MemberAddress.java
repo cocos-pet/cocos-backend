@@ -1,15 +1,17 @@
 package com.cocos.cocos.db.member.entity;
 
-import com.cocos.cocos.api.member.constant.MemberDefaults;
 import com.cocos.cocos.enums.location.LocationType;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 @Entity
 @Getter
 @NoArgsConstructor
+@DynamicInsert
 @Table(name = "member_address")
 public class MemberAddress {
 
@@ -22,22 +24,28 @@ public class MemberAddress {
     private Long memberId;
 
     @Column(name = "address", nullable = false)
+    @ColumnDefault("'주소를 설정해주세요!'")
     private String address;
 
     @Column(name = "road_address", nullable = false)
+    @ColumnDefault("'도로명 주소를 설정해주세요!'")
     private String roadAddress;
 
     @Column(name = "location_id", nullable = false)
+    @ColumnDefault("1")
     private Long locationId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "locatoin_type", nullable = false)
+    @Column(name = "location_type", nullable = false)
+    @ColumnDefault("'DISTRICT'")
     private LocationType locationType;
 
     @Column(name = "latitude", nullable = false)
+    @ColumnDefault("0.0")
     private Double latitude;
 
     @Column(name = "longitude", nullable = false)
+    @ColumnDefault("0.0")
     private Double longitude;
 
     @Builder
@@ -63,12 +71,6 @@ public class MemberAddress {
     public static MemberAddress createDefaultMemberAddress(final Long memberId) {
         return MemberAddress.builder()
                 .memberId(memberId)
-                .address(MemberDefaults.DEFAULT_ADDRESS)
-                .roadAddress(MemberDefaults.DEFAULT_ROAD_ADDRESS)
-                .latitude(MemberDefaults.DEFAULT_LATITUDE)
-                .longitude(MemberDefaults.DEFAULT_LONGITUDE)
-                .locationId(MemberDefaults.DEFAULT_LOCATION_ID)
-                .locationType(MemberDefaults.DEFAULT_LOCATION_TYPE)
                 .build();
     }
 }

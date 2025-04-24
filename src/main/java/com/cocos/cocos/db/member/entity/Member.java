@@ -1,16 +1,18 @@
 package com.cocos.cocos.db.member.entity;
 
-import com.cocos.cocos.api.member.constant.MemberDefaults;
 import com.cocos.cocos.db.BaseTime;
 import com.cocos.cocos.enums.member.Platform;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 @Entity
 @Getter
 @NoArgsConstructor
+@DynamicInsert
 @Table(name = "member")
 public class Member extends BaseTime {
 
@@ -22,10 +24,11 @@ public class Member extends BaseTime {
     @Column(name = "nickname", unique = true)
     private String nickname;
 
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", nullable = true)
     private String email;
 
     @Column(name = "image", nullable = false)
+    @ColumnDefault("'member/baseProfileImage.png'")
     private String image;
 
     @Column(name = "platform", nullable = false)
@@ -36,6 +39,7 @@ public class Member extends BaseTime {
     private String sub;
 
     @Column(name = "is_admin", nullable = false)
+    @ColumnDefault("false")
     private boolean isAdmin;
 
     @Column(name = "my_hospital_id", nullable = true)
@@ -55,9 +59,6 @@ public class Member extends BaseTime {
 
     public static Member createDefaultMember(final String sub, final Platform platform) {
         return Member.builder()
-                .email("")
-                .image(MemberDefaults.MEMBER_BASE_IMAGE_URL)
-                .isAdmin(false)
                 .platform(platform)
                 .sub(sub)
                 .build();
