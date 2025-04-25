@@ -26,6 +26,7 @@ public class ReviewService {
     private final MemberDataS3Client memberDataS3Client;
 
     private static final String REVIEW_IMAGE_S3_PREFIX = "reviewImage";
+    private static final boolean IS_GOOD_REVIEW = true;
 
     @Transactional
     public ReviewAddResponse addReview(final Long memberId, final Long hospitalId, final Long breedId, final Gender gender,
@@ -101,22 +102,8 @@ public class ReviewService {
         final List<ReviewSummaryOption> reviewSummaryOptions = reviewSummaryOptionRepository.findAll();
 
         return ReviewSummaryListResponse.of(
-                reviewSummaryOptions.stream()
-                        .filter(reviewSummaryOption -> reviewSummaryOption.getIsGood())
-                        .map(reviewSummaryOption -> ReviewSummaryResponse.of(
-                                reviewSummaryOption.getId(),
-                                reviewSummaryOption.getLabel(),
-                                reviewSummaryRepository.countByReviewIdInAndReviewSummaryOptionId(reviewIds, reviewSummaryOption.getId())
-                        ))
-                        .toList(),
-                reviewSummaryOptions.stream()
-                        .filter(reviewSummaryOption -> !reviewSummaryOption.getIsGood())
-                        .map(reviewSummaryOption -> ReviewSummaryResponse.of(
-                                reviewSummaryOption.getId(),
-                                reviewSummaryOption.getLabel(),
-                                reviewSummaryRepository.countByReviewIdInAndReviewSummaryOptionId(reviewIds, reviewSummaryOption.getId())
-                        ))
-                        .toList()
+                getReviewSummaryAndCount(reviewSummaryOptions, reviewIds, IS_GOOD_REVIEW),
+                getReviewSummaryAndCount(reviewSummaryOptions, reviewIds, !IS_GOOD_REVIEW)
         );
     }
 
