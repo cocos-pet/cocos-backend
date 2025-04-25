@@ -4,6 +4,7 @@ import com.cocos.cocos.api.hospital.dto.request.HospitalListRequest;
 import com.cocos.cocos.api.hospital.dto.response.HospitalDetailResponse;
 import com.cocos.cocos.api.hospital.dto.response.HospitalListResponse;
 import com.cocos.cocos.common.response.BaseResponse;
+import com.cocos.cocos.validation.hospital.HospitalConstraint;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -35,6 +36,6 @@ public interface HospitalControllerSwagger {
     )
     @Parameter(name = "hospitalId", description = "병원 아이디", in = ParameterIn.PATH, required = true, schema = @Schema(type = "Long"))
     public ResponseEntity<BaseResponse<HospitalDetailResponse>> getHospitalDetail(
-            @PathVariable final Long hospitalId
+            @PathVariable @HospitalConstraint final Long hospitalId
     );
 }

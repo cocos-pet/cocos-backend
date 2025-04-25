@@ -7,6 +7,8 @@ import com.cocos.cocos.common.response.FailResponse;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.ValidationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -97,5 +100,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<BaseResponse<?>> handleGeneralException(Exception e) {
         return FailResponse.failure(FailMessage.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<BaseResponse<?>> handleValidationException(final ValidationException e) {
+        if (e.getCause() instanceof CocosException cocosException) {
+            return FailResponse.failure(cocosException.getFailMessage());
+        }
+        return FailResponse.failure(FailMessage.BAD_REQUEST);
     }
 }
