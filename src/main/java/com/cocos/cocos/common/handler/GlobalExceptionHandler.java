@@ -2,13 +2,12 @@ package com.cocos.cocos.common.handler;
 
 import com.cocos.cocos.common.exception.CocosException;
 import com.cocos.cocos.common.response.BaseResponse;
-import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.common.response.FailResponse;
+import com.cocos.cocos.enums.message.FailMessage;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.ValidationException;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
