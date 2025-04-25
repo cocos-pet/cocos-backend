@@ -1,0 +1,113 @@
+package com.cocos.cocos.review;
+
+import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
+import com.cocos.cocos.api.review.service.ReviewService;
+import com.cocos.cocos.db.review.db.Review;
+import com.cocos.cocos.db.review.db.ReviewImage;
+import com.cocos.cocos.db.review.db.ReviewSummary;
+import com.cocos.cocos.db.review.db.ReviewSymptom;
+import com.cocos.cocos.db.review.repository.ReviewImageRepository;
+import com.cocos.cocos.db.review.repository.ReviewRepository;
+import com.cocos.cocos.db.review.repository.ReviewSummaryRepository;
+import com.cocos.cocos.db.review.repository.ReviewSymptomRepository;
+import com.cocos.cocos.enums.pet.Gender;
+import com.cocos.cocos.external.MemberDataS3Client;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.BDDMockito;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+
+@ExtendWith(MockitoExtension.class)
+@DisplayName("리뷰 테스트")
+@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+public class ReviewServiceTest {
+
+    @InjectMocks
+    ReviewService reviewService;
+
+    @Mock
+    ReviewRepository reviewRepository;
+
+    @Mock
+    ReviewSummaryRepository reviewSummaryRepository;
+
+    @Mock
+    ReviewSymptomRepository reviewSymptomRepository;
+
+    @Mock
+    ReviewImageRepository reviewImageRepository;
+
+    @Mock
+    MemberDataS3Client memberDataS3Client;
+
+    @Test
+    @DisplayName("리뷰를 작성할 수 있다.")
+    void addReview() {
+        //given
+        final Long memberId = 1L;
+        final Long hospitalId = 2L;
+        final Long breedId = 1L;
+        final Gender gender = Gender.F;
+        final Integer weight = 7;
+        final String visitedAt = "2025.04.22";
+        final String content = "내용";
+        final Long purposeId = 2L;
+        final Long diseaseId = 3L;
+        final List<Long> symptomIds = new ArrayList<>(List.of(1L, 2L));
+        final List<Long> goodReviewIds = new ArrayList<>(List.of(4L, 5L, 6L, 10L));
+        final List<Long> badReviewIds = new ArrayList<>(List.of(7L, 8L, 9L));
+        final String image1 = "image1";
+        final String image2 = "image2";
+        final List<String> images = new ArrayList<>(List.of(image1, image2));
+        final String presignedUrl = "presignedUrl";
+        final List<String> presignedUrls = new ArrayList<>(List.of(presignedUrl, presignedUrl));
+
+        final Review review = Review.builder()
+                .breedId(breedId)
+                .gender(gender)
+                .weight(weight)
+                .purposeId(purposeId)
+                .content(content)
+                .hospitalId(hospitalId)
+                .memberId(memberId)
+                .visitedAt(visitedAt)
+                .diseaseId(diseaseId)
+                .build();
+
+        ReflectionTestUtils.setField(review, "id", 123L);
+
+        BDDMockito.given(memberDataS3Client.putPresignedUrl(any())).willReturn(presignedUrl);
+        BDDMockito.given(reviewRepository.save(any(Review.class)))
+                .willReturn(review);
+
+
+        final ReviewAddResponse expected = ReviewAddResponse.of(
+                presignedUrls
+        );
+
+        //when
+        final ReviewAddResponse actual = reviewService.addReview(memberId, hospitalId, breedId, gender, weight, visitedAt
+                , content, purposeId, diseaseId, symptomIds, goodReviewIds, badReviewIds, images);
+
+        //then
+        Assertions.assertThat(actual).usingRecursiveAssertion().isEqualTo(expected);
+        BDDMockito.verify(reviewRepository, times(1)).save(any(Review.class));
+        BDDMockito.verify(reviewSummaryRepository, times(7)).save(any(ReviewSummary.class));
+        BDDMockito.verify(reviewSymptomRepository, times(2)).save(any(ReviewSymptom.class));
+        BDDMockito.verify(reviewImageRepository, times(2)).save(any(ReviewImage.class));
+
+    }
+}
