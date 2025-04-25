@@ -2,14 +2,8 @@ package com.cocos.cocos.api.review.service;
 
 import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewSummaryListResponse;
-import com.cocos.cocos.db.review.db.Review;
-import com.cocos.cocos.db.review.db.ReviewImage;
-import com.cocos.cocos.db.review.db.ReviewSummary;
-import com.cocos.cocos.db.review.db.ReviewSymptom;
-import com.cocos.cocos.db.review.repository.ReviewImageRepository;
-import com.cocos.cocos.db.review.repository.ReviewRepository;
-import com.cocos.cocos.db.review.repository.ReviewSummaryRepository;
-import com.cocos.cocos.db.review.repository.ReviewSymptomRepository;
+import com.cocos.cocos.db.review.db.*;
+import com.cocos.cocos.db.review.repository.*;
 import com.cocos.cocos.enums.pet.Gender;
 import com.cocos.cocos.external.MemberDataS3Client;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +21,7 @@ public class ReviewService {
     private final ReviewSummaryRepository reviewSummaryRepository;
     private final ReviewSymptomRepository reviewSymptomRepository;
     private final ReviewImageRepository reviewImageRepository;
+    private final ReviewSummaryOptionRepository reviewSummaryOptionRepository;
     private final MemberDataS3Client memberDataS3Client;
 
     private static final String REVIEW_IMAGE_S3_PREFIX = "reviewImage";
@@ -101,5 +96,7 @@ public class ReviewService {
         final List<Long> reviewIds = reviewRepository.findAllByHospitalId(hospitalId).stream()
                 .map(Review::getId)
                 .toList();
+
+        final List<ReviewSummaryOption> reviewSummaryOptions = reviewSummaryOptionRepository.findAll();
     }
 }
