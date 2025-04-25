@@ -1,15 +1,11 @@
 package com.cocos.cocos.review;
 
 import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
+import com.cocos.cocos.api.review.dto.response.ReviewSummaryListResponse;
+import com.cocos.cocos.api.review.dto.response.ReviewSummaryResponse;
 import com.cocos.cocos.api.review.service.ReviewService;
-import com.cocos.cocos.db.review.db.Review;
-import com.cocos.cocos.db.review.db.ReviewImage;
-import com.cocos.cocos.db.review.db.ReviewSummary;
-import com.cocos.cocos.db.review.db.ReviewSymptom;
-import com.cocos.cocos.db.review.repository.ReviewImageRepository;
-import com.cocos.cocos.db.review.repository.ReviewRepository;
-import com.cocos.cocos.db.review.repository.ReviewSummaryRepository;
-import com.cocos.cocos.db.review.repository.ReviewSymptomRepository;
+import com.cocos.cocos.db.review.db.*;
+import com.cocos.cocos.db.review.repository.*;
 import com.cocos.cocos.enums.pet.Gender;
 import com.cocos.cocos.external.MemberDataS3Client;
 import org.assertj.core.api.Assertions;
@@ -49,6 +45,9 @@ public class ReviewServiceTest {
 
     @Mock
     ReviewImageRepository reviewImageRepository;
+
+    @Mock
+    ReviewSummaryOptionRepository reviewSummaryOptionRepository;
 
     @Mock
     MemberDataS3Client memberDataS3Client;
@@ -109,5 +108,86 @@ public class ReviewServiceTest {
         BDDMockito.verify(reviewSymptomRepository, times(2)).save(any(ReviewSymptom.class));
         BDDMockito.verify(reviewImageRepository, times(2)).save(any(ReviewImage.class));
 
+    }
+
+    @Test
+    @DisplayName("병원에 해당하는 리뷰 요약을 조회할 수 있다.")
+    void getReviewSummaryByHospitalId() {
+        //given
+        final Long hospitalId = 1L;
+        final Review review1 = Review.builder()
+                .hospitalId(1L)
+                .build();
+        final Review review2 = Review.builder()
+                .hospitalId(1L)
+                .build();
+        final Review review3 = Review.builder()
+                .hospitalId(1L)
+                .build();
+
+        ReflectionTestUtils.setField(review1, "id", 1L);
+        ReflectionTestUtils.setField(review2, "id", 2L);
+        ReflectionTestUtils.setField(review3, "id", 3L);
+
+        final List<Review> reviews = new ArrayList<>(List.of(review1, review2, review3));
+        final List<Long> reviewIds = new ArrayList<>(List.of(review1.getId(), review2.getId(), review3.getId()));
+
+        final ReviewSummaryOption reviewSummaryOption1 = ReviewSummaryOption.builder()
+                .label("좋은 리뷰")
+                .isGood(true)
+                .build();
+
+        final ReviewSummaryOption reviewSummaryOption2 = ReviewSummaryOption.builder()
+                .label("나쁜 리뷰")
+                .isGood(false)
+                .build();
+
+        ReflectionTestUtils.setField(reviewSummaryOption1, "id", 1L);
+        ReflectionTestUtils.setField(reviewSummaryOption2, "id", 2L);
+
+        final List<ReviewSummaryOption> reviewSummaryOptions = new ArrayList<>(List.of(reviewSummaryOption1, reviewSummaryOption2));
+
+        final ReviewSummary reviewSummary1 = ReviewSummary.builder()
+                .reviewId(1L)
+                .reviewSummaryOptionId(1L)
+                .build();
+        final ReviewSummary reviewSummary2 = ReviewSummary.builder()
+                .reviewId(2L)
+                .reviewSummaryOptionId(1L)
+                .build();
+        final ReviewSummary reviewSummary3 = ReviewSummary.builder()
+                .reviewId(3L)
+                .reviewSummaryOptionId(2L)
+                .build();
+
+        final List<ReviewSummary> reviewSummaries = new ArrayList<>(List.of(reviewSummary1, reviewSummary2, reviewSummary3));
+
+        final ReviewSummaryResponse reviewSummaryResponse1 = ReviewSummaryResponse.of(
+                1L,
+                "좋은 리뷰",
+                2
+        );
+
+        final ReviewSummaryResponse reviewSummaryResponse2 = ReviewSummaryResponse.of(
+                2L,
+                "나쁜 리뷰",
+                1
+        );
+
+        final ReviewSummaryListResponse expected = ReviewSummaryListResponse.of(
+                List.of(reviewSummaryResponse1),
+                List.of(reviewSummaryResponse2)
+        );
+
+        BDDMockito.given(reviewRepository.findAllByHospitalId(hospitalId)).willReturn(reviews);
+        BDDMockito.given(reviewSummaryOptionRepository.findAll()).willReturn(reviewSummaryOptions);
+        BDDMockito.given(reviewSummaryRepository.countByReviewIdInReviewIdsAndReviewSummaryOptionId(reviewIds, reviewSummaryOption1.getId())).willReturn(2);
+        BDDMockito.given(reviewSummaryRepository.countByReviewIdInReviewIdsAndReviewSummaryOptionId(reviewIds, reviewSummaryOption2.getId())).willReturn(1);
+
+        //when
+        final ReviewSummaryListResponse actual = reviewService.getReviewSummaryList(hospitalId);
+
+        //then
+        Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
     }
 }
