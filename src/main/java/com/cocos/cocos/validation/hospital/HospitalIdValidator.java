@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class HospitalValidator implements ConstraintValidator<HospitalConstraint, Long> {
+public class HospitalIdValidator implements ConstraintValidator<HospitalIdConstraint, Long> {
 
     private final HospitalRepository hospitalRepository;
 
     @Override
-    public void initialize(HospitalConstraint hospitalConstraint) {
+    public void initialize(HospitalIdConstraint hospitalIdConstraint) {
     }
 
     @Override

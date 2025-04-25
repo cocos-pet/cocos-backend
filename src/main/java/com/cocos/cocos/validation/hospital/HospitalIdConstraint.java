@@ -5,10 +5,10 @@ import jakarta.validation.Payload;
 
 import java.lang.annotation.*;
 
-@Constraint(validatedBy = HospitalValidator.class)
+@Constraint(validatedBy = HospitalIdValidator.class)
 @Target({ElementType.PARAMETER, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface HospitalConstraint {
+public @interface HospitalIdConstraint {
     String message() default "Invalid Hospital Id";
 
     Class<?>[] groups() default {};
