@@ -1,6 +1,7 @@
 package com.cocos.cocos.api.review.service;
 
 import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
+import com.cocos.cocos.api.review.dto.response.ReviewSummaryListResponse;
 import com.cocos.cocos.db.review.db.Review;
 import com.cocos.cocos.db.review.db.ReviewImage;
 import com.cocos.cocos.db.review.db.ReviewSummary;
@@ -93,5 +94,12 @@ public class ReviewService {
                     )
             );
         }
+    }
+
+    @Transactional(readOnly = true)
+    public ReviewSummaryListResponse getReviewSummaryList(final Long hospitalId) {
+        final List<Long> reviewIds = reviewRepository.findAllByHospitalId(hospitalId).stream()
+                .map(Review::getId)
+                .toList();
     }
 }
