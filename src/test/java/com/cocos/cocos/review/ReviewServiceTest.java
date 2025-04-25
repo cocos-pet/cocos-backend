@@ -147,21 +147,6 @@ public class ReviewServiceTest {
 
         final List<ReviewSummaryOption> reviewSummaryOptions = new ArrayList<>(List.of(reviewSummaryOption1, reviewSummaryOption2));
 
-        final ReviewSummary reviewSummary1 = ReviewSummary.builder()
-                .reviewId(1L)
-                .reviewSummaryOptionId(1L)
-                .build();
-        final ReviewSummary reviewSummary2 = ReviewSummary.builder()
-                .reviewId(2L)
-                .reviewSummaryOptionId(1L)
-                .build();
-        final ReviewSummary reviewSummary3 = ReviewSummary.builder()
-                .reviewId(3L)
-                .reviewSummaryOptionId(2L)
-                .build();
-
-        final List<ReviewSummary> reviewSummaries = new ArrayList<>(List.of(reviewSummary1, reviewSummary2, reviewSummary3));
-
         final ReviewSummaryResponse reviewSummaryResponse1 = ReviewSummaryResponse.of(
                 1L,
                 "좋은 리뷰",
@@ -181,13 +166,15 @@ public class ReviewServiceTest {
 
         BDDMockito.given(reviewRepository.findAllByHospitalId(hospitalId)).willReturn(reviews);
         BDDMockito.given(reviewSummaryOptionRepository.findAll()).willReturn(reviewSummaryOptions);
-        BDDMockito.given(reviewSummaryRepository.countByReviewIdInReviewIdsAndReviewSummaryOptionId(reviewIds, reviewSummaryOption1.getId())).willReturn(2);
-        BDDMockito.given(reviewSummaryRepository.countByReviewIdInReviewIdsAndReviewSummaryOptionId(reviewIds, reviewSummaryOption2.getId())).willReturn(1);
+        BDDMockito.given(reviewSummaryRepository.countByReviewIdInAndReviewSummaryOptionId(reviewIds, reviewSummaryOption1.getId())).willReturn(2);
+        BDDMockito.given(reviewSummaryRepository.countByReviewIdInAndReviewSummaryOptionId(reviewIds, reviewSummaryOption2.getId())).willReturn(1);
 
         //when
         final ReviewSummaryListResponse actual = reviewService.getReviewSummaryList(hospitalId);
 
         //then
         Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
+        Assertions.assertThat(actual.goodReviews().getFirst().label()).isEqualTo("좋은 리뷰");
+        Assertions.assertThat(actual.badReviews().getFirst().label()).isEqualTo("나쁜 리뷰");
     }
 }

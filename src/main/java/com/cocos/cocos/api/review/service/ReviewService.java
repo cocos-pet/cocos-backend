@@ -2,6 +2,7 @@ package com.cocos.cocos.api.review.service;
 
 import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewSummaryListResponse;
+import com.cocos.cocos.api.review.dto.response.ReviewSummaryResponse;
 import com.cocos.cocos.db.review.db.*;
 import com.cocos.cocos.db.review.repository.*;
 import com.cocos.cocos.enums.pet.Gender;
@@ -98,5 +99,24 @@ public class ReviewService {
                 .toList();
 
         final List<ReviewSummaryOption> reviewSummaryOptions = reviewSummaryOptionRepository.findAll();
+
+        return ReviewSummaryListResponse.of(
+                reviewSummaryOptions.stream()
+                        .filter(reviewSummaryOption -> reviewSummaryOption.getIsGood())
+                        .map(reviewSummaryOption -> ReviewSummaryResponse.of(
+                                reviewSummaryOption.getId(),
+                                reviewSummaryOption.getLabel(),
+                                reviewSummaryRepository.countByReviewIdInAndReviewSummaryOptionId(reviewIds, reviewSummaryOption.getId())
+                        ))
+                        .toList(),
+                reviewSummaryOptions.stream()
+                        .filter(reviewSummaryOption -> !reviewSummaryOption.getIsGood())
+                        .map(reviewSummaryOption -> ReviewSummaryResponse.of(
+                                reviewSummaryOption.getId(),
+                                reviewSummaryOption.getLabel(),
+                                reviewSummaryRepository.countByReviewIdInAndReviewSummaryOptionId(reviewIds, reviewSummaryOption.getId())
+                        ))
+                        .toList()
+        );
     }
 }
