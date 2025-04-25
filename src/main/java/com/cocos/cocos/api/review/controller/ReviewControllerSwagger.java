@@ -2,6 +2,7 @@ package com.cocos.cocos.api.review.controller;
 
 import com.cocos.cocos.api.review.dto.request.ReviewAddRequest;
 import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
+import com.cocos.cocos.api.review.dto.response.ReviewSummaryListResponse;
 import com.cocos.cocos.common.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,5 +26,15 @@ public interface ReviewControllerSwagger {
     public ResponseEntity<BaseResponse<ReviewAddResponse>> addReview(
             @PathVariable(name = "hospitalId") final Long hospitalId,
             @RequestBody final ReviewAddRequest reviewAddRequest
+    );
+
+    @Operation(summary = "리뷰 요약 조회 API", description = "병원 리뷰 요약 리스트를 조회하는 API입니다. ")
+    @ApiResponse(
+            responseCode = "200",
+            description = "요청에 성공했습니다."
+    )
+    @Parameter(name = "hospitalId", description = "병원 아이디", in = ParameterIn.PATH, required = true, schema = @Schema(type = "Long"))
+    public ResponseEntity<BaseResponse<ReviewSummaryListResponse>> getReviewSummaryList(
+            @PathVariable(name = "hospitalId") final Long hospitalId
     );
 }

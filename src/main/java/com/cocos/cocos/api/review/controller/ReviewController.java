@@ -34,6 +34,7 @@ public class ReviewController implements ReviewControllerSwagger {
 
     @GetMapping("/{hospitalId}/summary")
     public ResponseEntity<BaseResponse<ReviewSummaryListResponse>> getReviewSummaryList(
+            // ToDo: 유효성 검사 머지되면 검사 필요
             @PathVariable(name = "hospitalId") final Long hospitalId
     ) {
         return SuccessResponse.success(SuccessMessage.OK, reviewService.getReviewSummaryList(hospitalId));
