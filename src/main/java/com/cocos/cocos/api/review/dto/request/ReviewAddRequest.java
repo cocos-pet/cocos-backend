@@ -2,6 +2,7 @@ package com.cocos.cocos.api.review.dto.request;
 
 import com.cocos.cocos.enums.pet.Gender;
 import com.cocos.cocos.validation.breed.BreedIdConstraint;
+import com.cocos.cocos.validation.disease.DiseaseIdConstraint;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public record ReviewAddRequest(
         @Schema(description = "방문 목적 아이디", nullable = true, example = "1")
         Long purposeId,
         @Schema(description = "질병 아이디", nullable = true, example = "7")
+        @DiseaseIdConstraint
         Long diseaseId,
         @Schema(description = "증상 아이디 리스트", nullable = true, example = "[5,30...]")
         List<Long> symptomIds,
