@@ -1,12 +1,14 @@
 package com.cocos.cocos.api.review.dto.request;
 
 import com.cocos.cocos.enums.pet.Gender;
+import com.cocos.cocos.validation.breed.BreedIdConstraint;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
 public record ReviewAddRequest(
         @Schema(description = "종 아이디", nullable = true, example = "1")
+        @BreedIdConstraint
         Long breedId,
         @Schema(description = "성별", nullable = true, example = "F | M")
         Gender gender,
