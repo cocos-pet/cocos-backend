@@ -13,13 +13,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("${api.prefix}/hospitals/reviews")
+@RequestMapping("${api.prefix}")
 @RequiredArgsConstructor
 public class ReviewController implements ReviewControllerSwagger {
 
     private final ReviewService reviewService;
 
-    @PostMapping("/{hospitalId}")
+    @PostMapping("/hospitals/{hospitalId}/reviews")
     public ResponseEntity<BaseResponse<ReviewAddResponse>> addReview(
             @PathVariable(name = "hospitalId") final Long hospitalId,
             @RequestBody final ReviewAddRequest reviewAddRequest
@@ -32,7 +32,7 @@ public class ReviewController implements ReviewControllerSwagger {
         ));
     }
 
-    @GetMapping("/{hospitalId}/summary")
+    @GetMapping("/hospitals/{hospitalId}/reviews/summary")
     public ResponseEntity<BaseResponse<ReviewSummaryListResponse>> getReviewSummaryList(
             // ToDo: 유효성 검사 머지되면 검사 필요
             @PathVariable(name = "hospitalId") final Long hospitalId
