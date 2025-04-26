@@ -129,7 +129,7 @@ public class HospitalService {
                 hospitalVisitPurposeRepository.findAll().stream()
                         .map(hospitalVisitPurpose -> HospitalVisitPurposeResponse.of(
                                 hospitalVisitPurpose.getId(),
-                                hospitalVisitPurpose.getLabel()
+                                hospitalVisitPurpose.getName()
                         ))
                         .toList()
         );

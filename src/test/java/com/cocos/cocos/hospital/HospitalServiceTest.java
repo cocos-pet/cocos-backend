@@ -7,7 +7,7 @@ import com.cocos.cocos.api.hospital.service.HospitalService;
 import com.cocos.cocos.db.hospital.entity.Hospital;
 import com.cocos.cocos.db.hospital.entity.HospitalTag;
 import com.cocos.cocos.db.hospital.entity.HospitalTagMapping;
-import com.cocos.cocos.db.hospital.entity.HospitalVisitPurpose;
+import com.cocos.cocos.db.hospital.entity.VisitPurpose;
 import com.cocos.cocos.db.hospital.repository.HospitalRepository;
 import com.cocos.cocos.db.hospital.repository.HospitalTagMappingRepository;
 import com.cocos.cocos.db.hospital.repository.HospitalTagRepository;
@@ -173,25 +173,25 @@ public class HospitalServiceTest {
     @DisplayName("병원 방문 목적을 조회할 수 있다.")
     void getHospitalVisitList() {
         //given
-        final HospitalVisitPurpose hospitalVisitPurpose1 = HospitalVisitPurpose.builder()
-                .label("목적1")
+        final VisitPurpose visitPurpose1 = VisitPurpose.builder()
+                .name("목적1")
                 .build();
 
-        final HospitalVisitPurpose hospitalVisitPurpose2 = HospitalVisitPurpose.builder()
-                .label("목적2")
+        final VisitPurpose visitPurpose2 = VisitPurpose.builder()
+                .name("목적2")
                 .build();
 
-        final HospitalVisitPurpose hospitalVisitPurpose3 = HospitalVisitPurpose.builder()
-                .label("목적3")
+        final VisitPurpose visitPurpose3 = VisitPurpose.builder()
+                .name("목적3")
                 .build();
 
-        ReflectionTestUtils.setField(hospitalVisitPurpose1, "id", 1L);
-        ReflectionTestUtils.setField(hospitalVisitPurpose2, "id", 2L);
-        ReflectionTestUtils.setField(hospitalVisitPurpose3, "id", 3L);
+        ReflectionTestUtils.setField(visitPurpose1, "id", 1L);
+        ReflectionTestUtils.setField(visitPurpose2, "id", 2L);
+        ReflectionTestUtils.setField(visitPurpose3, "id", 3L);
 
-        final List<HospitalVisitPurpose> hospitalVisitPurposes = new ArrayList<>(List.of(hospitalVisitPurpose1, hospitalVisitPurpose2, hospitalVisitPurpose3));
+        final List<VisitPurpose> visitPurposes = new ArrayList<>(List.of(visitPurpose1, visitPurpose2, visitPurpose3));
 
-        BDDMockito.given(hospitalVisitPurposeRepository.findAll()).willReturn(hospitalVisitPurposes);
+        BDDMockito.given(hospitalVisitPurposeRepository.findAll()).willReturn(visitPurposes);
 
         final HospitalVisitPurposeResponse hospitalVisitPurposeResponse1 = HospitalVisitPurposeResponse.of(
                 1L,

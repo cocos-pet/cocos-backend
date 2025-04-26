@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "hospital_visit_purpose")
-public class HospitalVisitPurpose {
+@Table(name = "visit_purpose")
+public class VisitPurpose {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,10 +17,10 @@ public class HospitalVisitPurpose {
     private Long id;
 
     @Column(name = "label", nullable = false)
-    private String label;
+    private String name;
 
     @Builder
-    public HospitalVisitPurpose(final String label) {
-        this.label = label;
+    public VisitPurpose(final String name) {
+        this.name = name;
     }
 }
