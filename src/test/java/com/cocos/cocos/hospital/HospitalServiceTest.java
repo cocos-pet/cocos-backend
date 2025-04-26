@@ -1,13 +1,17 @@
 package com.cocos.cocos.hospital;
 
 import com.cocos.cocos.api.hospital.dto.response.HospitalDetailResponse;
+import com.cocos.cocos.api.hospital.dto.response.HospitalVisitPurposeListResponse;
+import com.cocos.cocos.api.hospital.dto.response.HospitalVisitPurposeResponse;
 import com.cocos.cocos.api.hospital.service.HospitalService;
 import com.cocos.cocos.db.hospital.entity.Hospital;
 import com.cocos.cocos.db.hospital.entity.HospitalTag;
 import com.cocos.cocos.db.hospital.entity.HospitalTagMapping;
+import com.cocos.cocos.db.hospital.entity.HospitalVisitPurpose;
 import com.cocos.cocos.db.hospital.repository.HospitalRepository;
 import com.cocos.cocos.db.hospital.repository.HospitalTagMappingRepository;
 import com.cocos.cocos.db.hospital.repository.HospitalTagRepository;
+import com.cocos.cocos.db.hospital.repository.HospitalVisitPurposeRepository;
 import com.cocos.cocos.external.AppDataS3Client;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +23,7 @@ import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +47,9 @@ public class HospitalServiceTest {
 
     @Mock
     private HospitalTagMappingRepository hospitalTagMappingRepository;
+
+    @Mock
+    private HospitalVisitPurposeRepository hospitalVisitPurposeRepository;
 
     @Mock
     private AppDataS3Client appDataS3Client;
@@ -159,6 +167,56 @@ public class HospitalServiceTest {
         //then
         Assertions.assertThat(actual).usingRecursiveAssertion().isEqualTo(expected);
         Assertions.assertThat(actual.address()).isEqualTo("병원 주소");
+    }
+
+    @Test
+    @DisplayName("병원 방문 목적을 조회할 수 있다.")
+    void getHospitalVisitList() {
+        //given
+        final HospitalVisitPurpose hospitalVisitPurpose1 = HospitalVisitPurpose.builder()
+                .label("목적1")
+                .build();
+
+        final HospitalVisitPurpose hospitalVisitPurpose2 = HospitalVisitPurpose.builder()
+                .label("목적2")
+                .build();
+
+        final HospitalVisitPurpose hospitalVisitPurpose3 = HospitalVisitPurpose.builder()
+                .label("목적3")
+                .build();
+
+        ReflectionTestUtils.setField(hospitalVisitPurpose1, "id", 1L);
+        ReflectionTestUtils.setField(hospitalVisitPurpose2, "id", 2L);
+        ReflectionTestUtils.setField(hospitalVisitPurpose3, "id", 3L);
+
+        final List<HospitalVisitPurpose> hospitalVisitPurposes = new ArrayList<>(List.of(hospitalVisitPurpose1, hospitalVisitPurpose2, hospitalVisitPurpose3));
+
+        BDDMockito.given(hospitalVisitPurposeRepository.findAll()).willReturn(hospitalVisitPurposes);
+
+        final HospitalVisitPurposeResponse hospitalVisitPurposeResponse1 = HospitalVisitPurposeResponse.of(
+                1L,
+                "목적1"
+        );
+
+        final HospitalVisitPurposeResponse hospitalVisitPurposeResponse2 = HospitalVisitPurposeResponse.of(
+                2L,
+                "목적2"
+        );
+
+        final HospitalVisitPurposeResponse hospitalVisitPurposeResponse3 = HospitalVisitPurposeResponse.of(
+                3L,
+                "목적3"
+        );
+
+        final List<HospitalVisitPurposeResponse> hospitalVisitPurposeResponses = new ArrayList<>(List.of(hospitalVisitPurposeResponse1, hospitalVisitPurposeResponse2, hospitalVisitPurposeResponse3));
+
+        final HospitalVisitPurposeListResponse expected = HospitalVisitPurposeListResponse.of(hospitalVisitPurposeResponses);
+
+        //when
+        final HospitalVisitPurposeListResponse actual = hospitalService.getHospitalVisitPurposeList();
+
+        //then
+        Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
     }
 }
 
