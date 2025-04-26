@@ -1,8 +1,6 @@
 package com.cocos.cocos.api.hospital.service;
 
-import com.cocos.cocos.api.hospital.dto.response.HospitalDetailResponse;
-import com.cocos.cocos.api.hospital.dto.response.HospitalListResponse;
-import com.cocos.cocos.api.hospital.dto.response.HospitalResponse;
+import com.cocos.cocos.api.hospital.dto.response.*;
 import com.cocos.cocos.common.exception.CocosException;
 import com.cocos.cocos.db.district.entity.District;
 import com.cocos.cocos.db.district.repository.DistrictRepository;
@@ -12,12 +10,12 @@ import com.cocos.cocos.db.hospital.entity.HospitalTagMapping;
 import com.cocos.cocos.db.hospital.repository.HospitalRepository;
 import com.cocos.cocos.db.hospital.repository.HospitalTagMappingRepository;
 import com.cocos.cocos.db.hospital.repository.HospitalTagRepository;
+import com.cocos.cocos.db.hospital.repository.HospitalVisitPurposeRepository;
 import com.cocos.cocos.enums.hospital.HospitalSortCriteria;
 import com.cocos.cocos.enums.location.LocationType;
 import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.external.AppDataS3Client;
 import com.cocos.cocos.util.SortConstants;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +33,7 @@ public class HospitalService {
     private final DistrictRepository districtRepository;
     private final HospitalTagRepository hospitalTagRepository;
     private final HospitalTagMappingRepository hospitalTagMappingRepository;
+    private final HospitalVisitPurposeRepository hospitalVisitPurposeRepository;
     private final AppDataS3Client appDataS3Client;
 
     @Transactional(readOnly = true)
@@ -122,5 +121,17 @@ public class HospitalService {
         return hospitalTagRepository.findAllByIdIn(hospitalTagIds).stream()
                 .map(HospitalTag::getLabel)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public HospitalVisitPurposeListResponse getHospitalVisitPurposeList() {
+        return HospitalVisitPurposeListResponse.of(
+                hospitalVisitPurposeRepository.findAll().stream()
+                        .map(hospitalVisitPurpose -> HospitalVisitPurposeResponse.of(
+                                hospitalVisitPurpose.getId(),
+                                hospitalVisitPurpose.getLabel()
+                        ))
+                        .toList()
+        );
     }
 }
