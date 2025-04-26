@@ -7,6 +7,7 @@ import com.cocos.cocos.api.hospital.service.HospitalService;
 import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.common.response.SuccessResponse;
 import com.cocos.cocos.enums.message.SuccessMessage;
+import com.cocos.cocos.validation.hospital.HospitalIdConstraint;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class HospitalController implements HospitalControllerSwagger {
 
     @GetMapping("/{hospitalId}")
     public ResponseEntity<BaseResponse<HospitalDetailResponse>> getHospitalDetail(
-            @PathVariable(name = "hospitalId") final Long hospitalId
+            @PathVariable(name = "hospitalId") @HospitalIdConstraint final Long hospitalId
     ) {
         return SuccessResponse.success(SuccessMessage.OK, hospitalService.getHospitalDetail(hospitalId));
     }

@@ -2,11 +2,12 @@ package com.cocos.cocos.common.handler;
 
 import com.cocos.cocos.common.exception.CocosException;
 import com.cocos.cocos.common.response.BaseResponse;
-import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.common.response.FailResponse;
+import com.cocos.cocos.enums.message.FailMessage;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.ValidationException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -97,5 +98,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<BaseResponse<?>> handleGeneralException(Exception e) {
         return FailResponse.failure(FailMessage.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<BaseResponse<?>> handleValidationException(final ValidationException e) {
+        if (e.getCause() instanceof CocosException cocosException) {
+            return FailResponse.failure(cocosException.getFailMessage());
+        }
+        return FailResponse.failure(FailMessage.BAD_REQUEST);
     }
 }

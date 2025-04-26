@@ -4,6 +4,7 @@ import com.cocos.cocos.api.hospital.dto.request.HospitalListRequest;
 import com.cocos.cocos.api.hospital.dto.response.HospitalDetailResponse;
 import com.cocos.cocos.api.hospital.dto.response.HospitalListResponse;
 import com.cocos.cocos.common.response.BaseResponse;
+import com.cocos.cocos.validation.hospital.HospitalIdConstraint;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -12,7 +13,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -35,6 +35,6 @@ public interface HospitalControllerSwagger {
     )
     @Parameter(name = "hospitalId", description = "병원 아이디", in = ParameterIn.PATH, required = true, schema = @Schema(type = "Long"))
     public ResponseEntity<BaseResponse<HospitalDetailResponse>> getHospitalDetail(
-            @PathVariable final Long hospitalId
+            @PathVariable @HospitalIdConstraint final Long hospitalId
     );
 }
