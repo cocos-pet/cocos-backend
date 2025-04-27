@@ -107,9 +107,9 @@ public class ReviewService {
         );
     }
 
-    private List<ReviewSummaryResponse> getReviewSummaryAndCount(final List<ReviewSummaryOption> reviewSummaryOptions, final List<Long> reviewIds, final boolean isGoodOrBad) {
+    private List<ReviewSummaryResponse> getReviewSummaryAndCount(final List<ReviewSummaryOption> reviewSummaryOptions, final List<Long> reviewIds, final boolean isGood) {
         return reviewSummaryOptions.stream()
-                .filter(reviewSummaryOption -> reviewSummaryOption.getIsGood() == isGoodOrBad)
+                .filter(reviewSummaryOption -> reviewSummaryOption.getIsGood() == isGood)
                 .map(reviewSummaryOption -> ReviewSummaryResponse.of(
                         reviewSummaryOption.getId(),
                         reviewSummaryOption.getLabel(),
