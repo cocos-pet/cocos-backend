@@ -34,7 +34,7 @@ public class ReviewController implements ReviewControllerSwagger {
 
     @GetMapping("/hospitals/{hospitalId}/reviews/summary")
     public ResponseEntity<BaseResponse<ReviewSummaryListResponse>> getReviewSummaryList(
-            @PathVariable(name = "hospitalId") final @HospitalConstraint Long hospitalId
+            @PathVariable(name = "hospitalId") @HospitalIdConstraint final Long hospitalId
     ) {
         return SuccessResponse.success(SuccessMessage.OK, reviewService.getReviewSummaryList(hospitalId));
     }
