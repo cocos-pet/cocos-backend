@@ -83,4 +83,9 @@ public class Member extends BaseTime {
             this.myHospitalId = myHospitalId;
         }
     }
+
+    public void updateReviewTermsAgree() {
+        this.isReviewTermsAgree = true;
+        this.reviewTermsAgreeAt = LocalDateTime.now();
+    }
 }
