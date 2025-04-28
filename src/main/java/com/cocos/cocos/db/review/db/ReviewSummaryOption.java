@@ -2,6 +2,7 @@ package com.cocos.cocos.db.review.db;
 
 import com.cocos.cocos.db.BaseTime;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,4 +22,10 @@ public class ReviewSummaryOption extends BaseTime {
 
     @Column(name = "label", nullable = false)
     private String label;
+
+    @Builder
+    public ReviewSummaryOption(final Boolean isGood, final String label) {
+        this.isGood = isGood;
+        this.label = label;
+    }
 }

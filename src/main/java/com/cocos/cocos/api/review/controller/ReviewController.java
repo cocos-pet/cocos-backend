@@ -2,6 +2,7 @@ package com.cocos.cocos.api.review.controller;
 
 import com.cocos.cocos.api.review.dto.request.ReviewAddRequest;
 import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
+import com.cocos.cocos.api.review.dto.response.ReviewSummaryListResponse;
 import com.cocos.cocos.api.review.service.ReviewService;
 import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.common.response.SuccessResponse;
@@ -12,13 +13,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("${api.prefix}/reviews")
+@RequestMapping("${api.prefix}")
 @RequiredArgsConstructor
 public class ReviewController implements ReviewControllerSwagger {
 
     private final ReviewService reviewService;
 
-    @PostMapping("/{hospitalId}")
+    @PostMapping("/hospitals/{hospitalId}/reviews")
     public ResponseEntity<BaseResponse<ReviewAddResponse>> addReview(
             @PathVariable(name = "hospitalId") final Long hospitalId,
             @RequestBody final ReviewAddRequest reviewAddRequest
@@ -29,5 +30,12 @@ public class ReviewController implements ReviewControllerSwagger {
                 reviewAddRequest.purposeId(), reviewAddRequest.diseaseId(), reviewAddRequest.symptomIds(),
                 reviewAddRequest.goodReviewIds(), reviewAddRequest.badReviewIds(), reviewAddRequest.images()
         ));
+    }
+
+    @GetMapping("/hospitals/{hospitalId}/reviews/summary")
+    public ResponseEntity<BaseResponse<ReviewSummaryListResponse>> getReviewSummaryList(
+            @PathVariable(name = "hospitalId") @HospitalIdConstraint final Long hospitalId
+    ) {
+        return SuccessResponse.success(SuccessMessage.OK, reviewService.getReviewSummaryList(hospitalId));
     }
 }

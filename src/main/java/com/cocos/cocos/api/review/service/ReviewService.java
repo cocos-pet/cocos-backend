@@ -1,14 +1,10 @@
 package com.cocos.cocos.api.review.service;
 
 import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
-import com.cocos.cocos.db.review.db.Review;
-import com.cocos.cocos.db.review.db.ReviewImage;
-import com.cocos.cocos.db.review.db.ReviewSummary;
-import com.cocos.cocos.db.review.db.ReviewSymptom;
-import com.cocos.cocos.db.review.repository.ReviewImageRepository;
-import com.cocos.cocos.db.review.repository.ReviewRepository;
-import com.cocos.cocos.db.review.repository.ReviewSummaryRepository;
-import com.cocos.cocos.db.review.repository.ReviewSymptomRepository;
+import com.cocos.cocos.api.review.dto.response.ReviewSummaryListResponse;
+import com.cocos.cocos.api.review.dto.response.ReviewSummaryResponse;
+import com.cocos.cocos.db.review.db.*;
+import com.cocos.cocos.db.review.repository.*;
 import com.cocos.cocos.enums.pet.Gender;
 import com.cocos.cocos.external.MemberDataS3Client;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +22,11 @@ public class ReviewService {
     private final ReviewSummaryRepository reviewSummaryRepository;
     private final ReviewSymptomRepository reviewSymptomRepository;
     private final ReviewImageRepository reviewImageRepository;
+    private final ReviewSummaryOptionRepository reviewSummaryOptionRepository;
     private final MemberDataS3Client memberDataS3Client;
 
     private static final String REVIEW_IMAGE_S3_PREFIX = "reviewImage";
+    private static final boolean IS_GOOD_REVIEW = true;
 
     @Transactional
     public ReviewAddResponse addReview(final Long memberId, final Long hospitalId, final Long breedId, final Gender gender,
@@ -93,5 +91,30 @@ public class ReviewService {
                     )
             );
         }
+    }
+
+    @Transactional(readOnly = true)
+    public ReviewSummaryListResponse getReviewSummaryList(final Long hospitalId) {
+        final List<Long> reviewIds = reviewRepository.findAllByHospitalId(hospitalId).stream()
+                .map(Review::getId)
+                .toList();
+
+        final List<ReviewSummaryOption> reviewSummaryOptions = reviewSummaryOptionRepository.findAll();
+
+        return ReviewSummaryListResponse.of(
+                getReviewSummaryAndCount(reviewSummaryOptions, reviewIds, IS_GOOD_REVIEW),
+                getReviewSummaryAndCount(reviewSummaryOptions, reviewIds, !IS_GOOD_REVIEW)
+        );
+    }
+
+    private List<ReviewSummaryResponse> getReviewSummaryAndCount(final List<ReviewSummaryOption> reviewSummaryOptions, final List<Long> reviewIds, final boolean isGood) {
+        return reviewSummaryOptions.stream()
+                .filter(reviewSummaryOption -> reviewSummaryOption.getIsGood() == isGood)
+                .map(reviewSummaryOption -> ReviewSummaryResponse.of(
+                        reviewSummaryOption.getId(),
+                        reviewSummaryOption.getLabel(),
+                        reviewSummaryRepository.countByReviewIdInAndReviewSummaryOptionId(reviewIds, reviewSummaryOption.getId())
+                ))
+                .toList();
     }
 }
