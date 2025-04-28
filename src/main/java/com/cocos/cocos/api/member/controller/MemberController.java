@@ -89,4 +89,15 @@ public class MemberController implements MemberControllerSwagger {
         memberService.updateMemberHospital(hospitalId, PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.OK, null);
     }
+
+    @PatchMapping("/reviews/agree")
+    public ResponseEntity<BaseResponse<Void>> updateMemberReviewTerms() {
+        memberService.updateReviewTermsAgree(PrincipalHandler.getMemberIdFromPrincipal());
+        return SuccessResponse.success(SuccessMessage.OK, null);
+    }
+
+    @GetMapping("/reviews/agree")
+    public ResponseEntity<BaseResponse<MemberReviewTermsAgreeResponse>> getMemberReviewTerms() {
+        return SuccessResponse.success(SuccessMessage.OK, memberService.getMemberReviewTermsAgree(PrincipalHandler.getMemberIdFromPrincipal()));
+    }
 }
