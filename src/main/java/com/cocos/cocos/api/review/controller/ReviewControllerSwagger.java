@@ -37,4 +37,11 @@ public interface ReviewControllerSwagger {
     public ResponseEntity<BaseResponse<ReviewSummaryListResponse>> getReviewSummaryList(
             @PathVariable(name = "hospitalId") final Long hospitalId
     );
+
+    @Operation(summary = "리뷰 요약 옵션 리스트 조회 API", description = "병원 리뷰 요약 옵션 리스트를 조회하는 API입니다. ")
+    @ApiResponse(
+            responseCode = "200",
+            description = "요청에 성공했습니다."
+    )
+    public ResponseEntity<BaseResponse<ReviewSummaryListResponse>> getReviewSummaryOptionList();
 }

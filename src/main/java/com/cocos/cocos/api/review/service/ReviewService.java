@@ -121,6 +121,7 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public ReviewSummaryListResponse getReviewSummaryOptionList() {
         final List<ReviewSummaryOption> reviewSummaryOptions = reviewSummaryOptionRepository.findAll();
+        // ToDo: 로직 중복으로 인한 리팩터링 필요
         return ReviewSummaryListResponse.of(
                 reviewSummaryOptions.stream()
                         .filter(reviewSummaryOption -> reviewSummaryOption.getIsGood() == IS_GOOD_REVIEW)
