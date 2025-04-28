@@ -63,7 +63,7 @@ public class MemberServiceTest {
         BDDMockito.given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
 
         //when
-        final MemberReviewTermsAgreeResponse actual = memberService.getReviewTermsAgree();
+        final MemberReviewTermsAgreeResponse actual = memberService.getMemberReviewTermsAgree(memberId);
 
         //then
         Assertions.assertThat(expected).usingRecursiveAssertion().isEqualTo(actual);

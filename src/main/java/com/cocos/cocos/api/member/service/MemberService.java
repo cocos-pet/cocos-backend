@@ -191,4 +191,13 @@ public class MemberService {
 
         member.updateReviewTermsAgree();
     }
+
+    @Transactional(readOnly = true)
+    public MemberReviewTermsAgreeResponse getMemberReviewTermsAgree(final Long memberId) {
+        final Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_MEMBER)
+        );
+
+        return MemberReviewTermsAgreeResponse.of(member.isReviewTermsAgree());
+    }
 }
