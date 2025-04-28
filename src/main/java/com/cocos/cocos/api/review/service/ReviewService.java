@@ -117,4 +117,27 @@ public class ReviewService {
                 ))
                 .toList();
     }
+
+    @Transactional(readOnly = true)
+    public ReviewSummaryListResponse getReviewSummaryOptionList() {
+        final List<ReviewSummaryOption> reviewSummaryOptions = reviewSummaryOptionRepository.findAll();
+        return ReviewSummaryListResponse.of(
+                reviewSummaryOptions.stream()
+                        .filter(reviewSummaryOption -> reviewSummaryOption.getIsGood() == IS_GOOD_REVIEW)
+                        .map(reviewSummaryOption -> ReviewSummaryResponse.of(
+                                reviewSummaryOption.getId(),
+                                reviewSummaryOption.getLabel(),
+                                -1)
+                        )
+                        .toList(),
+                reviewSummaryOptions.stream()
+                        .filter(reviewSummaryOption -> reviewSummaryOption.getIsGood() == !IS_GOOD_REVIEW)
+                        .map(reviewSummaryOption -> ReviewSummaryResponse.of(
+                                reviewSummaryOption.getId(),
+                                reviewSummaryOption.getLabel(),
+                                -1)
+                        )
+                        .toList()
+        );
+    }
 }
