@@ -55,7 +55,7 @@ public class MemberServiceTest {
         ReflectionTestUtils.setField(member, "isReviewTermsAgree", true);
         ReflectionTestUtils.setField(member, "id", memberId);
 
-        final MemberReviewTermsAgreeResponse expected = MemberReviewTermsAgreeResponse.of(member.getIsReviewTermsAgree());
+        final MemberReviewTermsAgreeResponse expected = MemberReviewTermsAgreeResponse.of(member.isReviewTermsAgree());
 
         //when
         final MemberReviewTermsAgreeResponse actual = memberService.getReviewTermsAgree();
