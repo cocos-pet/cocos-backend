@@ -3,6 +3,7 @@ package com.cocos.cocos.api.hospital.controller;
 import com.cocos.cocos.api.hospital.dto.request.HospitalListRequest;
 import com.cocos.cocos.api.hospital.dto.response.HospitalDetailResponse;
 import com.cocos.cocos.api.hospital.dto.response.HospitalListResponse;
+import com.cocos.cocos.api.hospital.dto.response.HospitalVisitPurposeListResponse;
 import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.validation.hospital.HospitalIdConstraint;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,4 +38,11 @@ public interface HospitalControllerSwagger {
     public ResponseEntity<BaseResponse<HospitalDetailResponse>> getHospitalDetail(
             @PathVariable @HospitalIdConstraint final Long hospitalId
     );
+
+    @Operation(summary = "병원 방문 목적 리스트 조회 API", description = "병원 방문 목적 리스트 조회 API입니다. ")
+    @ApiResponse(
+            responseCode = "200",
+            description = "요청에 성공했습니다."
+    )
+    public ResponseEntity<BaseResponse<HospitalVisitPurposeListResponse>> getHospitalVisitPurposeList();
 }
