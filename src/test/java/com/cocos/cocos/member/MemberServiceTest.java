@@ -10,10 +10,13 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("지역 서비스 테스트")
@@ -36,12 +39,13 @@ public class MemberServiceTest {
 
         ReflectionTestUtils.setField(member, "isReviewTermsAgree", false);
         ReflectionTestUtils.setField(member, "id", memberId);
+        BDDMockito.given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
 
         //when
         memberService.updateReviewTermsAgree(memberId);
 
         //then
-        Assertions.assertThat(member.getIsReviewTermsAgree()).isEqualTo(true);
+        Assertions.assertThat(member.isReviewTermsAgree()).isEqualTo(true);
     }
 
     @Test
@@ -56,6 +60,7 @@ public class MemberServiceTest {
         ReflectionTestUtils.setField(member, "id", memberId);
 
         final MemberReviewTermsAgreeResponse expected = MemberReviewTermsAgreeResponse.of(member.isReviewTermsAgree());
+        BDDMockito.given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
 
         //when
         final MemberReviewTermsAgreeResponse actual = memberService.getReviewTermsAgree();

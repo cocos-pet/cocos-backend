@@ -182,4 +182,13 @@ public class MemberService {
         );
         memberAddress.updateAddress(address, roadAddress, locationId, latitude, longitude, locationType);
     }
+
+    @Transactional
+    public void updateReviewTermsAgree(final Long memberId) {
+        final Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_MEMBER)
+        );
+
+        member.updateReviewTermsAgree();
+    }
 }
