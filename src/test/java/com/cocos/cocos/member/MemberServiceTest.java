@@ -1,5 +1,6 @@
 package com.cocos.cocos.member;
 
+import com.cocos.cocos.api.member.dto.response.MemberReviewTermsAgreeResponse;
 import com.cocos.cocos.api.member.service.MemberService;
 import com.cocos.cocos.db.member.entity.Member;
 import com.cocos.cocos.db.member.repository.MemberRepository;
@@ -41,5 +42,26 @@ public class MemberServiceTest {
 
         //then
         Assertions.assertThat(member.getIsReviewTermsAgree()).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("리뷰 약관 동의 여부를 조회 할 수 있다.")
+    void getReviewAgree() {
+        //given
+        final Member member = Member.builder()
+                .build();
+        final Long memberId = 1L;
+
+        ReflectionTestUtils.setField(member, "isReviewTermsAgree", true);
+        ReflectionTestUtils.setField(member, "id", memberId);
+
+        final MemberReviewTermsAgreeResponse expected = MemberReviewTermsAgreeResponse.of(member.getIsReviewTermsAgree());
+
+        //when
+        final MemberReviewTermsAgreeResponse actual = memberService.getReviewTermsAgree();
+
+        //then
+        Assertions.assertThat(expected).usingRecursiveAssertion().isEqualTo(actual);
+
     }
 }
