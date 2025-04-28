@@ -177,4 +177,61 @@ public class ReviewServiceTest {
         Assertions.assertThat(actual.goodReviews().getFirst().label()).isEqualTo("좋은 리뷰");
         Assertions.assertThat(actual.badReviews().getFirst().label()).isEqualTo("나쁜 리뷰");
     }
+
+    @Test
+    @DisplayName("리뷰 요약 옵션 목록을 조회할 수 있다.")
+    void getReviewSummaryOptionList() {
+        //given
+        final ReviewSummaryOption reviewSummaryOption1 = ReviewSummaryOption.builder()
+                .label("좋은 리뷰1")
+                .isGood(true)
+                .build();
+
+        final ReviewSummaryOption reviewSummaryOption2 = ReviewSummaryOption.builder()
+                .label("나쁜 리뷰1")
+                .isGood(false)
+                .build();
+
+        final ReviewSummaryOption reviewSummaryOption3 = ReviewSummaryOption.builder()
+                .label("나쁜 리뷰2")
+                .isGood(false)
+                .build();
+
+        ReflectionTestUtils.setField(reviewSummaryOption1, "id", 1L);
+        ReflectionTestUtils.setField(reviewSummaryOption2, "id", 2L);
+        ReflectionTestUtils.setField(reviewSummaryOption3, "id", 3L);
+
+        final List<ReviewSummaryOption> reviewSummaryOptions = new ArrayList<>(List.of(reviewSummaryOption1, reviewSummaryOption2, reviewSummaryOption3));
+
+        final ReviewSummaryResponse reviewSummaryResponse1 = ReviewSummaryResponse.of(
+                1L,
+                "좋은 리뷰1",
+                -1
+        );
+
+        final ReviewSummaryResponse reviewSummaryResponse2 = ReviewSummaryResponse.of(
+                2L,
+                "나쁜 리뷰1",
+                -1
+        );
+
+        final ReviewSummaryResponse reviewSummaryResponse3 = ReviewSummaryResponse.of(
+                3L,
+                "나쁜 리뷰2",
+                -1
+        );
+
+        BDDMockito.given(reviewSummaryOptionRepository.findAll()).willReturn(reviewSummaryOptions);
+
+        final ReviewSummaryListResponse expected = ReviewSummaryListResponse.of(
+                List.of(reviewSummaryResponse1),
+                List.of(reviewSummaryResponse2, reviewSummaryResponse3)
+        );
+
+        //when
+        final ReviewSummaryListResponse actual = reviewService.getReviewSummaryOptionList();
+
+        //then
+        Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
+    }
 }
