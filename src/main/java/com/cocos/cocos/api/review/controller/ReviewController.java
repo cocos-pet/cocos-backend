@@ -40,7 +40,7 @@ public class ReviewController implements ReviewControllerSwagger {
         return SuccessResponse.success(SuccessMessage.OK, reviewService.getReviewSummaryList(hospitalId));
     }
 
-    @GetMapping("/hospitals/reviews/summary")
+    @GetMapping("/hospitals/reviews/summary/option")
     public ResponseEntity<BaseResponse<ReviewSummaryListResponse>> getReviewSummaryOptionList() {
         return SuccessResponse.success(SuccessMessage.OK, reviewService.getReviewSummaryOptionList());
     }
