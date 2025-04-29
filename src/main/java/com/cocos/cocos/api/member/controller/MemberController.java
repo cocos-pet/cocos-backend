@@ -100,4 +100,10 @@ public class MemberController implements MemberControllerSwagger {
     public ResponseEntity<BaseResponse<MemberReviewTermsAgreeResponse>> getMemberReviewTerms() {
         return SuccessResponse.success(SuccessMessage.OK, memberService.getMemberReviewTermsAgree(PrincipalHandler.getMemberIdFromPrincipal()));
     }
+
+    @DeleteMapping("/deactivate")
+    public ResponseEntity<BaseResponse<Void>> deactivateMember() {
+        memberService.deactivateMember(PrincipalHandler.getMemberIdFromPrincipal());
+        return SuccessResponse.success(SuccessMessage.OK, null);
+    }
 }
