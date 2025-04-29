@@ -7,6 +7,7 @@ import com.cocos.cocos.api.review.dto.response.ReviewSummaryListResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewSummaryOptionListResponse;
 import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.validation.hospital.HospitalIdConstraint;
+import com.cocos.cocos.validation.review.ReviewIdConstraint;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -55,6 +56,6 @@ public interface ReviewControllerSwagger {
     )
     @Parameter(name = "reviewId", description = "리뷰 아이디", in = ParameterIn.PATH, required = true, schema = @Schema(type = "Long"))
     public ResponseEntity<BaseResponse<ReviewImageDeleteListResponse>> deleteReview(
-            @PathVariable(name = "reviewId") final Long reviewId
+            @PathVariable(name = "reviewId") @ReviewIdConstraint final Long reviewId
     );
 }

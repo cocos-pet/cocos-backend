@@ -11,6 +11,7 @@ import com.cocos.cocos.common.response.SuccessResponse;
 import com.cocos.cocos.enums.message.SuccessMessage;
 import com.cocos.cocos.util.PrincipalHandler;
 import com.cocos.cocos.validation.hospital.HospitalIdConstraint;
+import com.cocos.cocos.validation.review.ReviewIdConstraint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,7 +50,7 @@ public class ReviewController implements ReviewControllerSwagger {
 
     @DeleteMapping("/hospitals/reviews/{reviewId}")
     public ResponseEntity<BaseResponse<ReviewImageDeleteListResponse>> deleteReview(
-            @PathVariable(name = "reviewId") final Long reviewId
+            @PathVariable(name = "reviewId") @ReviewIdConstraint final Long reviewId
     ) {
         return SuccessResponse.success(SuccessMessage.OK, reviewService.deleteReview(PrincipalHandler.getMemberIdFromPrincipal(), reviewId));
     }
