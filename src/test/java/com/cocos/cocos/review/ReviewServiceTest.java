@@ -1,8 +1,6 @@
 package com.cocos.cocos.review;
 
-import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
-import com.cocos.cocos.api.review.dto.response.ReviewSummaryListResponse;
-import com.cocos.cocos.api.review.dto.response.ReviewSummaryResponse;
+import com.cocos.cocos.api.review.dto.response.*;
 import com.cocos.cocos.api.review.service.ReviewService;
 import com.cocos.cocos.db.review.db.*;
 import com.cocos.cocos.db.review.repository.*;
@@ -176,5 +174,59 @@ public class ReviewServiceTest {
         Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
         Assertions.assertThat(actual.goodReviews().getFirst().label()).isEqualTo("좋은 리뷰");
         Assertions.assertThat(actual.badReviews().getFirst().label()).isEqualTo("나쁜 리뷰");
+    }
+
+    @Test
+    @DisplayName("리뷰 요약 옵션 목록을 조회할 수 있다.")
+    void getReviewSummaryOptionList() {
+        //given
+        final ReviewSummaryOption reviewSummaryOption1 = ReviewSummaryOption.builder()
+                .label("좋은 리뷰1")
+                .isGood(true)
+                .build();
+
+        final ReviewSummaryOption reviewSummaryOption2 = ReviewSummaryOption.builder()
+                .label("나쁜 리뷰1")
+                .isGood(false)
+                .build();
+
+        final ReviewSummaryOption reviewSummaryOption3 = ReviewSummaryOption.builder()
+                .label("나쁜 리뷰2")
+                .isGood(false)
+                .build();
+
+        ReflectionTestUtils.setField(reviewSummaryOption1, "id", 1L);
+        ReflectionTestUtils.setField(reviewSummaryOption2, "id", 2L);
+        ReflectionTestUtils.setField(reviewSummaryOption3, "id", 3L);
+
+        final List<ReviewSummaryOption> reviewSummaryOptions = new ArrayList<>(List.of(reviewSummaryOption1, reviewSummaryOption2, reviewSummaryOption3));
+
+        final ReviewSummaryOptionResponse reviewSummaryResponse1 = ReviewSummaryOptionResponse.of(
+                1L,
+                "좋은 리뷰1"
+        );
+
+        final ReviewSummaryOptionResponse reviewSummaryResponse2 = ReviewSummaryOptionResponse.of(
+                2L,
+                "나쁜 리뷰1"
+        );
+
+        final ReviewSummaryOptionResponse reviewSummaryResponse3 = ReviewSummaryOptionResponse.of(
+                3L,
+                "나쁜 리뷰2"
+        );
+
+        BDDMockito.given(reviewSummaryOptionRepository.findAll()).willReturn(reviewSummaryOptions);
+
+        final ReviewSummaryOptionListResponse expected = ReviewSummaryOptionListResponse.of(
+                List.of(reviewSummaryResponse1),
+                List.of(reviewSummaryResponse2, reviewSummaryResponse3)
+        );
+
+        //when
+        final ReviewSummaryOptionListResponse actual = reviewService.getReviewSummaryOptionList();
+
+        //then
+        Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
     }
 }

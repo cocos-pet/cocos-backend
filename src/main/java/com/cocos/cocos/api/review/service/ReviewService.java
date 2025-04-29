@@ -1,8 +1,6 @@
 package com.cocos.cocos.api.review.service;
 
-import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
-import com.cocos.cocos.api.review.dto.response.ReviewSummaryListResponse;
-import com.cocos.cocos.api.review.dto.response.ReviewSummaryResponse;
+import com.cocos.cocos.api.review.dto.response.*;
 import com.cocos.cocos.db.review.db.*;
 import com.cocos.cocos.db.review.repository.*;
 import com.cocos.cocos.enums.pet.Gender;
@@ -115,6 +113,25 @@ public class ReviewService {
                         reviewSummaryOption.getLabel(),
                         reviewSummaryRepository.countByReviewIdInAndReviewSummaryOptionId(reviewIds, reviewSummaryOption.getId())
                 ))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public ReviewSummaryOptionListResponse getReviewSummaryOptionList() {
+        final List<ReviewSummaryOption> reviewSummaryOptions = reviewSummaryOptionRepository.findAll();
+        return ReviewSummaryOptionListResponse.of(
+                getReviewSummaryOptionList(reviewSummaryOptions, IS_GOOD_REVIEW),
+                getReviewSummaryOptionList(reviewSummaryOptions, !IS_GOOD_REVIEW)
+        );
+    }
+
+    private List<ReviewSummaryOptionResponse> getReviewSummaryOptionList(final List<ReviewSummaryOption> reviewSummaryOptions, final boolean isGood) {
+        return reviewSummaryOptions.stream()
+                .filter(reviewSummaryOption -> reviewSummaryOption.getIsGood() == isGood)
+                .map(reviewSummaryOption -> ReviewSummaryOptionResponse.of(
+                        reviewSummaryOption.getId(),
+                        reviewSummaryOption.getLabel())
+                )
                 .toList();
     }
 }

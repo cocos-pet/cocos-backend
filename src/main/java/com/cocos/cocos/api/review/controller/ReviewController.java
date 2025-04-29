@@ -3,6 +3,7 @@ package com.cocos.cocos.api.review.controller;
 import com.cocos.cocos.api.review.dto.request.ReviewAddRequest;
 import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewSummaryListResponse;
+import com.cocos.cocos.api.review.dto.response.ReviewSummaryOptionListResponse;
 import com.cocos.cocos.api.review.service.ReviewService;
 import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.common.response.SuccessResponse;
@@ -38,5 +39,10 @@ public class ReviewController implements ReviewControllerSwagger {
             @PathVariable(name = "hospitalId") @HospitalIdConstraint final Long hospitalId
     ) {
         return SuccessResponse.success(SuccessMessage.OK, reviewService.getReviewSummaryList(hospitalId));
+    }
+
+    @GetMapping("/hospitals/reviews/summary/option")
+    public ResponseEntity<BaseResponse<ReviewSummaryOptionListResponse>> getReviewSummaryOptionList() {
+        return SuccessResponse.success(SuccessMessage.OK, reviewService.getReviewSummaryOptionList());
     }
 }
