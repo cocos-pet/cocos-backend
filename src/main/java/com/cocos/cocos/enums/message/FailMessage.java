@@ -29,6 +29,7 @@ public enum FailMessage {
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, 40100, "인증이 필요합니다. "),
     UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, 40101, "인증되지 않은 사용자 입니다."),
     UNAUTHORIZED_EXPIRATION_JWT_EXCEPTION(HttpStatus.UNAUTHORIZED, 40102, "기간이 만료된 토큰입니다."),
+    UNAUTHORIZED_NOT_WRITER(HttpStatus.UNAUTHORIZED, 40103, "리뷰를 작성한 사용자가 아닙니다."),
 
 
     /**
@@ -62,6 +63,7 @@ public enum FailMessage {
     NOT_FOUND_CITY(HttpStatus.NOT_FOUND, 40419, "시/도를 찾을 수 없습니다."),
     NOT_FOUND_DISTRICT(HttpStatus.NOT_FOUND, 40420, "시/군/구를 찾을 수 없습니다."),
     NOT_FOUND_HOSPITAL(HttpStatus.NOT_FOUND, 40421, "병원을 찾을 수 없습니다."),
+    NOT_FOUND_REVIEW(HttpStatus.NOT_FOUND, 40422, "리뷰를 찾을 수 없습니다."),
 
     /**
      * 405

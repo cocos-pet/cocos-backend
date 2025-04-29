@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ReviewSymptomRepository extends JpaRepository<ReviewSymptom, Long> {
+
+    void deleteAllByReviewId(final Long reviewId);
 }
