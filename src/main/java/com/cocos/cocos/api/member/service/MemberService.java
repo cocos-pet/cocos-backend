@@ -239,55 +239,84 @@ public class MemberService {
                 () -> new CocosException(FailMessage.NOT_FOUND_MEMBER)
         );
 
+        deleteAboutPet(memberId);
+        deleteAboutPost(memberId);
+        deleteAboutReview(memberId);
+
+        searchRepository.deleteAllByMemberId(memberId);
+
+        memberAddressRepository.deleteByMemberId(memberId);
+        memberTokenRepository.deleteByMemberId(memberId);
+        kakaoLoginClient.unlink(Long.parseLong(member.getSub()));
+        memberRepository.deleteById(memberId);
+    }
+
+    private void deleteAboutPet(final Long memberId) {
         final Pet pet = petRepository.findByMemberId(memberId);
 
-        final List<Long> memberWritePostIds = postRepository.findAllByMemberId(memberId).stream()
-                .map(Post::getId)
-                .toList();
+        petSymptomRepository.deleteAllByPetId(pet.getId());
+        petDiseaseRepository.deleteAllByPetId(pet.getId());
+        petRepository.deleteById(pet.getId());
+    }
 
-        final List<Long> commentIds = commentRepository.findAllByPostIdIn(memberWritePostIds).stream()
-                .map(Comment::getId)
-                .toList();
-
-
+    private void deleteAboutPost(final Long memberId) {
         final List<Post> memberLikePosts = postLikeRepository.findAllByMemberId(memberId).stream()
                 .map(postLike -> postRepository.findById(postLike.getPostId()).orElseThrow(
                         () -> new CocosException(FailMessage.NOT_FOUND_POST)
                 ))
                 .toList();
 
-        final List<Long> reviewIds = reviewRepository.findAllByMemberId(memberId).stream()
+        memberLikePosts.forEach(Post::deleteLike);
+        postLikeRepository.deleteAllByMemberId(memberId);
+
+        final List<Post> memberWritePosts = postRepository.findAllByMemberId(memberId);
+        final List<Long> memberWritePostIds = memberWritePosts.stream()
+                .map(Post::getId)
+                .toList();
+
+        postImageRepository.deleteAllByPostIdIn(memberWritePostIds);
+        postTagRepository.deleteAllByPostIdIn(memberWritePostIds);
+
+        deleteAboutComment(memberWritePostIds, memberId);
+
+        postRepository.deleteAllByMemberId(memberId);
+    }
+
+    private void deleteAboutComment(final List<Long> memberWritePostIds, final Long memberId) {
+        final List<Comment> memberWriteOrDeleteTargetComments = commentRepository.findAllByPostIdInOrMemberId(memberWritePostIds, memberId);
+        final List<Long> memberWriteOrDeleteTargetCommentsIds = memberWriteOrDeleteTargetComments.stream()
+                .map(Comment::getId)
+                .toList();
+
+        deleteAboutSubComment(memberWriteOrDeleteTargetCommentsIds, memberId);
+
+        commentRepository.deleteAllByPostIdInOrMemberId(memberWritePostIds, memberId);
+    }
+
+    private void deleteAboutSubComment(final List<Long> memberWriteOrDeleteTargetCommentsIds, final Long memberId) {
+        subCommentRepository.deleteAllByCommentIdInOrMemberId(memberWriteOrDeleteTargetCommentsIds, memberId);
+    }
+
+    private void deleteAboutReview(final Long memberId) {
+        final List<Review> memberWriteReviews = reviewRepository.findAllByMemberId(memberId);
+        final List<Long> memberWriteReviewIds = memberWriteReviews.stream()
                 .map(Review::getId)
                 .toList();
 
-        final List<Hospital> hospitals = reviewRepository.findAllByMemberId(memberId).stream()
+        reviewImageRepository.deleteAllByReviewIdIn(memberWriteReviewIds);
+        reviewSummaryRepository.deleteAllByReviewIdIn(memberWriteReviewIds);
+
+        deleteAboutHospital(memberWriteReviews);
+
+        reviewRepository.deleteAllByIdIn(memberWriteReviewIds);
+    }
+
+    private void deleteAboutHospital(final List<Review> memberWriteReviews) {
+        final List<Hospital> hospitals = memberWriteReviews.stream()
                 .map(review -> hospitalRepository.findById(review.getId()).orElseThrow(
                         () -> new CocosException(FailMessage.NOT_FOUND_HOSPITAL)
                 )).toList();
 
         hospitals.forEach(Hospital::deleteReview);
-        reviewRepository.deleteAllByIdIn(reviewIds);
-
-        reviewImageRepository.deleteAllByReviewIdIn(reviewIds);
-        reviewSummaryRepository.deleteAllByReviewIdIn(reviewIds);
-
-        memberLikePosts.forEach(Post::deleteLike);
-        postTagRepository.deleteAllByPostIdIn(memberWritePostIds);
-        postRepository.deleteAllByMemberId(memberId);
-        searchRepository.deleteAllByMemberId(memberId);
-
-        subCommentRepository.deleteAllByCommentIdInOrMemberId(commentIds, memberId);
-        commentRepository.deleteAllByPostIdInOrMemberId(memberWritePostIds, memberId);
-        postImageRepository.deleteAllByPostIdIn(memberWritePostIds);
-
-        petSymptomRepository.deleteAllByPetId(pet.getId());
-        petDiseaseRepository.deleteAllByPetId(pet.getId());
-        petRepository.deleteById(pet.getId());
-
-        memberAddressRepository.deleteByMemberId(memberId);
-        memberTokenRepository.deleteByMemberId(memberId);
-
-        kakaoLoginClient.unlink(Long.parseLong(member.getSub()));
-        memberRepository.deleteById(memberId);
     }
 }
