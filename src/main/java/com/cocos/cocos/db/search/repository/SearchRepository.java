@@ -19,4 +19,6 @@ public interface SearchRepository extends JpaRepository<Search, Long> {
     List<Search> findTop5ByMemberIdAndSearchTypeOrderByUpdatedAtDesc(final Long memberId, final SearchType searchType);
 
     List<Search> findAllByMemberIdAndKeywordAndSearchType(final Long memberId, final String keyword, final SearchType searchType);
+
+    void deleteAllByMemberId(final Long memberId);
 }

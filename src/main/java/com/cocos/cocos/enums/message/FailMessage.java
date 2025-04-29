@@ -90,6 +90,8 @@ public enum FailMessage {
     INTERNAL_SERVER_ERROR_PET_ID_FOR_MEMBER(HttpStatus.INTERNAL_SERVER_ERROR, 50002, "서버에 유효하지 않은 petId가 존재합니다. "),
     INTERNAL_SERVER_ERROR_PET_AGE(HttpStatus.INTERNAL_SERVER_ERROR, 50003, "서버에 유효하지 않은 petAge가 존재합니다. "),
     INTERNAL_SERVER_ERROR_UNSUPPORTED_OPERATION(HttpStatus.INTERNAL_SERVER_ERROR, 50004, "유틸 클래스입니다. "),
+    INTERNAL_SERVER_ERROR_KAKAO_UNLINK(HttpStatus.INTERNAL_SERVER_ERROR, 50005, "카카오 회원탈퇴에 실패했습니다."),
+
     /**
      * 503
      */

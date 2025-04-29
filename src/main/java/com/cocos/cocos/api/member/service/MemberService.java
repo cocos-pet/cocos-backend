@@ -5,6 +5,9 @@ import com.cocos.cocos.auth.JwtProvider;
 import com.cocos.cocos.common.exception.CocosException;
 import com.cocos.cocos.db.city.entity.City;
 import com.cocos.cocos.db.city.repository.CityRepository;
+import com.cocos.cocos.db.comment.entity.Comment;
+import com.cocos.cocos.db.comment.repository.CommentRepository;
+import com.cocos.cocos.db.comment.repository.SubCommentRepository;
 import com.cocos.cocos.db.district.entity.District;
 import com.cocos.cocos.db.district.repository.DistrictRepository;
 import com.cocos.cocos.db.hospital.entity.Hospital;
@@ -15,6 +18,20 @@ import com.cocos.cocos.db.member.entity.MemberToken;
 import com.cocos.cocos.db.member.repository.MemberAddressRepository;
 import com.cocos.cocos.db.member.repository.MemberRepository;
 import com.cocos.cocos.db.member.repository.MemberTokenRepository;
+import com.cocos.cocos.db.pet.entity.Pet;
+import com.cocos.cocos.db.pet.repository.PetDiseaseRepository;
+import com.cocos.cocos.db.pet.repository.PetRepository;
+import com.cocos.cocos.db.pet.repository.PetSymptomRepository;
+import com.cocos.cocos.db.post.entity.Post;
+import com.cocos.cocos.db.post.repository.PostImageRepository;
+import com.cocos.cocos.db.post.repository.PostLikeRepository;
+import com.cocos.cocos.db.post.repository.PostRepository;
+import com.cocos.cocos.db.post.repository.PostTagRepository;
+import com.cocos.cocos.db.review.db.Review;
+import com.cocos.cocos.db.review.repository.ReviewImageRepository;
+import com.cocos.cocos.db.review.repository.ReviewRepository;
+import com.cocos.cocos.db.review.repository.ReviewSummaryRepository;
+import com.cocos.cocos.db.search.repository.SearchRepository;
 import com.cocos.cocos.enums.location.LocationType;
 import com.cocos.cocos.enums.member.Platform;
 import com.cocos.cocos.enums.message.FailMessage;
@@ -23,6 +40,8 @@ import com.cocos.cocos.external.MemberDataS3Client;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +56,19 @@ public class MemberService {
     private final CityRepository cityRepository;
     private final DistrictRepository districtRepository;
     private final HospitalRepository hospitalRepository;
+    private final PetRepository petRepository;
+    private final PetSymptomRepository petSymptomRepository;
+    private final PetDiseaseRepository petDiseaseRepository;
+    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
+    private final SubCommentRepository subCommentRepository;
+    private final PostImageRepository postImageRepository;
+    private final PostLikeRepository postLikeRepository;
+    private final PostTagRepository postTagRepository;
+    private final SearchRepository searchRepository;
+    private final ReviewRepository reviewRepository;
+    private final ReviewImageRepository reviewImageRepository;
+    private final ReviewSummaryRepository reviewSummaryRepository;
 
     @Transactional(readOnly = true)
     public MemberProfileResponse getMemberProfile(final String nickname, final Long memberId) {
@@ -199,5 +231,63 @@ public class MemberService {
         );
 
         return MemberReviewTermsAgreeResponse.of(member.isReviewTermsAgree());
+    }
+
+    @Transactional
+    public void deactivateMember(final Long memberId) {
+        final Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_MEMBER)
+        );
+
+        final Pet pet = petRepository.findByMemberId(memberId);
+
+        final List<Long> memberWritePostIds = postRepository.findAllByMemberId(memberId).stream()
+                .map(Post::getId)
+                .toList();
+
+        final List<Long> commentIds = commentRepository.findAllByPostIdIn(memberWritePostIds).stream()
+                .map(Comment::getId)
+                .toList();
+
+
+        final List<Post> memberLikePosts = postLikeRepository.findAllByMemberId(memberId).stream()
+                .map(postLike -> postRepository.findById(postLike.getPostId()).orElseThrow(
+                        () -> new CocosException(FailMessage.NOT_FOUND_POST)
+                ))
+                .toList();
+
+        final List<Long> reviewIds = reviewRepository.findAllByMemberId(memberId).stream()
+                .map(Review::getId)
+                .toList();
+
+        final List<Hospital> hospitals = reviewRepository.findAllByMemberId(memberId).stream()
+                .map(review -> hospitalRepository.findById(review.getId()).orElseThrow(
+                        () -> new CocosException(FailMessage.NOT_FOUND_HOSPITAL)
+                )).toList();
+
+        hospitals.forEach(Hospital::deleteReview);
+        reviewRepository.deleteAllByIdIn(reviewIds);
+
+        reviewImageRepository.deleteAllByReviewIdIn(reviewIds);
+        reviewSummaryRepository.deleteAllByReviewIdIn(reviewIds);
+
+        memberLikePosts.forEach(Post::deleteLike);
+        postTagRepository.deleteAllByPostIdIn(memberWritePostIds);
+        postRepository.deleteAllByMemberId(memberId);
+        searchRepository.deleteAllByMemberId(memberId);
+
+        subCommentRepository.deleteAllByCommentIdInOrMemberId(commentIds, memberId);
+        commentRepository.deleteAllByPostIdInOrMemberId(memberWritePostIds, memberId);
+        postImageRepository.deleteAllByPostIdIn(memberWritePostIds);
+
+        petSymptomRepository.deleteAllByPetId(pet.getId());
+        petDiseaseRepository.deleteAllByPetId(pet.getId());
+        petRepository.deleteById(pet.getId());
+
+        memberAddressRepository.deleteByMemberId(memberId);
+        memberTokenRepository.deleteByMemberId(memberId);
+
+        kakaoLoginClient.unlink(Long.parseLong(member.getSub()));
+        memberRepository.deleteById(memberId);
     }
 }
