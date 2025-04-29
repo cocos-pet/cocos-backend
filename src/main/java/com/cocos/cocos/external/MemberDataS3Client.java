@@ -3,13 +3,11 @@ package com.cocos.cocos.external;
 import com.cocos.cocos.config.AwsConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
-import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
-import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
-import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
-import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.*;
 
 import java.time.Duration;
 
@@ -66,6 +64,29 @@ public class MemberDataS3Client {
         final PresignedPutObjectRequest presignedPutObjectRequest = s3Presigner
                 .presignPutObject(putObjectPresignRequest);
         final String url = presignedPutObjectRequest.url().toString();
+
+        s3Presigner.close();
+        return url;
+    }
+
+    public String deletePresignedUrl(final String fileName) {
+        if (fileName == null || fileName.equals("")) {
+            return null;
+        }
+
+        final DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                .bucket(bucketName)
+                .key(fileName)
+                .build();
+
+        final DeleteObjectPresignRequest deleteObjectPresignRequest = DeleteObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(5))
+                .deleteObjectRequest(deleteObjectRequest)
+                .build();
+
+        final PresignedDeleteObjectRequest presignedDeleteObjectRequest = s3Presigner
+                .presignDeleteObject(deleteObjectPresignRequest);
+        final String url = presignedDeleteObjectRequest.url().toString();
 
         s3Presigner.close();
         return url;
