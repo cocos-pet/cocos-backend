@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 
 import java.time.LocalDateTime;
@@ -52,8 +51,7 @@ public class Member extends BaseTime {
     @ColumnDefault("false")
     private boolean isReviewTermsAgree;
 
-    @Column(name = "review_terms_agree_at", nullable = false)
-    @CreationTimestamp
+    @Column(name = "review_terms_agree_at", nullable = true)
     private LocalDateTime reviewTermsAgreeAt;
 
     @Builder
