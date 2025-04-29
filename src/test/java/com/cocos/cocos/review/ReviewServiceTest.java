@@ -1,8 +1,6 @@
 package com.cocos.cocos.review;
 
-import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
-import com.cocos.cocos.api.review.dto.response.ReviewSummaryListResponse;
-import com.cocos.cocos.api.review.dto.response.ReviewSummaryResponse;
+import com.cocos.cocos.api.review.dto.response.*;
 import com.cocos.cocos.api.review.service.ReviewService;
 import com.cocos.cocos.db.review.db.*;
 import com.cocos.cocos.db.review.repository.*;
@@ -203,33 +201,30 @@ public class ReviewServiceTest {
 
         final List<ReviewSummaryOption> reviewSummaryOptions = new ArrayList<>(List.of(reviewSummaryOption1, reviewSummaryOption2, reviewSummaryOption3));
 
-        final ReviewSummaryResponse reviewSummaryResponse1 = ReviewSummaryResponse.of(
+        final ReviewSummaryOptionResponse reviewSummaryResponse1 = ReviewSummaryOptionResponse.of(
                 1L,
-                "좋은 리뷰1",
-                -1
+                "좋은 리뷰1"
         );
 
-        final ReviewSummaryResponse reviewSummaryResponse2 = ReviewSummaryResponse.of(
+        final ReviewSummaryOptionResponse reviewSummaryResponse2 = ReviewSummaryOptionResponse.of(
                 2L,
-                "나쁜 리뷰1",
-                -1
+                "나쁜 리뷰1"
         );
 
-        final ReviewSummaryResponse reviewSummaryResponse3 = ReviewSummaryResponse.of(
+        final ReviewSummaryOptionResponse reviewSummaryResponse3 = ReviewSummaryOptionResponse.of(
                 3L,
-                "나쁜 리뷰2",
-                -1
+                "나쁜 리뷰2"
         );
 
         BDDMockito.given(reviewSummaryOptionRepository.findAll()).willReturn(reviewSummaryOptions);
 
-        final ReviewSummaryListResponse expected = ReviewSummaryListResponse.of(
+        final ReviewSummaryOptionListResponse expected = ReviewSummaryOptionListResponse.of(
                 List.of(reviewSummaryResponse1),
                 List.of(reviewSummaryResponse2, reviewSummaryResponse3)
         );
 
         //when
-        final ReviewSummaryListResponse actual = reviewService.getReviewSummaryOptionList();
+        final ReviewSummaryOptionListResponse actual = reviewService.getReviewSummaryOptionList();
 
         //then
         Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);

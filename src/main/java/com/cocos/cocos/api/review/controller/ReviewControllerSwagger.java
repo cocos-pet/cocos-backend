@@ -3,6 +3,7 @@ package com.cocos.cocos.api.review.controller;
 import com.cocos.cocos.api.review.dto.request.ReviewAddRequest;
 import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewSummaryListResponse;
+import com.cocos.cocos.api.review.dto.response.ReviewSummaryOptionListResponse;
 import com.cocos.cocos.common.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -43,5 +44,5 @@ public interface ReviewControllerSwagger {
             responseCode = "200",
             description = "요청에 성공했습니다."
     )
-    public ResponseEntity<BaseResponse<ReviewSummaryListResponse>> getReviewSummaryOptionList();
+    public ResponseEntity<BaseResponse<ReviewSummaryOptionListResponse>> getReviewSummaryOptionList();
 }

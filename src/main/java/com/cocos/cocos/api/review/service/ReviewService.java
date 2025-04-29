@@ -1,8 +1,6 @@
 package com.cocos.cocos.api.review.service;
 
-import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
-import com.cocos.cocos.api.review.dto.response.ReviewSummaryListResponse;
-import com.cocos.cocos.api.review.dto.response.ReviewSummaryResponse;
+import com.cocos.cocos.api.review.dto.response.*;
 import com.cocos.cocos.db.review.db.*;
 import com.cocos.cocos.db.review.repository.*;
 import com.cocos.cocos.enums.pet.Gender;
@@ -119,24 +117,22 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public ReviewSummaryListResponse getReviewSummaryOptionList() {
+    public ReviewSummaryOptionListResponse getReviewSummaryOptionList() {
         final List<ReviewSummaryOption> reviewSummaryOptions = reviewSummaryOptionRepository.findAll();
         // ToDo: 로직 중복으로 인한 리팩터링 필요
-        return ReviewSummaryListResponse.of(
+        return ReviewSummaryOptionListResponse.of(
                 reviewSummaryOptions.stream()
                         .filter(reviewSummaryOption -> reviewSummaryOption.getIsGood() == IS_GOOD_REVIEW)
-                        .map(reviewSummaryOption -> ReviewSummaryResponse.of(
+                        .map(reviewSummaryOption -> ReviewSummaryOptionResponse.of(
                                 reviewSummaryOption.getId(),
-                                reviewSummaryOption.getLabel(),
-                                -1)
+                                reviewSummaryOption.getLabel())
                         )
                         .toList(),
                 reviewSummaryOptions.stream()
                         .filter(reviewSummaryOption -> reviewSummaryOption.getIsGood() == !IS_GOOD_REVIEW)
-                        .map(reviewSummaryOption -> ReviewSummaryResponse.of(
+                        .map(reviewSummaryOption -> ReviewSummaryOptionResponse.of(
                                 reviewSummaryOption.getId(),
-                                reviewSummaryOption.getLabel(),
-                                -1)
+                                reviewSummaryOption.getLabel())
                         )
                         .toList()
         );
