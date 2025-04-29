@@ -23,7 +23,7 @@ public class ReviewController implements ReviewControllerSwagger {
 
     @PostMapping("/hospitals/{hospitalId}/reviews")
     public ResponseEntity<BaseResponse<ReviewAddResponse>> addReview(
-            @PathVariable(name = "hospitalId") final Long hospitalId,
+            @PathVariable(name = "hospitalId") @HospitalIdConstraint final Long hospitalId,
             @RequestBody final ReviewAddRequest reviewAddRequest
     ) {
         return SuccessResponse.success(SuccessMessage.CREATED, reviewService.addReview(
