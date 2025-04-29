@@ -77,4 +77,18 @@ public interface MemberControllerSwagger {
     public ResponseEntity<BaseResponse<Void>> updateMemberHospital(
             @PathVariable(name = "hospitalId") final Long hospitalId
     );
+
+    @Operation(summary = "리뷰 약관 동의 업데이트 API", description = "리뷰 약관 동의 여부를 업데이트하는 API입니다.")
+    @ApiResponse(
+            responseCode = "200",
+            description = "요청에 성공했습니다."
+    )
+    public ResponseEntity<BaseResponse<Void>> updateMemberReviewTerms();
+
+    @Operation(summary = "리뷰 약관 동의 여부 조회 API", description = "리뷰 약관 동의 여부를 조회하는 API입니다.")
+    @ApiResponse(
+            responseCode = "200",
+            description = "요청에 성공했습니다."
+    )
+    public ResponseEntity<BaseResponse<MemberReviewTermsAgreeResponse>> getMemberReviewTerms();
 }

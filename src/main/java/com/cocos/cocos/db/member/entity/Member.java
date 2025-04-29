@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -45,6 +47,12 @@ public class Member extends BaseTime {
     @Column(name = "my_hospital_id")
     private Long myHospitalId;
 
+    @Column(name = "is_review_terms_agree", nullable = false)
+    @ColumnDefault("false")
+    private boolean isReviewTermsAgree;
+
+    @Column(name = "review_terms_agree_at", nullable = true)
+    private LocalDateTime reviewTermsAgreeAt;
 
     @Builder
     public Member(final String nickname, final String email, final String image, final Platform platform, final String sub, final boolean isAdmin, final Long myHospitalId) {
@@ -68,9 +76,14 @@ public class Member extends BaseTime {
         if (nickname != null) this.nickname = nickname;
     }
 
-    public  void updateMyHospitalId(final Long myHospitalId) {
+    public void updateMyHospitalId(final Long myHospitalId) {
         if (myHospitalId != null) {
             this.myHospitalId = myHospitalId;
         }
+    }
+
+    public void updateReviewTermsAgree() {
+        this.isReviewTermsAgree = true;
+        this.reviewTermsAgreeAt = LocalDateTime.now();
     }
 }
