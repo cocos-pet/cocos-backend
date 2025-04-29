@@ -119,22 +119,19 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public ReviewSummaryOptionListResponse getReviewSummaryOptionList() {
         final List<ReviewSummaryOption> reviewSummaryOptions = reviewSummaryOptionRepository.findAll();
-        // ToDo: 로직 중복으로 인한 리팩터링 필요
         return ReviewSummaryOptionListResponse.of(
-                reviewSummaryOptions.stream()
-                        .filter(reviewSummaryOption -> reviewSummaryOption.getIsGood() == IS_GOOD_REVIEW)
-                        .map(reviewSummaryOption -> ReviewSummaryOptionResponse.of(
-                                reviewSummaryOption.getId(),
-                                reviewSummaryOption.getLabel())
-                        )
-                        .toList(),
-                reviewSummaryOptions.stream()
-                        .filter(reviewSummaryOption -> reviewSummaryOption.getIsGood() == !IS_GOOD_REVIEW)
-                        .map(reviewSummaryOption -> ReviewSummaryOptionResponse.of(
-                                reviewSummaryOption.getId(),
-                                reviewSummaryOption.getLabel())
-                        )
-                        .toList()
+                getReviewSummaryOptionList(reviewSummaryOptions, IS_GOOD_REVIEW),
+                getReviewSummaryOptionList(reviewSummaryOptions, !IS_GOOD_REVIEW)
         );
+    }
+
+    private List<ReviewSummaryOptionResponse> getReviewSummaryOptionList(final List<ReviewSummaryOption> reviewSummaryOptions, final boolean isGood) {
+        return reviewSummaryOptions.stream()
+                .filter(reviewSummaryOption -> reviewSummaryOption.getIsGood() == isGood)
+                .map(reviewSummaryOption -> ReviewSummaryOptionResponse.of(
+                        reviewSummaryOption.getId(),
+                        reviewSummaryOption.getLabel())
+                )
+                .toList();
     }
 }
