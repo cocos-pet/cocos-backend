@@ -2,6 +2,7 @@ package com.cocos.cocos.api.review.controller;
 
 import com.cocos.cocos.api.review.dto.request.ReviewAddRequest;
 import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
+import com.cocos.cocos.api.review.dto.response.ReviewImageDeleteListResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewSummaryListResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewSummaryOptionListResponse;
 import com.cocos.cocos.api.review.service.ReviewService;
@@ -44,5 +45,12 @@ public class ReviewController implements ReviewControllerSwagger {
     @GetMapping("/hospitals/reviews/summary/option")
     public ResponseEntity<BaseResponse<ReviewSummaryOptionListResponse>> getReviewSummaryOptionList() {
         return SuccessResponse.success(SuccessMessage.OK, reviewService.getReviewSummaryOptionList());
+    }
+
+    @DeleteMapping("/hospitals/reviews/{reviewId}")
+    public ResponseEntity<BaseResponse<ReviewImageDeleteListResponse>> deleteReview(
+            @PathVariable(name = "reviewId") final Long reviewId
+    ) {
+        return SuccessResponse.success(SuccessMessage.OK, reviewService.deleteReview(PrincipalHandler.getMemberIdFromPrincipal(), reviewId));
     }
 }

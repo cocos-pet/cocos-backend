@@ -2,6 +2,7 @@ package com.cocos.cocos.api.review.controller;
 
 import com.cocos.cocos.api.review.dto.request.ReviewAddRequest;
 import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
+import com.cocos.cocos.api.review.dto.response.ReviewImageDeleteListResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewSummaryListResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewSummaryOptionListResponse;
 import com.cocos.cocos.common.response.BaseResponse;
@@ -46,4 +47,14 @@ public interface ReviewControllerSwagger {
             description = "요청에 성공했습니다."
     )
     public ResponseEntity<BaseResponse<ReviewSummaryOptionListResponse>> getReviewSummaryOptionList();
+
+    @Operation(summary = "리뷰 삭제 API", description = "리뷰를 삭제하는 API입니다. ")
+    @ApiResponse(
+            responseCode = "200",
+            description = "요청에 성공했습니다."
+    )
+    @Parameter(name = "reviewId", description = "리뷰 아이디", in = ParameterIn.PATH, required = true, schema = @Schema(type = "Long"))
+    public ResponseEntity<BaseResponse<ReviewImageDeleteListResponse>> deleteReview(
+            @PathVariable(name = "reviewId") final Long reviewId
+    );
 }
