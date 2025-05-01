@@ -1,6 +1,5 @@
 package com.cocos.cocos.api.review.service;
 
-import com.cocos.cocos.api.member.service.MemberService;
 import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewSummaryListResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewSummaryResponse;
@@ -15,6 +14,7 @@ import com.cocos.cocos.db.hospital.entity.Hospital;
 import com.cocos.cocos.db.hospital.repository.HospitalRepository;
 import com.cocos.cocos.db.member.entity.Member;
 import com.cocos.cocos.api.review.dto.response.*;
+import com.cocos.cocos.db.member.repository.MemberRepository;
 import com.cocos.cocos.db.review.db.*;
 import com.cocos.cocos.db.review.repository.*;
 import com.cocos.cocos.db.symptom.entity.Symptom;
@@ -49,8 +49,7 @@ public class ReviewService {
     private final AnimalRepository animalRepository;
     private final DiseaseRepository diseaseRepository;
     private final SymptomRepository symptomRepository;
-
-    private final MemberService memberService;
+    private final MemberRepository memberRepository;
 
     private static final String REVIEW_IMAGE_S3_PREFIX = "reviewImage";
     private static final boolean IS_GOOD_REVIEW = true;
@@ -137,10 +136,8 @@ public class ReviewService {
 
     @Transactional(readOnly = true)
     public MemberHospitalReviewListResponse getMemberHospitalReviewList(final String nickname, final Long cursorId, final int size, final Long memberId) {
-        if (memberId == null && nickname == null) {
-            throw new CocosException(FailMessage.BAD_REQUEST_INVALID_MEMBER_QUERY);
-        }
-        final Member member = memberService.findMember(nickname, memberId);
+        final Member member = findMember(nickname, memberId);
+
         final int searchSize = memberId == null ? DEFAULT_PAGE_SIZE : size;
         final Pageable pageable = PageRequest.of(0, searchSize, Sort.by(
                 SortConstants.ID_DESC
@@ -260,6 +257,17 @@ public class ReviewService {
     private <T> T requireEntity(final T entity, final FailMessage message) {
         if (entity == null) throw new CocosException(message);
         return entity;
+    }
+
+    private Member findMember(final String nickname, final Long memberId) {
+        if (memberId == null && nickname == null) {
+            throw new CocosException(FailMessage.BAD_REQUEST_INVALID_MEMBER_QUERY);
+        }
+
+        if (nickname != null) {
+            return memberRepository.findByNickname(nickname).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
+        }
+        return memberRepository.findById(memberId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
     }
 
     private List<ReviewSummaryResponse> getReviewSummaryAndCount(final List<ReviewSummaryOption> reviewSummaryOptions, final List<Long> reviewIds, final boolean isGood) {
