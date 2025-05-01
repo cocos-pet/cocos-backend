@@ -167,7 +167,7 @@ public class MemberService {
         member.updateMyHospitalId(hospitalId);
     }
 
-    public Member findMember(final String nickname, final Long memberId) {
+    private Member findMember(final String nickname, final Long memberId) {
         if (nickname != null) {
             return memberRepository.findByNickname(nickname).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
         }
