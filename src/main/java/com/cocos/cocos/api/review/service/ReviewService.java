@@ -1,16 +1,38 @@
 package com.cocos.cocos.api.review.service;
 
+import com.cocos.cocos.api.member.service.MemberService;
+import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
+import com.cocos.cocos.api.review.dto.response.ReviewSummaryListResponse;
+import com.cocos.cocos.api.review.dto.response.ReviewSummaryResponse;
+import com.cocos.cocos.common.exception.CocosException;
+import com.cocos.cocos.db.animal.entity.Animal;
+import com.cocos.cocos.db.animal.repository.AnimalRepository;
+import com.cocos.cocos.db.breed.entity.Breed;
+import com.cocos.cocos.db.breed.repository.BreedRepository;
+import com.cocos.cocos.db.disease.entity.Disease;
+import com.cocos.cocos.db.disease.repository.DiseaseRepository;
+import com.cocos.cocos.db.hospital.entity.Hospital;
+import com.cocos.cocos.db.hospital.repository.HospitalRepository;
+import com.cocos.cocos.db.member.entity.Member;
 import com.cocos.cocos.api.review.dto.response.*;
 import com.cocos.cocos.db.review.db.*;
 import com.cocos.cocos.db.review.repository.*;
+import com.cocos.cocos.db.symptom.entity.Symptom;
+import com.cocos.cocos.db.symptom.repository.SymptomRepository;
+import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.enums.pet.Gender;
 import com.cocos.cocos.external.MemberDataS3Client;
+import com.cocos.cocos.util.SortConstants;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,9 +44,17 @@ public class ReviewService {
     private final ReviewImageRepository reviewImageRepository;
     private final ReviewSummaryOptionRepository reviewSummaryOptionRepository;
     private final MemberDataS3Client memberDataS3Client;
+    private final HospitalRepository hospitalRepository;
+    private final BreedRepository breedRepository;
+    private final AnimalRepository animalRepository;
+    private final DiseaseRepository diseaseRepository;
+    private final SymptomRepository symptomRepository;
+
+    private final MemberService memberService;
 
     private static final String REVIEW_IMAGE_S3_PREFIX = "reviewImage";
     private static final boolean IS_GOOD_REVIEW = true;
+    private static final int DEFAULT_PAGE_SIZE = 4;
 
     @Transactional
     public ReviewAddResponse addReview(final Long memberId, final Long hospitalId, final Long breedId, final Gender gender,
@@ -103,6 +133,133 @@ public class ReviewService {
                 getReviewSummaryAndCount(reviewSummaryOptions, reviewIds, IS_GOOD_REVIEW),
                 getReviewSummaryAndCount(reviewSummaryOptions, reviewIds, !IS_GOOD_REVIEW)
         );
+    }
+
+    @Transactional(readOnly = true)
+    public MemberHospitalReviewListResponse getMemberHospitalReviewList(final String nickname, final Long cursorId, final int size, final Long memberId) {
+        if (memberId == null && nickname == null) {
+            throw new CocosException(FailMessage.BAD_REQUEST_INVALID_MEMBER_QUERY);
+        }
+        final Member member = memberService.findMember(nickname, memberId);
+        final int searchSize = memberId == null ? DEFAULT_PAGE_SIZE : size;
+        final Pageable pageable = PageRequest.of(0, searchSize, Sort.by(
+                SortConstants.ID_DESC
+        ));
+
+        final List<Review> reviews = (cursorId == null)
+                ? reviewRepository.findAllByMemberId(member.getId(), pageable)
+                : reviewRepository.findAllByMemberIdAndIdLessThan(member.getId(), cursorId, pageable);
+
+        final Set<Long> reviewIds = reviews.stream().map(Review::getId).collect(Collectors.toSet());
+
+        final Set<Long> hospitalIds = reviews.stream().map(Review::getHospitalId).collect(Collectors.toSet());
+        final Map<Long, Hospital> hospitalMap = hospitalRepository.findAllById(hospitalIds).stream()
+                .collect(Collectors.toMap(Hospital::getId, Function.identity()));
+
+        final List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewIdIn(reviewIds);
+        final Map<Long, List<String>> reviewIdToImageUrls = reviewImages.stream()
+                .collect(Collectors.groupingBy(
+                        ReviewImage::getReviewId,
+                        Collectors.mapping(img -> memberDataS3Client.getPresignedUrl(img.getImage()), Collectors.toList())
+                ));
+
+        final Set<Long> breedIds = reviews.stream().map(Review::getBreedId).collect(Collectors.toSet());
+        final Map<Long, Breed> breedMap = breedRepository.findAllById(breedIds).stream()
+                .collect(Collectors.toMap(Breed::getId, Function.identity()));
+        final Set<Long> animalIds = breedMap.values().stream()
+                .map(Breed::getAnimalId)
+                .collect(Collectors.toSet());
+        final Map<Long, Animal> animalMap = animalRepository.findAllById(animalIds).stream()
+                .collect(Collectors.toMap(Animal::getId, Function.identity()));
+
+        final Set<Long> diseaseIds = reviews.stream().map(Review::getDiseaseId).collect(Collectors.toSet());
+        final Map<Long, Disease> diseaseMap = diseaseRepository.findAllById(diseaseIds).stream()
+                .collect(Collectors.toMap(Disease::getId, Function.identity()));
+
+        final List<ReviewSymptom> reviewSymptoms = reviewSymptomRepository.findByReviewIdIn(reviewIds);
+        final Map<Long, List<Long>> reviewIdToSymptomIds = reviewSymptoms.stream()
+                .collect(Collectors.groupingBy(
+                        ReviewSymptom::getReviewId,
+                        Collectors.mapping(ReviewSymptom::getSymptomId, Collectors.toList())
+                ));
+        final Set<Long> symptomIds = reviewSymptoms.stream().map(ReviewSymptom::getSymptomId).collect(Collectors.toSet());
+        final Map<Long, Symptom> symptomMap = symptomRepository.findAllById(symptomIds).stream()
+                .collect(Collectors.toMap(Symptom::getId, Function.identity()));
+
+        final List<ReviewSummary> reviewSummaries = reviewSummaryRepository.findByReviewIdIn(reviewIds);
+        final Map<Long, List<Long>> reviewIdToSummaryIds = reviewSummaries.stream()
+                .collect(Collectors.groupingBy(
+                        ReviewSummary::getReviewId,
+                        Collectors.mapping(ReviewSummary::getReviewSummaryOptionId, Collectors.toList())
+                ));
+        final Set<Long> reviewSummaryOptionIds = reviewSummaries.stream().map(ReviewSummary::getReviewSummaryOptionId).collect(Collectors.toSet());
+        final Map<Long, ReviewSummaryOption> reviewSummaryOptionMap = reviewSummaryOptionRepository.findAllById(reviewSummaryOptionIds).stream()
+                .collect(Collectors.toMap(ReviewSummaryOption::getId, Function.identity()));
+
+        final List<HospitalReviewResponse> reviewResponses = reviews.stream()
+                .map(review -> {
+                    final Hospital hospital = requireEntity(hospitalMap.get(review.getHospitalId()), FailMessage.NOT_FOUND_HOSPITAL);
+                    final Breed breed = requireEntity(breedMap.get(review.getBreedId()), FailMessage.NOT_FOUND_BREED);
+                    final Animal animal = requireEntity(animalMap.get(breed.getAnimalId()), FailMessage.NOT_FOUND_ANIMAL);
+                    final Disease disease = requireEntity(diseaseMap.get(review.getDiseaseId()), FailMessage.NOT_FOUND_DISEASE);
+
+                    final List<String> imageUrls = reviewIdToImageUrls.getOrDefault(review.getId(), List.of());
+
+                    final List<String> symptomResponses = reviewIdToSymptomIds.getOrDefault(review.getId(), List.of()).stream()
+                            .map(symptomId -> {
+                                final Symptom symptom = requireEntity(symptomMap.get(symptomId), FailMessage.NOT_FOUND_SYMPTOM);
+                                return symptom.getName();
+                            })
+                            .toList();
+
+                    final List<Long> summaryOptionIds = reviewIdToSummaryIds.getOrDefault(review.getId(), List.of());
+                    final List<ReviewSummaryOption> summaryOptions = summaryOptionIds.stream()
+                            .map(optionId -> requireEntity(reviewSummaryOptionMap.get(optionId), FailMessage.NOT_FOUND_SUMMARY_OPTION))
+                            .toList();
+
+                    final List<ReviewSummaryOptionResponse> goodReviewSummaries = summaryOptions.stream()
+                            .filter(opt -> Boolean.TRUE.equals(opt.getIsGood()))
+                            .map(opt -> ReviewSummaryOptionResponse.of(opt.getId(), opt.getLabel()))
+                            .toList();
+
+                    final List<ReviewSummaryOptionResponse> badReviewSummaries = summaryOptions.stream()
+                            .filter(opt -> Boolean.FALSE.equals(opt.getIsGood()))
+                            .map(opt -> ReviewSummaryOptionResponse.of(opt.getId(), opt.getLabel()))
+                            .toList();
+
+                    final ReviewSummaryOptionListResponse summaryOptionList = ReviewSummaryOptionListResponse.of(
+                            goodReviewSummaries, badReviewSummaries
+                    );
+
+
+                    return HospitalReviewResponse.of(
+                            review.getId(),
+                            hospital.getId(),
+                            hospital.getName(),
+                            review.getVisitedAt(),
+                            hospital.getDisplayAddress(),
+                            review.getContent(),
+                            summaryOptionList,
+                            imageUrls,
+                            symptomResponses,
+                            disease.getName(),
+                            animal.getName(),
+                            review.getGender(),
+                            breed.getName(),
+                            review.getWeight()
+                    );
+                })
+                .toList();
+
+        return MemberHospitalReviewListResponse.of(
+                reviews.isEmpty() ? null : reviews.getLast().getId(),
+                reviewResponses
+        );
+    }
+
+    private <T> T requireEntity(final T entity, final FailMessage message) {
+        if (entity == null) throw new CocosException(message);
+        return entity;
     }
 
     private List<ReviewSummaryResponse> getReviewSummaryAndCount(final List<ReviewSummaryOption> reviewSummaryOptions, final List<Long> reviewIds, final boolean isGood) {
