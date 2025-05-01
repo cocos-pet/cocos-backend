@@ -37,10 +37,10 @@ public record HospitalReviewResponse(
         double weight
 ) {
     public static HospitalReviewResponse of(
-            Long id, Long hospitalId, String hospitalName, String visitedAt, String hospitalAddress,
-            String content, ReviewSummaryOptionListResponse reviewSummary,
-            List<String> images, List<String> symptoms, String disease,
-            String animal, Gender gender, String breed, double weight
+            final Long id, final Long hospitalId, final String hospitalName, final String visitedAt, final String hospitalAddress,
+            final String content, final ReviewSummaryOptionListResponse reviewSummary,
+            final List<String> images, final List<String> symptoms, final String disease,
+            final String animal, final Gender gender, final String breed, final double weight
     ) {
         return new HospitalReviewResponse(id, hospitalId, hospitalName, visitedAt, hospitalAddress,
                 content, reviewSummary, images, symptoms,
