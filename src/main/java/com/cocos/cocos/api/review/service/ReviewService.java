@@ -147,7 +147,7 @@ public class ReviewService {
                 ? reviewRepository.findAllByMemberId(member.getId(), pageable)
                 : reviewRepository.findAllByMemberIdAndIdLessThan(member.getId(), cursorId, pageable);
 
-        final Set<Long> reviewIds = reviews.stream().map(Review::getId).collect(Collectors.toSet());
+        final List<Long> reviewIds = reviews.stream().map(Review::getId).toList();
 
         final Set<Long> hospitalIds = reviews.stream().map(Review::getHospitalId).collect(Collectors.toSet());
         final Map<Long, Hospital> hospitalMap = hospitalRepository.findAllById(hospitalIds).stream()

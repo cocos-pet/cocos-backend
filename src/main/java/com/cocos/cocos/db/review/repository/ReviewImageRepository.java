@@ -5,9 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Set;
 
 @Repository
 public interface ReviewImageRepository extends JpaRepository<ReviewImage, Long> {
-    List<ReviewImage> findAllByReviewIdIn(final Set<Long> reviewId);
+    List<ReviewImage> findAllByReviewIdIn(final List<Long> reviewIds);
 }
