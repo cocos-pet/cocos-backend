@@ -215,13 +215,13 @@ public class ReviewService {
                             .toList();
 
                     final List<ReviewSummaryOptionResponse> goodReviewSummaries = summaryOptions.stream()
-                            .filter(opt -> Boolean.TRUE.equals(opt.getIsGood()))
-                            .map(opt -> ReviewSummaryOptionResponse.of(opt.getId(), opt.getLabel()))
+                            .filter(option -> Boolean.TRUE.equals(option.getIsGood()))
+                            .map(option -> ReviewSummaryOptionResponse.of(option.getId(), option.getLabel()))
                             .toList();
 
                     final List<ReviewSummaryOptionResponse> badReviewSummaries = summaryOptions.stream()
-                            .filter(opt -> Boolean.FALSE.equals(opt.getIsGood()))
-                            .map(opt -> ReviewSummaryOptionResponse.of(opt.getId(), opt.getLabel()))
+                            .filter(option -> Boolean.FALSE.equals(option.getIsGood()))
+                            .map(option -> ReviewSummaryOptionResponse.of(option.getId(), option.getLabel()))
                             .toList();
 
                     final ReviewSummaryOptionListResponse summaryOptionList = ReviewSummaryOptionListResponse.of(
