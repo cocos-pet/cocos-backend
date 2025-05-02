@@ -31,6 +31,7 @@ import com.cocos.cocos.db.review.db.Review;
 import com.cocos.cocos.db.review.repository.ReviewImageRepository;
 import com.cocos.cocos.db.review.repository.ReviewRepository;
 import com.cocos.cocos.db.review.repository.ReviewSummaryRepository;
+import com.cocos.cocos.db.review.repository.ReviewSymptomRepository;
 import com.cocos.cocos.db.search.repository.SearchRepository;
 import com.cocos.cocos.enums.location.LocationType;
 import com.cocos.cocos.enums.member.Platform;
@@ -69,6 +70,7 @@ public class MemberService {
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final ReviewSummaryRepository reviewSummaryRepository;
+    private final ReviewSymptomRepository reviewSymptomRepository;
 
     @Transactional(readOnly = true)
     public MemberProfileResponse getMemberProfile(final String nickname, final Long memberId) {
@@ -305,6 +307,7 @@ public class MemberService {
 
         reviewImageRepository.deleteAllByReviewIdIn(memberWriteReviewIds);
         reviewSummaryRepository.deleteAllByReviewIdIn(memberWriteReviewIds);
+        reviewSymptomRepository.deleteAllByReviewIdIn(memberWriteReviewIds);
 
         deleteAboutHospital(memberWriteReviews);
 
