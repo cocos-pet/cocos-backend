@@ -142,6 +142,10 @@ public class ReviewService {
 
     @Transactional
     public ReviewImageDeleteListResponse deleteReview(final Long memberId, final Long reviewId) {
+        if (memberId == null) {
+            throw new CocosException(FailMessage.UNAUTHORIZED);
+        }
+
         final Review review = reviewRepository.findById(reviewId).orElseThrow(
                 () -> new CocosException(FailMessage.NOT_FOUND_REVIEW)
         );
