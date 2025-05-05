@@ -20,4 +20,6 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
     List<Post> findTopPostsByPostIds(@Param("postIds") List<Long> postIds, Pageable pageable);
 
     List<Post> findAllByMemberId(final Long memberId);
+
+    void deleteAllByMemberId(final Long memberId);
 }
