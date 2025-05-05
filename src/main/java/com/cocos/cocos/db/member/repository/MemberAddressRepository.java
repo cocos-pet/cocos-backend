@@ -11,4 +11,6 @@ public interface MemberAddressRepository extends JpaRepository<MemberAddress, Lo
     Optional<MemberAddress> findByMemberId(final Long memberId);
 
     boolean existsByMemberId(final Long memberId);
+
+    void deleteByMemberId(final Long memberId);
 }

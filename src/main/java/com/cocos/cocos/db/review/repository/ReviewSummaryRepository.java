@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface ReviewSummaryRepository extends CrudRepository<ReviewSummary, Long> {
     int countByReviewIdInAndReviewSummaryOptionId(final List<Long> reviewIds, final Long reviewSummaryOptionId);
+
+    void deleteAllByReviewIdIn(final List<Long> reviewIds);
 }

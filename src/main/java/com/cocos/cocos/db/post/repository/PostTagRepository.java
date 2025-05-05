@@ -18,4 +18,6 @@ public interface PostTagRepository extends JpaRepository<PostTag, Long> {
 
     @Query("SELECT pt FROM PostTag pt WHERE pt.tagId IN :tagIds AND pt.tagType = :tagType")
     List<PostTag> findAllByTagIdAndTagType(@Param("tagIds") List<Long> tagIds, @Param("tagType") TagType tagType);
+
+    void deleteAllByPostIdIn(final List<Long> postIds);
 }
