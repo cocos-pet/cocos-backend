@@ -316,7 +316,7 @@ public class MemberService {
 
     private void deleteAboutHospital(final List<Review> memberWriteReviews) {
         final List<Hospital> hospitals = memberWriteReviews.stream()
-                .map(review -> hospitalRepository.findById(review.getId()).orElseThrow(
+                .map(review -> hospitalRepository.findById(review.getHospitalId()).orElseThrow(
                         () -> new CocosException(FailMessage.NOT_FOUND_HOSPITAL)
                 )).toList();
 
