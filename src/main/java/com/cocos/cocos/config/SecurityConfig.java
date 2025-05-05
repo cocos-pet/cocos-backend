@@ -29,8 +29,8 @@ public class SecurityConfig {
             "/v3/api-docs/**",
             "/api/dev/test/**",
             "/api/dev/locations",
-            "/api/local/hospitals/**",
-            "/api/dev/hospitals/**",
+            "/api/local/hospitals/*",
+            "/api/dev/hospitals/*",
             "/api/local/members/login",
     };
 
