@@ -1,8 +1,12 @@
 package com.cocos.cocos.api.review.service;
 
 import com.cocos.cocos.api.review.dto.response.*;
+import com.cocos.cocos.common.exception.CocosException;
+import com.cocos.cocos.db.hospital.entity.Hospital;
+import com.cocos.cocos.db.hospital.repository.HospitalRepository;
 import com.cocos.cocos.db.review.db.*;
 import com.cocos.cocos.db.review.repository.*;
+import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.enums.pet.Gender;
 import com.cocos.cocos.external.MemberDataS3Client;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +29,7 @@ public class ReviewService {
 
     private static final String REVIEW_IMAGE_S3_PREFIX = "reviewImage";
     private static final boolean IS_GOOD_REVIEW = true;
+    private final HospitalRepository hospitalRepository;
 
     @Transactional
     public ReviewAddResponse addReview(final Long memberId, final Long hospitalId, final Long breedId, final Gender gender,
@@ -133,5 +138,37 @@ public class ReviewService {
                         reviewSummaryOption.getLabel())
                 )
                 .toList();
+    }
+
+    @Transactional
+    public ReviewImageDeleteListResponse deleteReview(final Long memberId, final Long reviewId) {
+        if (memberId == null) {
+            throw new CocosException(FailMessage.UNAUTHORIZED);
+        }
+
+        final Review review = reviewRepository.findById(reviewId).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_REVIEW)
+        );
+
+        if (!review.getMemberId().equals(memberId)) {
+            throw new CocosException(FailMessage.UNAUTHORIZED_NOT_WRITER);
+        }
+
+        final List<String> reviewImages = reviewImageRepository.findAllByReviewId(reviewId).stream()
+                .map(reviewImage -> memberDataS3Client.deletePresignedUrl(reviewImage.getImage()))
+                .toList();
+
+        reviewSummaryRepository.deleteAllByReviewId(reviewId);
+        reviewSymptomRepository.deleteAllByReviewId(reviewId);
+        reviewImageRepository.deleteAllByReviewId(reviewId);
+
+        final Hospital hospital = hospitalRepository.findById(review.getHospitalId()).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_HOSPITAL)
+        );
+
+        hospital.deleteReview();
+        reviewRepository.deleteById(reviewId);
+
+        return ReviewImageDeleteListResponse.of(reviewImages);
     }
 }

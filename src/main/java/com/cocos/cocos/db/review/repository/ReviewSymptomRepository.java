@@ -8,5 +8,8 @@ import java.util.List;
 
 @Repository
 public interface ReviewSymptomRepository extends JpaRepository<ReviewSymptom, Long> {
+
+    void deleteAllByReviewId(final Long reviewId);
+
     void deleteAllByReviewIdIn(final List<Long> reviewIds);
 }

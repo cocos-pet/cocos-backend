@@ -2,6 +2,7 @@ package com.cocos.cocos.api.review.controller;
 
 import com.cocos.cocos.api.review.dto.request.ReviewAddRequest;
 import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
+import com.cocos.cocos.api.review.dto.response.ReviewImageDeleteListResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewSummaryListResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewSummaryOptionListResponse;
 import com.cocos.cocos.api.review.service.ReviewService;
@@ -10,6 +11,7 @@ import com.cocos.cocos.common.response.SuccessResponse;
 import com.cocos.cocos.enums.message.SuccessMessage;
 import com.cocos.cocos.util.PrincipalHandler;
 import com.cocos.cocos.validation.hospital.HospitalIdConstraint;
+import com.cocos.cocos.validation.review.ReviewIdConstraint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,5 +46,12 @@ public class ReviewController implements ReviewControllerSwagger {
     @GetMapping("/hospitals/reviews/summary/option")
     public ResponseEntity<BaseResponse<ReviewSummaryOptionListResponse>> getReviewSummaryOptionList() {
         return SuccessResponse.success(SuccessMessage.OK, reviewService.getReviewSummaryOptionList());
+    }
+
+    @DeleteMapping("/hospitals/reviews/{reviewId}")
+    public ResponseEntity<BaseResponse<ReviewImageDeleteListResponse>> deleteReview(
+            @PathVariable(name = "reviewId") @ReviewIdConstraint final Long reviewId
+    ) {
+        return SuccessResponse.success(SuccessMessage.OK, reviewService.deleteReview(PrincipalHandler.getMemberIdFromPrincipal(), reviewId));
     }
 }
