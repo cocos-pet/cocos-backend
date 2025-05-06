@@ -2,6 +2,8 @@ package com.cocos.cocos.review;
 
 import com.cocos.cocos.api.review.dto.response.*;
 import com.cocos.cocos.api.review.service.ReviewService;
+import com.cocos.cocos.db.hospital.entity.Hospital;
+import com.cocos.cocos.db.hospital.repository.HospitalRepository;
 import com.cocos.cocos.db.review.db.*;
 import com.cocos.cocos.db.review.repository.*;
 import com.cocos.cocos.enums.pet.Gender;
@@ -15,11 +17,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -49,6 +53,9 @@ public class ReviewServiceTest {
 
     @Mock
     MemberDataS3Client memberDataS3Client;
+
+    @Mock
+    HospitalRepository hospitalRepository;
 
     @Test
     @DisplayName("리뷰를 작성할 수 있다.")
@@ -228,5 +235,60 @@ public class ReviewServiceTest {
 
         //then
         Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("리뷰를 삭제할 수 있다.")
+    void deleteReview() {
+        //given
+        final Long memberId = 1L;
+        final Long reviewId = 2L;
+
+        final Hospital hospital = Hospital.builder()
+                .reviewCount(10)
+                .build();
+
+        final Review review = Review.builder()
+                .memberId(memberId)
+                .hospitalId(1L)
+                .build();
+
+        final ReviewImage reviewImage1 = ReviewImage.builder()
+                .image("image1")
+                .reviewId(1L)
+                .build();
+
+        final ReviewImage reviewImage2 = ReviewImage.builder()
+                .image("image2")
+                .reviewId(1L)
+                .build();
+
+        final ReviewImage reviewImage3 = ReviewImage.builder()
+                .image("image3")
+                .reviewId(1L)
+                .build();
+
+        final List<ReviewImage> reviewImages = new ArrayList<>(List.of(reviewImage1, reviewImage2, reviewImage3));
+
+        BDDMockito.given(reviewRepository.findById(reviewId)).willReturn(Optional.of(review));
+        BDDMockito.given(reviewImageRepository.findAllByReviewId(reviewId)).willReturn(reviewImages);
+        BDDMockito.given(memberDataS3Client.deletePresignedUrl(reviewImage1.getImage())).willReturn("presignedUrl1");
+        BDDMockito.given(memberDataS3Client.deletePresignedUrl(reviewImage2.getImage())).willReturn("presignedUrl2");
+        BDDMockito.given(memberDataS3Client.deletePresignedUrl(reviewImage3.getImage())).willReturn("presignedUrl3");
+        BDDMockito.given(hospitalRepository.findById(review.getHospitalId())).willReturn(Optional.of(hospital));
+
+        final ReviewImageDeleteListResponse expected = ReviewImageDeleteListResponse.of(
+                List.of("presignedUrl1", "presignedUrl2", "presignedUrl3")
+        );
+
+        //when
+        final ReviewImageDeleteListResponse actual = reviewService.deleteReview(memberId, reviewId);
+
+        //then
+        Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
+        Assertions.assertThat(hospital.getReviewCount()).isEqualTo(9);
+        Mockito.verify(reviewSummaryRepository, Mockito.times(1)).deleteAllByReviewId(reviewId);
+        Mockito.verify(reviewImageRepository, Mockito.times(1)).deleteAllByReviewId(reviewId);
+
     }
 }

@@ -22,13 +22,15 @@ public enum FailMessage {
     BAD_REQUEST_INVALID_HOSPITAL_ID(HttpStatus.BAD_REQUEST, 40008, "유효하지 않은 병원 아이디입니다."),
     BAD_REQUEST_INVALID_BREED_ID(HttpStatus.BAD_REQUEST, 40009, "유효하지 않은 품종 아이디입니다."),
     BAD_REQUEST_INVALID_DISEASE_ID(HttpStatus.BAD_REQUEST, 40010, "유효하지 않은 질병 아이디입니다."),
-    BAD_REQUEST_INVALID_MEMBER_QUERY(HttpStatus.BAD_REQUEST, 40011, "회원 식별자 (id 또는 nickname)를 제공해야 합니다."),
+    BAD_REQUEST_INVALID_REVIEW_ID(HttpStatus.BAD_REQUEST, 40011, "유효하지 않은 리뷰 아이디입니다."),
+    BAD_REQUEST_INVALID_MEMBER_QUERY(HttpStatus.BAD_REQUEST, 40012, "회원 식별자 (id 또는 nickname)를 제공해야 합니다."),
     /**
      * 401
      */
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, 40100, "인증이 필요합니다. "),
     UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, 40101, "인증되지 않은 사용자 입니다."),
     UNAUTHORIZED_EXPIRATION_JWT_EXCEPTION(HttpStatus.UNAUTHORIZED, 40102, "기간이 만료된 토큰입니다."),
+    UNAUTHORIZED_NOT_WRITER(HttpStatus.UNAUTHORIZED, 40103, "리뷰를 작성한 사용자가 아닙니다."),
 
 
     /**
@@ -62,7 +64,8 @@ public enum FailMessage {
     NOT_FOUND_CITY(HttpStatus.NOT_FOUND, 40419, "시/도를 찾을 수 없습니다."),
     NOT_FOUND_DISTRICT(HttpStatus.NOT_FOUND, 40420, "시/군/구를 찾을 수 없습니다."),
     NOT_FOUND_HOSPITAL(HttpStatus.NOT_FOUND, 40421, "병원을 찾을 수 없습니다."),
-    NOT_FOUND_SUMMARY_OPTION(HttpStatus.NOT_FOUND, 40422, "리뷰 요약 옵션을 찾을 수 없습니다."),
+    NOT_FOUND_REVIEW(HttpStatus.NOT_FOUND, 40422, "리뷰를 찾을 수 없습니다."),
+    NOT_FOUND_SUMMARY_OPTION(HttpStatus.NOT_FOUND, 40423, "리뷰 요약 옵션을 찾을 수 없습니다."),
 
     /**
      * 405
@@ -91,6 +94,8 @@ public enum FailMessage {
     INTERNAL_SERVER_ERROR_PET_ID_FOR_MEMBER(HttpStatus.INTERNAL_SERVER_ERROR, 50002, "서버에 유효하지 않은 petId가 존재합니다. "),
     INTERNAL_SERVER_ERROR_PET_AGE(HttpStatus.INTERNAL_SERVER_ERROR, 50003, "서버에 유효하지 않은 petAge가 존재합니다. "),
     INTERNAL_SERVER_ERROR_UNSUPPORTED_OPERATION(HttpStatus.INTERNAL_SERVER_ERROR, 50004, "유틸 클래스입니다. "),
+    INTERNAL_SERVER_ERROR_KAKAO_UNLINK(HttpStatus.INTERNAL_SERVER_ERROR, 50005, "카카오 회원탈퇴에 실패했습니다."),
+
     /**
      * 503
      */

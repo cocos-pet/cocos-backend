@@ -14,7 +14,6 @@ public class DiseaseIdValidator implements ConstraintValidator<DiseaseIdConstrai
 
     private final DiseaseRepository diseaseRepository;
 
-
     @Override
     public boolean isValid(Long diseaseId, ConstraintValidatorContext constraintValidatorContext) {
         if (!diseaseRepository.existsById(diseaseId)) {

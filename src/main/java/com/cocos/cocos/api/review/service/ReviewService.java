@@ -17,9 +17,9 @@ import com.cocos.cocos.api.review.dto.response.*;
 import com.cocos.cocos.db.member.repository.MemberRepository;
 import com.cocos.cocos.db.review.db.*;
 import com.cocos.cocos.db.review.repository.*;
+import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.db.symptom.entity.Symptom;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
-import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.enums.pet.Gender;
 import com.cocos.cocos.external.MemberDataS3Client;
 import com.cocos.cocos.util.SortConstants;
@@ -343,5 +343,37 @@ public class ReviewService {
                         reviewSummaryOption.getLabel())
                 )
                 .toList();
+    }
+
+    @Transactional
+    public ReviewImageDeleteListResponse deleteReview(final Long memberId, final Long reviewId) {
+        if (memberId == null) {
+            throw new CocosException(FailMessage.UNAUTHORIZED);
+        }
+
+        final Review review = reviewRepository.findById(reviewId).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_REVIEW)
+        );
+
+        if (!review.getMemberId().equals(memberId)) {
+            throw new CocosException(FailMessage.UNAUTHORIZED_NOT_WRITER);
+        }
+
+        final List<String> reviewImages = reviewImageRepository.findAllByReviewId(reviewId).stream()
+                .map(reviewImage -> memberDataS3Client.deletePresignedUrl(reviewImage.getImage()))
+                .toList();
+
+        reviewSummaryRepository.deleteAllByReviewId(reviewId);
+        reviewSymptomRepository.deleteAllByReviewId(reviewId);
+        reviewImageRepository.deleteAllByReviewId(reviewId);
+
+        final Hospital hospital = hospitalRepository.findById(review.getHospitalId()).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_HOSPITAL)
+        );
+
+        hospital.deleteReview();
+        reviewRepository.deleteById(reviewId);
+
+        return ReviewImageDeleteListResponse.of(reviewImages);
     }
 }

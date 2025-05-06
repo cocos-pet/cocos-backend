@@ -19,4 +19,10 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findByPostIdOrderByCreatedAtAsc(@Param("postId") Long postId);
 
     List<Comment> findAllByMemberIdOrderByCreatedAtDesc(final Long memberId);
+
+    List<Comment> findAllByPostIdIn(final List<Long> postIds);
+
+    void deleteAllByPostIdInOrMemberId(final List<Long> postIds, final Long memberId);
+
+    List<Comment> findAllByPostIdInOrMemberId(final List<Long> postIds, final Long memberId);
 }

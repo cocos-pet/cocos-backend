@@ -4,6 +4,8 @@ import com.cocos.cocos.db.post.entity.PostLike;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
 
@@ -14,4 +16,8 @@ public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
     int countByPostId(final Long postId);
 
     void deleteAllByPostId(final Long postId);
+
+    List<PostLike> findAllByMemberId(final Long memberId);
+
+    void deleteAllByMemberId(final Long memberId);
 }
