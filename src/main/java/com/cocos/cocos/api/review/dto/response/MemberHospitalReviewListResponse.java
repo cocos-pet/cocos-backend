@@ -4,9 +4,9 @@ import java.util.List;
 
 public record MemberHospitalReviewListResponse(
         Long cursorId,
-        List<HospitalReviewResponse> reviews
+        List<MemberHospitalReviewResponse> reviews
 ) {
-    public static MemberHospitalReviewListResponse of(final Long cursorId, final List<HospitalReviewResponse> reviewResponses) {
+    public static MemberHospitalReviewListResponse of(final Long cursorId, final List<MemberHospitalReviewResponse> reviewResponses) {
         return new MemberHospitalReviewListResponse(cursorId, reviewResponses);
     }
 }
