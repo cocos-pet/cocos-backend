@@ -28,4 +28,8 @@ public interface HospitalRepository extends JpaRepository<Hospital, Long> {
     List<Hospital> findAllByDistrictIdInWithCursor(@Param("districtIds") final List<Long> districtIds, @Param("cursorId") final Long cursorId, @Param("reviewCount") final Integer reviewCount, final Pageable pageable);
 
     List<Hospital> findAllByDistrictIdIn(final List<Long> districtIds, final Pageable pageable);
+
+    List<Hospital> findAllByDistrictIdIn(final List<Long> districtIds);
+
+
 }
