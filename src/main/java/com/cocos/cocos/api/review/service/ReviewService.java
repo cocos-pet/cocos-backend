@@ -255,14 +255,11 @@ public class ReviewService {
     }
 
     private Map<Long, List<String>> getReviewIdToSymptoms(final List<Long> reviewIds) {
-
-        List<ReviewSymptom> reviewSymptoms = reviewSymptomRepository.findByReviewIdIn(reviewIds);
-
-        Set<Long> symptomIds = reviewSymptoms.stream()
+        final List<ReviewSymptom> reviewSymptoms = reviewSymptomRepository.findByReviewIdIn(reviewIds);
+        final Set<Long> symptomIds = reviewSymptoms.stream()
                 .map(ReviewSymptom::getSymptomId)
                 .collect(Collectors.toSet());
-
-        Map<Long, Symptom> symptomMap = symptomRepository.findAllById(symptomIds).stream()
+        final Map<Long, Symptom> symptomMap = symptomRepository.findAllById(symptomIds).stream()
                 .collect(Collectors.toMap(Symptom::getId, Function.identity()));
 
         return reviewSymptoms.stream()
