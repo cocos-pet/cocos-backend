@@ -6,6 +6,8 @@ import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewImageDeleteListResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewSummaryListResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewSummaryOptionListResponse;
+import com.cocos.cocos.api.review.dto.request.ReviewListRequest;
+import com.cocos.cocos.api.review.dto.response.*;
 import com.cocos.cocos.api.review.service.ReviewService;
 import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.common.response.SuccessResponse;
@@ -60,6 +62,13 @@ public class ReviewController implements ReviewControllerSwagger {
             @RequestParam(name = "size", defaultValue = "10") @Min(value = 1) @Max(value = 20) final int size
     ) {
         return SuccessResponse.success(SuccessMessage.OK, reviewService.getMemberHospitalReviewList(nickname, cursorId, size, PrincipalHandler.getMemberIdFromPrincipal()));
+    }
+
+    @PostMapping("/hospitals/reviews/filter")
+    public ResponseEntity<BaseResponse<HospitalReviewListResponse>> getHospitalReviewList(
+            @RequestBody final ReviewListRequest reviewListRequest
+    ) {
+        return SuccessResponse.success(SuccessMessage.OK, reviewService.getHospitalReviewList(reviewListRequest.hospitalId(), reviewListRequest.summaryOptionId(), reviewListRequest.cursorId(), reviewListRequest.size(), reviewListRequest.bodyId(), reviewListRequest.locationId(), reviewListRequest.locationType(), PrincipalHandler.getMemberIdFromPrincipal()));
     }
 
     @DeleteMapping("/hospitals/reviews/{reviewId}")
