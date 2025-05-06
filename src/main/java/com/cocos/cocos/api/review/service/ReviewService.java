@@ -149,6 +149,7 @@ public class ReviewService {
 
         final List<Long> reviewIds = reviews.stream().map(Review::getId).toList();
 
+        // TODO: 팀 컨벤션 측면에서, Map방식과 filter 방식 중 적절한 방식 논의 필요
         final Map<Long, Hospital> hospitalMap = getHospitalMap(reviews);
         final Map<Long, List<String>> reviewIdToImageUrls = getReviewIdToImageUrls(reviewIds);
         final Map<Long, Breed> breedMap = getBreedMap(reviews);
