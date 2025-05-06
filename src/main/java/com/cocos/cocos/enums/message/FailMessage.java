@@ -23,7 +23,7 @@ public enum FailMessage {
     BAD_REQUEST_INVALID_BREED_ID(HttpStatus.BAD_REQUEST, 40009, "유효하지 않은 품종 아이디입니다."),
     BAD_REQUEST_INVALID_DISEASE_ID(HttpStatus.BAD_REQUEST, 40010, "유효하지 않은 질병 아이디입니다."),
     BAD_REQUEST_INVALID_REVIEW_ID(HttpStatus.BAD_REQUEST, 40011, "유효하지 않은 리뷰 아이디입니다."),
-
+    BAD_REQUEST_INVALID_MEMBER_QUERY(HttpStatus.BAD_REQUEST, 40012, "회원 식별자 (id 또는 nickname)를 제공해야 합니다."),
     /**
      * 401
      */
@@ -65,6 +65,7 @@ public enum FailMessage {
     NOT_FOUND_DISTRICT(HttpStatus.NOT_FOUND, 40420, "시/군/구를 찾을 수 없습니다."),
     NOT_FOUND_HOSPITAL(HttpStatus.NOT_FOUND, 40421, "병원을 찾을 수 없습니다."),
     NOT_FOUND_REVIEW(HttpStatus.NOT_FOUND, 40422, "리뷰를 찾을 수 없습니다."),
+    NOT_FOUND_SUMMARY_OPTION(HttpStatus.NOT_FOUND, 40423, "리뷰 요약 옵션을 찾을 수 없습니다."),
 
     /**
      * 405

@@ -1,6 +1,5 @@
 package com.cocos.cocos.validation.review;
 
-import com.cocos.cocos.validation.disease.DiseaseIdValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 

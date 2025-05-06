@@ -13,4 +13,6 @@ public interface ReviewSummaryRepository extends CrudRepository<ReviewSummary, L
     void deleteAllByReviewId(final Long reviewId);
 
     void deleteAllByReviewIdIn(final List<Long> reviewIds);
+
+    List<ReviewSummary> findByReviewIdIn(final List<Long> reviewIds);
 }
