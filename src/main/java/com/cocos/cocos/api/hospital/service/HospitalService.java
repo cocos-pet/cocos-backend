@@ -85,7 +85,7 @@ public class HospitalService {
         }
     }
 
-    private List<Hospital> getHospitalsBySortAndCursor(int size, List<Long> districtIds, Long cursorId, Integer cursorReviewCount, HospitalSortCriteria hospitalSortCriteria) {
+    private List<Hospital> getHospitalsBySortAndCursor(final int size, final List<Long> districtIds, final Long cursorId, final Integer cursorReviewCount, final HospitalSortCriteria hospitalSortCriteria) {
         // TODO: 유효한 정렬 기준 확인하는 로직으로 따로 분리 (정렬 기준 늘어날 경우)
         if (hospitalSortCriteria != HospitalSortCriteria.REVIEW) {
             throw new CocosException(FailMessage.BAD_REQUEST_INVALID_SORT_CRITERIA);
@@ -113,7 +113,7 @@ public class HospitalService {
 
     }
 
-    private List<Hospital> getHospitalsByKeyword(int size, List<Long> districtIds, String keyword, Long cursorId) {
+    private List<Hospital> getHospitalsByKeyword(final int size, final List<Long> districtIds, final String keyword, final Long cursorId) {
         Pageable pageable = PageRequest.of(0, size, Sort.by(
                 SortConstants.ID_DESC
         ));
