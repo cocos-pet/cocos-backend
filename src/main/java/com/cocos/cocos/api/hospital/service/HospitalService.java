@@ -66,7 +66,7 @@ public class HospitalService {
 
     private List<Long> getDistrictIds(final Long locationId, final LocationType locationType) {
         if (locationType == LocationType.CITY) {
-            return districtRepository.findByCityId(locationId).stream().map(District::getId).toList();
+            return districtRepository.findAllByCityId(locationId).stream().map(District::getId).toList();
         }
         return List.of(locationId);
     }

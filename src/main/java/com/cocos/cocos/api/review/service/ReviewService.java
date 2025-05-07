@@ -534,7 +534,7 @@ public class ReviewService {
     // TODO: hospitalService와 중복. 공용으로 관리하도록 리팩 필요
     private List<Long> getDistrictIds(final Long locationId, final LocationType locationType) {
         if (locationType == LocationType.CITY) {
-            return districtRepository.findByCityId(locationId).stream().map(District::getId).toList();
+            return districtRepository.findAllByCityId(locationId).stream().map(District::getId).toList();
         }
         if (locationType == LocationType.DISTRICT) {
             return List.of(locationId);
