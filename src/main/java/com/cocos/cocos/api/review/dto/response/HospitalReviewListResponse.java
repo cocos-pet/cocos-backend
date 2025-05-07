@@ -7,7 +7,7 @@ import java.util.List;
 public record HospitalReviewListResponse(
         @Schema(description = "리뷰수", example = "111", nullable = true)
         Integer reviewCount,
-        @Schema(description = "커서 아이디 (마지막으로 전달받은 리뷰 아이디)", example = "12")
+        @Schema(description = "커서 아이디 (현재 응답 값의 마지막 리뷰 아이디)", example = "12")
         Long cursorId,
         List<HospitalReviewResponse> reviews
 ) {
