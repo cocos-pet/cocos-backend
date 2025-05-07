@@ -65,31 +65,70 @@ public class HospitalService {
     }
 
     private List<Long> getDistrictIds(final Long locationId, final LocationType locationType) {
-        if (locationType == LocationType.CITY) {
-            return districtRepository.findAllByCityId(locationId).stream().map(District::getId).toList();
+        if (locationType == null) {
+            return List.of();
         }
-        return List.of(locationId);
+
+        return switch (locationType) {
+            case LocationType.CITY ->
+                    districtRepository.findAllByCityId(locationId).stream().map(District::getId).toList();
+            case LocationType.DISTRICT -> List.of(locationId);
+            default -> List.of();
+        };
     }
 
     private List<Hospital> getHospitalsByKeywordAndCursor(final int size, final List<Long> districtIds, final String keyword, final Long cursorId, final Integer cursorReviewCount, final HospitalSortCriteria hospitalSortCriteria) {
         if (keyword != null && !keyword.isBlank()) {
-            Pageable pageable = PageRequest.of(0, size, Sort.by(
-                    SortConstants.ID_DESC
-            ));
-            return (cursorId != null) ? hospitalRepository.findAllByNameContainingAndDistrictIdInAndIdLessThan(keyword, districtIds, cursorId, pageable) : hospitalRepository.findAllByNameContainingAndDistrictIdIn(keyword, districtIds, pageable);
+            return getHospitalsByKeyword(size, districtIds, keyword, cursorId);
         } else {
-            Pageable pageable = PageRequest.of(0, size, Sort.by(
-                    Sort.Order.desc(hospitalSortCriteria.getFieldName()),
-                    SortConstants.ID_DESC
-            ));
-            if (hospitalSortCriteria == HospitalSortCriteria.REVIEW) {
-                if (cursorId == null) {
-                    return hospitalRepository.findAllByDistrictIdIn(districtIds, pageable);
-                } else {
-                    return hospitalRepository.findAllByDistrictIdInWithCursor(districtIds, cursorId, cursorReviewCount, pageable);
-                }
-            }
+            return getHospitalsBySortAndCursor(size, districtIds, cursorId, cursorReviewCount, hospitalSortCriteria);
+        }
+    }
+
+    private List<Hospital> getHospitalsBySortAndCursor(final int size, final List<Long> districtIds, final Long cursorId, final Integer cursorReviewCount, final HospitalSortCriteria hospitalSortCriteria) {
+        // TODO: 유효한 정렬 기준 확인하는 로직으로 따로 분리 (정렬 기준 늘어날 경우)
+        if (hospitalSortCriteria != HospitalSortCriteria.REVIEW) {
             throw new CocosException(FailMessage.BAD_REQUEST_INVALID_SORT_CRITERIA);
+        }
+
+        Pageable pageable = PageRequest.of(0, size, Sort.by(
+                Sort.Order.desc(hospitalSortCriteria.getFieldName()),
+                SortConstants.ID_DESC
+        ));
+
+
+        if (cursorId == null) {
+            if (districtIds.isEmpty()) {
+                return hospitalRepository.findAll(pageable).getContent();
+            } else {
+                return hospitalRepository.findAllByDistrictIdIn(districtIds, pageable);
+            }
+        } else {
+            if (districtIds.isEmpty()) {
+                return hospitalRepository.findAllWithCursor(cursorId, cursorReviewCount, pageable);
+            } else {
+                return hospitalRepository.findAllByDistrictIdInWithCursor(districtIds, cursorId, cursorReviewCount, pageable);
+            }
+        }
+
+    }
+
+    private List<Hospital> getHospitalsByKeyword(final int size, final List<Long> districtIds, final String keyword, final Long cursorId) {
+        Pageable pageable = PageRequest.of(0, size, Sort.by(
+                SortConstants.ID_DESC
+        ));
+        if (cursorId == null) {
+            if (districtIds.isEmpty()) {
+                return hospitalRepository.findAllByNameContaining(keyword, pageable);
+            } else {
+                return hospitalRepository.findAllByNameContainingAndDistrictIdIn(keyword, districtIds, pageable);
+            }
+        } else {
+            if (districtIds.isEmpty()) {
+                return hospitalRepository.findAllByNameContainingAndIdLessThan(keyword, cursorId, pageable);
+            } else {
+                return hospitalRepository.findAllByNameContainingAndDistrictIdInAndIdLessThan(keyword, districtIds, cursorId, pageable);
+            }
         }
     }
 
