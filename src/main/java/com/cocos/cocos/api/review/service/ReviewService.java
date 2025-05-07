@@ -176,8 +176,8 @@ public class ReviewService {
 
                     final List<ReviewSummaryOption> summaryOptions = reviewSummaryOptionsMap.getOrDefault(review.getId(), List.of());
 
-                    final List<ReviewSummaryOptionResponse> goodReviewSummaries = getReviewSummaryOptionList(summaryOptions, true);
-                    final List<ReviewSummaryOptionResponse> badReviewSummaries = getReviewSummaryOptionList(summaryOptions, false);
+                    final List<ReviewSummaryOptionResponse> goodReviewSummaries = getReviewSummaryOptionList(summaryOptions, IS_GOOD_REVIEW);
+                    final List<ReviewSummaryOptionResponse> badReviewSummaries = getReviewSummaryOptionList(summaryOptions, !IS_GOOD_REVIEW);
                     final ReviewSummaryOptionListResponse summaryOptionList = ReviewSummaryOptionListResponse.of(
                             goodReviewSummaries, badReviewSummaries
                     );
@@ -245,8 +245,8 @@ public class ReviewService {
 
                     final List<ReviewSummaryOption> summaryOptions = reviewSummaryOptionsMap.getOrDefault(review.getId(), List.of());
 
-                    final List<ReviewSummaryOptionResponse> goodReviewSummaries = getReviewSummaryOptionList(summaryOptions, true);
-                    final List<ReviewSummaryOptionResponse> badReviewSummaries = getReviewSummaryOptionList(summaryOptions, false);
+                    final List<ReviewSummaryOptionResponse> goodReviewSummaries = getReviewSummaryOptionList(summaryOptions, IS_GOOD_REVIEW);
+                    final List<ReviewSummaryOptionResponse> badReviewSummaries = getReviewSummaryOptionList(summaryOptions, !IS_GOOD_REVIEW);
                     final ReviewSummaryOptionListResponse summaryOptionList = ReviewSummaryOptionListResponse.of(
                             goodReviewSummaries, badReviewSummaries
                     );
