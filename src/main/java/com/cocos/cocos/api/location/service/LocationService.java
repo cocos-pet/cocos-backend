@@ -26,7 +26,7 @@ public class LocationService {
         return LocationResponse.of(
                 cities.stream()
                         .map(city -> {
-                            final List<District> districts = districtRepository.findByCityId(city.getId());
+                            final List<District> districts = districtRepository.findAllByCityId(city.getId());
                             return CityResponse.of(
                                     city.getId(),
                                     city.getName(),

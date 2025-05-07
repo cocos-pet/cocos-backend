@@ -14,4 +14,6 @@ public interface ReviewSymptomRepository extends JpaRepository<ReviewSymptom, Lo
     void deleteAllByReviewIdIn(final List<Long> reviewIds);
 
     List<ReviewSymptom> findByReviewIdIn(final List<Long> reviewIds);
+
+    List<ReviewSymptom> findBySymptomIdIn(final List<Long> symptomIds);
 }

@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface PetRepository extends JpaRepository<Pet, Long> {
@@ -13,6 +14,8 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
     Pet findByMemberId(final Long memberId);
 
     List<Pet> findAllByMemberIdIn(@Param("memberIds") List<Long> memberIds);
+
+    List<Pet> findAllByMemberIdIn(Set<Long> memberIds);
 
     boolean existsByMemberId(final Long memberId);
 }

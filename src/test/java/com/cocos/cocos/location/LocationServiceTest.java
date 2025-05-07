@@ -60,7 +60,7 @@ public class LocationServiceTest {
         final List<District> districts = new ArrayList<>(List.of(district1, district2));
 
         BDDMockito.given(cityRepository.findAll()).willReturn(cities);
-        BDDMockito.given(districtRepository.findByCityId(any())).willReturn(districts);
+        BDDMockito.given(districtRepository.findAllByCityId(any())).willReturn(districts);
 
         final DistrictResponse districtResponse1 = DistrictResponse.of(district1.getId(), district1.getName());
         final DistrictResponse districtResponse2 = DistrictResponse.of(district2.getId(), district2.getName());

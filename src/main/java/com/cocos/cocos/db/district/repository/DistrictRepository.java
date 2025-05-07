@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface DistrictRepository extends JpaRepository<District, Long> {
 
-    List<District> findByCityId(final Long cityId);
+    List<District> findAllByCityId(final Long cityId);
 
     District findByNameAndCityId(final String name, final Long cityId);
 }
