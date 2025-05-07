@@ -71,7 +71,7 @@ public class HospitalService {
 
         return switch (locationType) {
             case LocationType.CITY ->
-                    districtRepository.findByCityId(locationId).stream().map(District::getId).toList();
+                    districtRepository.findAllByCityId(locationId).stream().map(District::getId).toList();
             case LocationType.DISTRICT -> List.of(locationId);
             default -> List.of();
         };

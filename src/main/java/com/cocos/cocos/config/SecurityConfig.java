@@ -29,11 +29,13 @@ public class SecurityConfig {
             "/v3/api-docs/**",
             "/api/dev/test/**",
             "/api/dev/locations",
-            "/api/local/hospitals/**",
-            "/api/dev/hospitals/**",
+            "/api/local/hospitals/*",
+            "/api/dev/hospitals/*",
             "/api/local/members/login",
             "/api/local/hospitals/reviews/member",
-            "/api/dev/hospitals/reviews/member"
+            "/api/dev/hospitals/reviews/member",
+            "/api/local/hospitals/reviews/filter",
+            "/api/dev/hospitals/reviews/filter"
     };
 
     @Bean

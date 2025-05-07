@@ -22,8 +22,9 @@ public enum FailMessage {
     BAD_REQUEST_INVALID_HOSPITAL_ID(HttpStatus.BAD_REQUEST, 40008, "유효하지 않은 병원 아이디입니다."),
     BAD_REQUEST_INVALID_BREED_ID(HttpStatus.BAD_REQUEST, 40009, "유효하지 않은 품종 아이디입니다."),
     BAD_REQUEST_INVALID_DISEASE_ID(HttpStatus.BAD_REQUEST, 40010, "유효하지 않은 질병 아이디입니다."),
-    BAD_REQUEST_INVALID_REVIEW_ID(HttpStatus.BAD_REQUEST, 40011, "유효하지 않은 리뷰 아이디입니다."),
-    BAD_REQUEST_INVALID_MEMBER_QUERY(HttpStatus.BAD_REQUEST, 40012, "회원 식별자 (id 또는 nickname)를 제공해야 합니다."),
+    BAD_REQUEST_INVALID_MEMBER_QUERY(HttpStatus.BAD_REQUEST, 40011, "회원 식별자 (id 또는 nickname)를 제공해야 합니다."),
+    BAD_REQUEST_MISSING_BODY(HttpStatus.BAD_REQUEST, 40012, "필수 body가 누락되었습니다."),
+    BAD_REQUEST_INVALID_REVIEW_ID(HttpStatus.BAD_REQUEST, 40013, "유효하지 않은 리뷰 아이디입니다."),
     /**
      * 401
      */

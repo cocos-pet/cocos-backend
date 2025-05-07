@@ -1,11 +1,8 @@
 package com.cocos.cocos.api.review.controller;
 
 import com.cocos.cocos.api.review.dto.request.ReviewAddRequest;
-import com.cocos.cocos.api.review.dto.response.MemberHospitalReviewListResponse;
-import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
-import com.cocos.cocos.api.review.dto.response.ReviewImageDeleteListResponse;
-import com.cocos.cocos.api.review.dto.response.ReviewSummaryListResponse;
-import com.cocos.cocos.api.review.dto.response.ReviewSummaryOptionListResponse;
+import com.cocos.cocos.api.review.dto.request.ReviewListRequest;
+import com.cocos.cocos.api.review.dto.response.*;
 import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.validation.hospital.HospitalIdConstraint;
 import com.cocos.cocos.validation.review.ReviewIdConstraint;
@@ -75,5 +72,14 @@ public interface ReviewControllerSwagger {
             @RequestParam(name = "nickname", required = false) final String nickname,
             @RequestParam(name = "cursorId", required = false) final Long cursorId,
             @RequestParam(name = "size", defaultValue = "10") @Min(value = 1) @Max(value = 20) final int size
+    );
+
+    @Operation(summary = "리뷰 리스트 조회 API", description = "메인페이지 리뷰 리스트 조회 & 병원 리뷰 리스트 조회 API입니다.")
+    @ApiResponse(
+            responseCode = "200",
+            description = "요청에 성공했습니다."
+    )
+    public ResponseEntity<BaseResponse<HospitalReviewListResponse>> getHospitalReviewList(
+            @RequestBody final ReviewListRequest reviewListRequest
     );
 }

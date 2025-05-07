@@ -10,16 +10,21 @@ import com.cocos.cocos.db.breed.entity.Breed;
 import com.cocos.cocos.db.breed.repository.BreedRepository;
 import com.cocos.cocos.db.disease.entity.Disease;
 import com.cocos.cocos.db.disease.repository.DiseaseRepository;
+import com.cocos.cocos.db.district.entity.District;
+import com.cocos.cocos.db.district.repository.DistrictRepository;
 import com.cocos.cocos.db.hospital.entity.Hospital;
 import com.cocos.cocos.db.hospital.repository.HospitalRepository;
 import com.cocos.cocos.db.member.entity.Member;
 import com.cocos.cocos.api.review.dto.response.*;
 import com.cocos.cocos.db.member.repository.MemberRepository;
+import com.cocos.cocos.db.pet.entity.Pet;
+import com.cocos.cocos.db.pet.repository.PetRepository;
 import com.cocos.cocos.db.review.db.*;
 import com.cocos.cocos.db.review.repository.*;
 import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.db.symptom.entity.Symptom;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
+import com.cocos.cocos.enums.location.LocationType;
 import com.cocos.cocos.enums.pet.Gender;
 import com.cocos.cocos.external.MemberDataS3Client;
 import com.cocos.cocos.util.SortConstants;
@@ -50,6 +55,8 @@ public class ReviewService {
     private final DiseaseRepository diseaseRepository;
     private final SymptomRepository symptomRepository;
     private final MemberRepository memberRepository;
+    private final PetRepository petRepository;
+    private final DistrictRepository districtRepository;
 
     private static final String REVIEW_IMAGE_S3_PREFIX = "reviewImage";
     private static final boolean IS_GOOD_REVIEW = true;
@@ -152,7 +159,7 @@ public class ReviewService {
         // TODO: 팀 컨벤션 측면에서, Map방식과 filter 방식 중 적절한 방식 논의 필요
         final Map<Long, Hospital> hospitalMap = getHospitalMap(reviews);
         final Map<Long, List<String>> reviewIdToImageUrls = getReviewIdToImageUrls(reviewIds);
-        final Map<Long, Breed> breedMap = getBreedMap(reviews);
+        final Map<Long, Breed> breedMap = getBreedMapFromReviews(reviews);
         final Map<Long, Animal> animalMap = getAnimalMap(breedMap);
         final Map<Long, Disease> diseaseMap = getDiseaseMap(reviews);
         final Map<Long, List<String>> symptomMap = getReviewIdToSymptoms(reviewIds);
@@ -169,8 +176,8 @@ public class ReviewService {
 
                     final List<ReviewSummaryOption> summaryOptions = reviewSummaryOptionsMap.getOrDefault(review.getId(), List.of());
 
-                    final List<ReviewSummaryOptionResponse> goodReviewSummaries = getReviewSummaryOptionList(summaryOptions, true);
-                    final List<ReviewSummaryOptionResponse> badReviewSummaries = getReviewSummaryOptionList(summaryOptions, false);
+                    final List<ReviewSummaryOptionResponse> goodReviewSummaries = getReviewSummaryOptionList(summaryOptions, IS_GOOD_REVIEW);
+                    final List<ReviewSummaryOptionResponse> badReviewSummaries = getReviewSummaryOptionList(summaryOptions, !IS_GOOD_REVIEW);
                     final ReviewSummaryOptionListResponse summaryOptionList = ReviewSummaryOptionListResponse.of(
                             goodReviewSummaries, badReviewSummaries
                     );
@@ -200,6 +207,132 @@ public class ReviewService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public HospitalReviewListResponse getHospitalReviewList(final Long hospitalId, final Long summaryOptionId, final Long cursorId, final int size, final Long bodyId, final Long locationId, final LocationType locationType, final Long memberId) {
+        final int searchSize = memberId == null ? DEFAULT_PAGE_SIZE : size;
+        final Pageable pageable = PageRequest.of(0, searchSize, Sort.by(
+                SortConstants.ID_DESC
+        ));
+
+        final List<Review> reviews = getReviews(locationId, locationType, hospitalId, summaryOptionId, cursorId, bodyId, pageable);
+
+        final Map<Long, Hospital> hospitalMap = getHospitalMap(reviews);
+        final List<Long> reviewIds = reviews.stream().map(Review::getId).toList();
+        final Set<Long> memberIds = reviews.stream().map(Review::getMemberId).collect(Collectors.toSet());
+
+        final Map<Long, List<String>> reviewIdToImageUrls = getReviewIdToImageUrls(reviewIds);
+        final Map<Long, Member> memberMap = getMemberMap(memberIds);
+        final Map<Long, Pet> petMap = getPetMap(memberIds);
+        final Map<Long, Breed> breedMap = getBreedMapFromReviewsAndPets(reviews, petMap);
+        final Map<Long, Animal> animalMap = getAnimalMap(breedMap);
+        final Map<Long, Disease> diseaseMap = getDiseaseMap(reviews);
+        final Map<Long, List<String>> symptomMap = getReviewIdToSymptoms(reviewIds);
+        final Map<Long, List<ReviewSummaryOption>> reviewSummaryOptionsMap = getReviewSummaryOptionsMap(reviewIds);
+
+        final Integer reviewCount = getReviewCountByHospitalId(hospitalId);
+
+        final List<HospitalReviewResponse> reviewResponses = reviews.stream()
+                .map(review -> {
+                    final Hospital hospital = hospitalMap.get(review.getHospitalId());
+                    final Breed breed = breedMap.get(review.getBreedId());
+                    final Member member = memberMap.get(review.getMemberId());
+                    final Pet pet = petMap.get(review.getMemberId());
+                    final Breed memberBreed = breedMap.get(pet.getBreedId());
+                    final Animal animal = animalMap.get(breed.getAnimalId());
+                    final Disease disease = diseaseMap.get(review.getDiseaseId());
+                    final List<String> imageUrls = reviewIdToImageUrls.getOrDefault(review.getId(), List.of());
+                    final List<String> symptoms = symptomMap.getOrDefault(review.getId(), List.of());
+
+                    final List<ReviewSummaryOption> summaryOptions = reviewSummaryOptionsMap.getOrDefault(review.getId(), List.of());
+
+                    final List<ReviewSummaryOptionResponse> goodReviewSummaries = getReviewSummaryOptionList(summaryOptions, IS_GOOD_REVIEW);
+                    final List<ReviewSummaryOptionResponse> badReviewSummaries = getReviewSummaryOptionList(summaryOptions, !IS_GOOD_REVIEW);
+                    final ReviewSummaryOptionListResponse summaryOptionList = ReviewSummaryOptionListResponse.of(
+                            goodReviewSummaries, badReviewSummaries
+                    );
+
+                    return HospitalReviewResponse.of(
+                            review.getId(),
+                            member.getId(),
+                            member.getNickname(),
+                            memberBreed.getName(),
+                            pet.getAge(),
+                            hospital.getId(),
+                            hospital.getName(),
+                            review.getVisitedAt(),
+                            hospital.getDisplayAddress(),
+                            review.getContent(),
+                            summaryOptionList,
+                            imageUrls,
+                            symptoms,
+                            disease.getName(),
+                            animal.getName(),
+                            review.getGender(),
+                            breed.getName(),
+                            review.getWeight()
+                    );
+                })
+                .toList();
+
+        return HospitalReviewListResponse.of(
+                reviewCount,
+                reviews.isEmpty() ? null : reviews.getLast().getId(),
+                reviewResponses
+        );
+    }
+
+    private List<Review> getReviews(final Long locationId, final LocationType locationType, final Long hospitalId, final Long summaryOptionId, final Long cursorId, final Long bodyId, final Pageable pageable) {
+
+        if (bodyId != null && locationId != null && locationType != null) {
+            final List<Long> symptomIds = symptomRepository.findAllByBodyId(bodyId).stream()
+                    .map(Symptom::getId)
+                    .toList();
+
+            final List<Long> districtIds = getDistrictIds(locationId, locationType);
+            final List<Long> hospitalIds = hospitalRepository.findAllByDistrictIdIn(districtIds).stream()
+                    .map(Hospital::getId)
+                    .toList();
+
+            final List<Long> reviewIds = reviewSymptomRepository.findBySymptomIdIn(symptomIds).stream()
+                    .map(ReviewSymptom::getReviewId)
+                    .toList();
+
+            return reviewRepository.findByBodyAndLocationAndSummaryOptionIdAndCursorId(reviewIds, hospitalIds, summaryOptionId, cursorId, pageable);
+        } else if (hospitalId != null) {
+            return reviewRepository.findByHospitalIdAndSummaryOptionIdAndCursorId(hospitalId, summaryOptionId, cursorId, pageable);
+        } else {
+            throw new CocosException(FailMessage.BAD_REQUEST_MISSING_BODY);
+        }
+    }
+
+    private Integer getReviewCountByHospitalId(final Long hospitalId) {
+        if (hospitalId == null) {
+            return null;
+        } else {
+            return hospitalRepository.findById(hospitalId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_HOSPITAL)).getReviewCount();        }
+    }
+
+
+    private Map<Long, Member> getMemberMap(final Set<Long> memberIds) {
+        final Map<Long, Member> membermap = memberRepository.findAllById(memberIds).stream()
+                .collect(Collectors.toMap(Member::getId, Function.identity()));
+
+        if (membermap.size() != memberIds.size()) {
+            throw new CocosException(FailMessage.NOT_FOUND_MEMBER);
+        }
+        return membermap;
+    }
+
+    private Map<Long, Pet> getPetMap(final Set<Long> memberIds) {
+        final Map<Long, Pet> petMap = petRepository.findAllByMemberIdIn(memberIds).stream()
+                .collect(Collectors.toMap(Pet::getMemberId, Function.identity()));
+
+        if (memberIds.size() != petMap.size()) {
+            throw new CocosException(FailMessage.NOT_FOUND_PET);
+        }
+        return petMap;
+    }
+
     private Map<Long, Disease> getDiseaseMap(final List<Review> reviews) {
         final Set<Long> diseaseIds = reviews.stream().map(Review::getDiseaseId).collect(Collectors.toSet());
         final Map<Long, Disease> diseaseMap = diseaseRepository.findAllById(diseaseIds).stream()
@@ -224,8 +357,30 @@ public class ReviewService {
         return animalMap;
     }
 
-    private Map<Long, Breed> getBreedMap(final List<Review> reviews) {
-        final Set<Long> breedIds = reviews.stream().map(Review::getBreedId).collect(Collectors.toSet());
+    private Map<Long, Breed> getBreedMapFromReviewsAndPets(final List<Review> reviews, final Map<Long, Pet> pets) {
+        final Set<Long> breedIdsFromReviews = reviews.stream()
+                .map(Review::getBreedId)
+                .collect(Collectors.toSet());
+
+        final Set<Long> breedIdsFromPets = pets.values().stream()
+                .map(Pet::getBreedId)
+                .collect(Collectors.toSet());
+
+        final Set<Long> allBreedIds = new HashSet<>();
+        allBreedIds.addAll(breedIdsFromReviews);
+        allBreedIds.addAll(breedIdsFromPets);
+
+        return fetchBreedMap(allBreedIds);
+    }
+
+    private Map<Long, Breed> getBreedMapFromReviews(final List<Review> reviews) {
+        final Set<Long> breedIds = reviews.stream()
+                .map(Review::getBreedId)
+                .collect(Collectors.toSet());
+        return fetchBreedMap(breedIds);
+    }
+
+    private Map<Long, Breed> fetchBreedMap(final Set<Long> breedIds) {
         final Map<Long, Breed> breedMap = breedRepository.findAllById(breedIds).stream()
                 .collect(Collectors.toMap(Breed::getId, Function.identity()));
 
@@ -375,5 +530,16 @@ public class ReviewService {
         reviewRepository.deleteById(reviewId);
 
         return ReviewImageDeleteListResponse.of(reviewImages);
+    }
+
+    // TODO: hospitalService와 중복. 공용으로 관리하도록 리팩 필요
+    private List<Long> getDistrictIds(final Long locationId, final LocationType locationType) {
+        if (locationType == LocationType.CITY) {
+            return districtRepository.findAllByCityId(locationId).stream().map(District::getId).toList();
+        }
+        if (locationType == LocationType.DISTRICT) {
+            return List.of(locationId);
+        }
+        throw new CocosException(FailMessage.BAD_REQUEST_INVALID_LOCATION_TYPE);
     }
 }
