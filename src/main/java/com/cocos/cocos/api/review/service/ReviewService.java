@@ -207,6 +207,7 @@ public class ReviewService {
         );
     }
 
+    @Transactional(readOnly = true)
     public HospitalReviewListResponse getHospitalReviewList(final Long hospitalId, final Long summaryOptionId, final Long cursorId, final int size, final Long bodyId, final Long locationId, final LocationType locationType, final Long memberId) {
         final int searchSize = memberId == null ? DEFAULT_PAGE_SIZE : size;
         final Pageable pageable = PageRequest.of(0, searchSize, Sort.by(
