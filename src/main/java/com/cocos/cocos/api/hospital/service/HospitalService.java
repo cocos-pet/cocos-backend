@@ -86,6 +86,7 @@ public class HospitalService {
     }
 
     private List<Hospital> getHospitalsBySortAndCursor(int size, List<Long> districtIds, Long cursorId, Integer cursorReviewCount, HospitalSortCriteria hospitalSortCriteria) {
+        // TODO: 유효한 정렬 기준 확인하는 로직으로 따로 분리 (정렬 기준 늘어날 경우)
         Pageable pageable = PageRequest.of(0, size, Sort.by(
                 Sort.Order.desc(hospitalSortCriteria.getFieldName()),
                 SortConstants.ID_DESC
