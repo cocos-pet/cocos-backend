@@ -87,14 +87,15 @@ public class HospitalService {
 
     private List<Hospital> getHospitalsBySortAndCursor(int size, List<Long> districtIds, Long cursorId, Integer cursorReviewCount, HospitalSortCriteria hospitalSortCriteria) {
         // TODO: 유효한 정렬 기준 확인하는 로직으로 따로 분리 (정렬 기준 늘어날 경우)
+        if (hospitalSortCriteria != HospitalSortCriteria.REVIEW) {
+            throw new CocosException(FailMessage.BAD_REQUEST_INVALID_SORT_CRITERIA);
+        }
+
         Pageable pageable = PageRequest.of(0, size, Sort.by(
                 Sort.Order.desc(hospitalSortCriteria.getFieldName()),
                 SortConstants.ID_DESC
         ));
 
-        if (hospitalSortCriteria != HospitalSortCriteria.REVIEW) {
-            throw new CocosException(FailMessage.BAD_REQUEST_INVALID_SORT_CRITERIA);
-        }
 
         if (cursorId == null) {
             if (districtIds.isEmpty()) {
