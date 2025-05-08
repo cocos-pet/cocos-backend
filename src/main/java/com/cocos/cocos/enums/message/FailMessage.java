@@ -96,6 +96,8 @@ public enum FailMessage {
     INTERNAL_SERVER_ERROR_PET_AGE(HttpStatus.INTERNAL_SERVER_ERROR, 50003, "서버에 유효하지 않은 petAge가 존재합니다. "),
     INTERNAL_SERVER_ERROR_UNSUPPORTED_OPERATION(HttpStatus.INTERNAL_SERVER_ERROR, 50004, "유틸 클래스입니다. "),
     INTERNAL_SERVER_ERROR_KAKAO_UNLINK(HttpStatus.INTERNAL_SERVER_ERROR, 50005, "카카오 회원탈퇴에 실패했습니다."),
+    INTERNAL_SERVER_ERROR_KAKAO_ACCESS_TOKEN(HttpStatus.INTERNAL_SERVER_ERROR, 50006, "카카오 어세스 토큰 발급에 실패했습니다."),
+    INTERNAL_SERVER_ERROR_KAKAO_USER_INFO(HttpStatus.INTERNAL_SERVER_ERROR, 50007, "카카오 사용자 정보 조회에 실패했습니다."),
 
     /**
      * 503
