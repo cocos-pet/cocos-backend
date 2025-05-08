@@ -32,7 +32,8 @@ public enum FailMessage {
     UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, 40101, "인증되지 않은 사용자 입니다."),
     UNAUTHORIZED_EXPIRATION_JWT_EXCEPTION(HttpStatus.UNAUTHORIZED, 40102, "기간이 만료된 토큰입니다."),
     UNAUTHORIZED_NOT_WRITER(HttpStatus.UNAUTHORIZED, 40103, "리뷰를 작성한 사용자가 아닙니다."),
-
+    UNAUTHORIZED_MALFORMED_JWT(HttpStatus.UNAUTHORIZED, 40104, "토큰 값의 형식이 올바르지 않습니다."),
+    UNAUTHORIZED_UNSUPPORTED_JWT(HttpStatus.UNAUTHORIZED, 40105, "지원하지 않는 토큰 형식입니다."),
 
     /**
      * 403
