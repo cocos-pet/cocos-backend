@@ -32,7 +32,7 @@ public class MemberAddress {
     private String roadAddress;
 
     @Column(name = "location_id", nullable = false)
-    @ColumnDefault("1")
+    @ColumnDefault("143")
     private Long locationId;
 
     @Enumerated(EnumType.STRING)
