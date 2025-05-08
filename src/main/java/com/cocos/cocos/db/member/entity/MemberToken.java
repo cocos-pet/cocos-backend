@@ -1,5 +1,6 @@
 package com.cocos.cocos.db.member.entity;
 
+import com.cocos.cocos.db.BaseTime;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @Table(name = "member_token")
-public class MemberToken {
+public class MemberToken extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
