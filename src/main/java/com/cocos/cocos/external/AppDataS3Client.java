@@ -22,7 +22,7 @@ public class AppDataS3Client {
     }
 
     public String getPresignedUrl(final String filename) {
-        if (filename == null || filename.equals("")) {
+        if (filename == null || filename.isEmpty()) {
             return null;
         }
 

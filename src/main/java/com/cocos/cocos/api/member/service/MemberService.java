@@ -36,6 +36,7 @@ import com.cocos.cocos.db.search.repository.SearchRepository;
 import com.cocos.cocos.enums.location.LocationType;
 import com.cocos.cocos.enums.member.Platform;
 import com.cocos.cocos.enums.message.FailMessage;
+import com.cocos.cocos.external.AppDataS3Client;
 import com.cocos.cocos.external.KakaoLoginClient;
 import com.cocos.cocos.external.MemberDataS3Client;
 import lombok.RequiredArgsConstructor;
@@ -71,6 +72,7 @@ public class MemberService {
     private final ReviewImageRepository reviewImageRepository;
     private final ReviewSummaryRepository reviewSummaryRepository;
     private final ReviewSymptomRepository reviewSymptomRepository;
+    private final AppDataS3Client appDataS3Client;
 
     @Transactional(readOnly = true)
     public MemberProfileResponse getMemberProfile(final String nickname, final Long memberId) {
@@ -189,7 +191,12 @@ public class MemberService {
         }
 
         final Hospital hospital = hospitalRepository.findById(member.getMyHospitalId()).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_HOSPITAL));
-        return MemberHospitalResponse.of(hospital.getId(), hospital.getName(), hospital.getDisplayAddress());
+        return MemberHospitalResponse.of(
+                hospital.getId(),
+                hospital.getName(),
+                hospital.getDisplayAddress(),
+                appDataS3Client.getPresignedUrl(hospital.getImage())
+        );
     }
 
     @Transactional
