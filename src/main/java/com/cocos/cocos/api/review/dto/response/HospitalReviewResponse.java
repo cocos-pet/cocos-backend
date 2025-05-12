@@ -42,16 +42,18 @@ public record HospitalReviewResponse(
         @Schema(description = "종 이름", example = "말티즈")
         String breed,
         @Schema(description = "몸무게", example = "2.7")
-        double weight
+        double weight,
+        @Schema(description = "방문 목적", example = "수술")
+        String visitPurpose
 ) {
     public static HospitalReviewResponse of(
             final Long id, final Long memberId, final String nickname, final String memberBreed, final int age, final Long hospitalId, final String hospitalName, final String visitedAt, final String hospitalAddress,
             final String content, final ReviewSummaryOptionListResponse reviewSummary,
             final List<String> images, final List<String> symptoms, final String disease,
-            final String animal, final Gender gender, final String breed, final double weight
+            final String animal, final Gender gender, final String breed, final double weight, final String visitPurpose
     ) {
         return new HospitalReviewResponse(id, memberId, nickname, memberBreed, age, hospitalId, hospitalName, visitedAt, hospitalAddress,
                 content, reviewSummary, images, symptoms,
-                disease, animal, gender, breed, weight);
+                disease, animal, gender, breed, weight, visitPurpose);
     }
 }
