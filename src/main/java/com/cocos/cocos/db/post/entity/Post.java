@@ -20,7 +20,7 @@ public class Post extends BaseTime {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", columnDefinition = "text", nullable = false)
     private String content;
 
     @Column(name = "member_id", nullable = false)
