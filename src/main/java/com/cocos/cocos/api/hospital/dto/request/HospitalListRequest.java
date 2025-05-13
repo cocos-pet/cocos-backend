@@ -16,7 +16,7 @@ public record HospitalListRequest(
         LocationType locationType,
 
         @Schema(description = "지역 아이디", nullable = true, example = "1")
-        Long locationId,
+        Long locationId, // TODO: 유효성 검증 로직 추가
 
         @Schema(description = "마지막으로 조회된 병원 아이디 (첫 요청을 제외하고 필수로 보내야 합니다.)", nullable = true, example = "1")
         @HospitalIdConstraint

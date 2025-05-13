@@ -34,6 +34,10 @@ public enum FailMessage {
     BAD_REQUEST_INVALID_SYMPTOM_ID(HttpStatus.BAD_REQUEST, 40020, "유효하지 않은 증상 아이디입니다."),
     BAD_REQUEST_INVALID_CATEGORY_ID(HttpStatus.BAD_REQUEST, 40021, "유효하지 않은 카테고리 아이디입니다. "),
     BAD_REQUEST_INVALID_ANIMAL_ID(HttpStatus.BAD_REQUEST, 40022, "유효하지 않은 동물 아이디 입니다. "),
+    BAD_REQUEST_INVALID_PURPOSE_ID(HttpStatus.BAD_REQUEST, 40023, "유효하지 않은 방문목적 아이디 입니다. "),
+    BAD_REQUEST_INVALID_SUMMARY_OPTION_ID(HttpStatus.BAD_REQUEST, 40024, "유효하지 않은 리뷰 요약 아이디입니다. "),
+    BAD_REQUEST_INVALID_GOOD_SUMMARY_OPTION_ID(HttpStatus.BAD_REQUEST, 40025, "유효하지 않은 좋은 리뷰 요약 아이디입니다. "),
+    BAD_REQUEST_INVALID_BAD_SUMMARY_OPTION_ID(HttpStatus.BAD_REQUEST, 440026, "유효하지 않은 나쁜 리뷰 요약 아이디입니다. "),
     /**
      * 401
      */

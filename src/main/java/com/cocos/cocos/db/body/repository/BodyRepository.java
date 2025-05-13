@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface BodyRepository extends JpaRepository<Body, Long> {
-    long countByIdIn(final List<Long> bodyIds);
+    long countByIdIn(final List<Long> ids);
 }

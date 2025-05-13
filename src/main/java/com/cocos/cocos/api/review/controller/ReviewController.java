@@ -14,7 +14,9 @@ import com.cocos.cocos.common.response.SuccessResponse;
 import com.cocos.cocos.enums.message.SuccessMessage;
 import com.cocos.cocos.util.PrincipalHandler;
 import com.cocos.cocos.validation.hospital.HospitalIdConstraint;
+import com.cocos.cocos.validation.member.MemberNicknameConstraint;
 import com.cocos.cocos.validation.review.ReviewIdConstraint;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +35,7 @@ public class ReviewController implements ReviewControllerSwagger {
     @PostMapping("/hospitals/{hospitalId}/reviews")
     public ResponseEntity<BaseResponse<ReviewAddResponse>> addReview(
             @PathVariable(name = "hospitalId") @HospitalIdConstraint final Long hospitalId,
-            @RequestBody final ReviewAddRequest reviewAddRequest
+            @RequestBody @Valid final ReviewAddRequest reviewAddRequest
     ) {
         return SuccessResponse.success(SuccessMessage.CREATED, reviewService.addReview(
                 PrincipalHandler.getMemberIdFromPrincipal(), hospitalId, reviewAddRequest.breedId(), reviewAddRequest.gender(),
@@ -57,8 +59,8 @@ public class ReviewController implements ReviewControllerSwagger {
 
     @GetMapping("/hospitals/reviews/members")
     public ResponseEntity<BaseResponse<MemberHospitalReviewListResponse>> getMemberHospitalReviewList(
-            @RequestParam(name = "nickname", required = false) final String nickname,
-            @RequestParam(name = "cursorId", required = false) final Long cursorId,
+            @RequestParam(name = "nickname", required = false) @MemberNicknameConstraint final String nickname,
+            @RequestParam(name = "cursorId", required = false) @ReviewIdConstraint final Long cursorId,
             @RequestParam(name = "size", defaultValue = "10") @Min(value = 1) @Max(value = 20) final int size
     ) {
         return SuccessResponse.success(SuccessMessage.OK, reviewService.getMemberHospitalReviewList(nickname, cursorId, size, PrincipalHandler.getMemberIdFromPrincipal()));
@@ -66,7 +68,7 @@ public class ReviewController implements ReviewControllerSwagger {
 
     @PostMapping("/hospitals/reviews/filter")
     public ResponseEntity<BaseResponse<HospitalReviewListResponse>> getHospitalReviewList(
-            @RequestBody final ReviewListRequest reviewListRequest
+            @RequestBody @Valid final ReviewListRequest reviewListRequest
     ) {
         return SuccessResponse.success(SuccessMessage.OK, reviewService.getHospitalReviewList(reviewListRequest.hospitalId(), reviewListRequest.summaryOptionId(), reviewListRequest.cursorId(), reviewListRequest.size(), reviewListRequest.bodyId(), reviewListRequest.locationId(), reviewListRequest.locationType(), PrincipalHandler.getMemberIdFromPrincipal()));
     }

@@ -21,7 +21,7 @@ public record ProfileUpdateRequest(
         @Schema(description = "경도", example = "128.xxx")
         Double longitude,
         @Schema(description = "위치 아이디", example = "1")
-        Long locationId,
+        Long locationId,  // TODO: 유효성 검증 로직 추가
         @Schema(description = "위치 종류", example = "CITY | DISTRICT")
         LocationType locationType
 ) {
