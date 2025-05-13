@@ -2,6 +2,7 @@ package com.cocos.cocos.api.hospital.dto.request;
 
 import com.cocos.cocos.enums.hospital.HospitalSortCriteria;
 import com.cocos.cocos.enums.location.LocationType;
+import com.cocos.cocos.validation.hospital.HospitalIdConstraint;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -18,6 +19,7 @@ public record HospitalListRequest(
         Long locationId,
 
         @Schema(description = "마지막으로 조회된 병원 아이디 (첫 요청을 제외하고 필수로 보내야 합니다.)", nullable = true, example = "1")
+        @HospitalIdConstraint
         Long cursorId,
 
         @Schema(description = "마지막으로 조회된 병원 리뷰수 (정렬 기준이 REVIEW일 때는 첫 요청을 제외하고 필수로 보내야 합니다.)", nullable = true, example = "1")
