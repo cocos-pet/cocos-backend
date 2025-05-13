@@ -1,5 +1,6 @@
 package com.cocos.cocos.api.post.dto.request;
 
+import com.cocos.cocos.validation.animal.AnimalIdConstraint;
 import com.cocos.cocos.validation.category.CategoryIdConstraint;
 import com.cocos.cocos.validation.disease.DiseaseIdsConstraint;
 import com.cocos.cocos.validation.symptom.SymptomIdsConstraint;
@@ -18,6 +19,7 @@ public record PostRequest(
         @Schema(description = "게시글 이미지 리스트", example = "[image1.png, image2.jpg]")
         List<String> images,
         @Schema(description = "게시글 동물 종 아이디", example = "1")
+        @AnimalIdConstraint
         Long animalId,
         @Schema(description = "게시글 증상 아이디 리스트", example = "[1, 2]")
         @SymptomIdsConstraint

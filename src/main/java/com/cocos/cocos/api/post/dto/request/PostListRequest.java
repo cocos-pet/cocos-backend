@@ -1,6 +1,8 @@
 package com.cocos.cocos.api.post.dto.request;
 
 import com.cocos.cocos.enums.post.PostSortCriteria;
+import com.cocos.cocos.validation.animal.AnimalIdsConstraint;
+import com.cocos.cocos.validation.body.BodyIdConstraint;
 import com.cocos.cocos.validation.category.CategoryIdConstraint;
 import com.cocos.cocos.validation.disease.DiseaseIdsConstraint;
 import com.cocos.cocos.validation.post.PostIdConstraint;
@@ -14,6 +16,7 @@ public record PostListRequest(
         @Schema(description = "검색 키워드", example = "포메 or null")
         String keyword,
         @Schema(description = "동물 아이디 리스트", example = "[1, 2] or null")
+        @AnimalIdsConstraint
         List<Long> animalIds,
         @Schema(description = "증상 아이디 리스트", example = "[1, 2] or null")
         @SymptomIdsConstraint
@@ -34,6 +37,7 @@ public record PostListRequest(
         @Schema(description = "마지막 게시글 생성일", example = "YYYY-MM-DD~ or null")
         LocalDateTime createdAt,
         @Schema(description = "신체 아이디", example = "1")
+        @BodyIdConstraint
         Long bodyId
 ) {
 }
