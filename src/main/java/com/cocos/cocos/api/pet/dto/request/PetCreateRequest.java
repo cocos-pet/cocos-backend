@@ -25,8 +25,4 @@ public record PetCreateRequest(
         @Schema(description = "증상 아이디 리스트", example = "[1,2,3]")
         List<Long> symptomIds
 ) {
-    //ToDo: RequestDTO에는 of 제거해도 될 듯
-    public static PetCreateRequest of(final Long breedId, final String name, final Gender gender, final int age, final List<Long> diseaseIds, final List<Long> symptomIds) {
-        return new PetCreateRequest(breedId, name, gender, age, diseaseIds, symptomIds);
-    }
 }

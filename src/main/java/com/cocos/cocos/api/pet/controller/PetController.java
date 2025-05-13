@@ -8,6 +8,7 @@ import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.common.response.SuccessResponse;
 import com.cocos.cocos.enums.message.SuccessMessage;
 import com.cocos.cocos.util.PrincipalHandler;
+import com.cocos.cocos.validation.pet.PetIdConstraint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +31,7 @@ public class PetController implements PetControllerSwagger {
 
     @PatchMapping("/{petId}")
     public ResponseEntity<BaseResponse<Void>> updatePet(
-            @PathVariable(name = "petId") final Long petId,
+            @PathVariable(name = "petId") @PetIdConstraint final Long petId,
             @RequestBody final PetUpdateRequest petUpdateRequest
     ) {
         //ToDo: 넘길 때 DTO 자체 보단, 값을 넘기는 것이 Controller에서 사용하는 DTO의 역할을 잘 지키는 것이라고 생각함
