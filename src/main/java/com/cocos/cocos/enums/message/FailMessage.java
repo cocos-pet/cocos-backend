@@ -31,6 +31,7 @@ public enum FailMessage {
     BAD_REQUEST_INVALID_MEMBER_NICKNAME(HttpStatus.BAD_REQUEST, 40017, "유효하지 않은 멤버 닉네임입니다. "),
     BAD_REQUEST_INVALID_BODY_ID(HttpStatus.BAD_REQUEST, 40018, "유효하지 않은 신체 아이디입니다. "),
     BAD_REQUEST_INVALID_PET_ID(HttpStatus.BAD_REQUEST, 40019, "유효하지 않은 펫 아이디입니다. "),
+    BAD_REQUEST_INVALID_SYMPTOM_ID(HttpStatus.BAD_REQUEST, 40020, "유효하지 않은 증상 아이디입니다."),
     /**
      * 401
      */

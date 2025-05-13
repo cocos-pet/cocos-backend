@@ -3,6 +3,7 @@ package com.cocos.cocos.api.pet.dto.request;
 import com.cocos.cocos.enums.pet.Gender;
 import com.cocos.cocos.validation.breed.BreedIdConstraint;
 import com.cocos.cocos.validation.disease.DiseaseIdsConstraint;
+import com.cocos.cocos.validation.symptom.SymptomIdsConstraint;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
@@ -27,6 +28,7 @@ public record PetCreateRequest(
         List<Long> diseaseIds,
 
         @Schema(description = "증상 아이디 리스트", example = "[1,2,3]")
+        @SymptomIdsConstraint
         List<Long> symptomIds
 ) {
 }
