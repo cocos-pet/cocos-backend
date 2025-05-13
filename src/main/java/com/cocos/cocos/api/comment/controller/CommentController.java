@@ -10,6 +10,7 @@ import com.cocos.cocos.common.response.SuccessResponse;
 import com.cocos.cocos.enums.message.SuccessMessage;
 import com.cocos.cocos.util.PrincipalHandler;
 import com.cocos.cocos.util.validation.EntityExistsValidator;
+import com.cocos.cocos.validation.post.PostIdConstraint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,10 +25,9 @@ public class CommentController implements CommentControllerSwagger {
 
     @PostMapping("/{postId}")
     public ResponseEntity<BaseResponse<Void>> addPostComment(
-            @PathVariable(name = "postId") final Long postId,
+            @PathVariable(name = "postId") @PostIdConstraint final Long postId,
             @RequestBody final CommentContentRequest commentContentRequest
     ) {
-        entityExistsValidator.validatePostByPostId(postId);
         entityExistsValidator.validatePetByMemberId(PrincipalHandler.getMemberIdFromPrincipal());
         commentService.addPostComment(postId, commentContentRequest.content(), PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.CREATED, null);

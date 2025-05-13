@@ -5,6 +5,7 @@ import com.cocos.cocos.api.comment.dto.request.SubCommentContentRequest;
 import com.cocos.cocos.api.comment.dto.response.CommentsAndSubCommentsResponse;
 import com.cocos.cocos.api.comment.dto.response.MyAllCommentsResponse;
 import com.cocos.cocos.common.response.BaseResponse;
+import com.cocos.cocos.validation.post.PostIdConstraint;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -23,7 +24,7 @@ public interface CommentControllerSwagger {
             responseCode = "201",
             description = "요청에 성공했습니다.")
     public ResponseEntity<BaseResponse<Void>> addPostComment(
-            @Parameter(name = "postId", description = "게시글 아이디", in = ParameterIn.PATH, required = true, schema = @Schema(type = "Long")) final Long postId,
+            @Parameter(name = "postId", description = "게시글 아이디", in = ParameterIn.PATH, required = true, schema = @Schema(type = "Long")) @PostIdConstraint final Long postId,
             @RequestBody final CommentContentRequest content
     );
 
