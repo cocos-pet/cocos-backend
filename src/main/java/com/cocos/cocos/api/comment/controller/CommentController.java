@@ -58,7 +58,6 @@ public class CommentController implements CommentControllerSwagger {
     public ResponseEntity<BaseResponse<Void>> deletePostSubComment(
             @PathVariable(name = "subCommentId") @SubCommentIdConstraint final Long subCommentId
     ) {
-        entityExistsValidator.validateSubCommentBySubCommentId(subCommentId);
         commentService.deletePostSubComment(subCommentId, PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.OK, null);
     }
