@@ -17,7 +17,7 @@ public class BreedIdValidator implements ConstraintValidator<BreedIdConstraint, 
     @Override
     public boolean isValid(Long breedId, ConstraintValidatorContext constraintValidatorContext) {
         if (!breedRepository.existsById(breedId)) {
-            throw new CocosException(FailMessage.BAD_REQUEST_INVALID_HOSPITAL_ID);
+            throw new CocosException(FailMessage.BAD_REQUEST_INVALID_BREED_ID);
         }
         return true;
     }
