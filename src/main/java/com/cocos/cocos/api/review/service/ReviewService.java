@@ -167,8 +167,7 @@ public class ReviewService {
         final Map<Long, Disease> diseaseMap = getDiseaseMap(reviews);
         final Map<Long, List<String>> symptomMap = getReviewIdToSymptoms(reviewIds);
         final Map<Long, List<ReviewSummaryOption>> reviewSummaryOptionsMap = getReviewSummaryOptionsMap(reviewIds);
-        final Map<Long, VisitPurpose> visitPurposeMap = hospitalVisitPurposeRepository.findAll().stream()
-                .collect(Collectors.toMap(VisitPurpose::getId, Function.identity()));
+        final Map<Long, VisitPurpose> visitPurposeMap = getVisitPurposeMap();
 
         final List<MemberHospitalReviewResponse> reviewResponses = reviews.stream()
                 .map(review -> {
@@ -235,8 +234,7 @@ public class ReviewService {
         final Map<Long, Disease> diseaseMap = getDiseaseMap(reviews);
         final Map<Long, List<String>> symptomMap = getReviewIdToSymptoms(reviewIds);
         final Map<Long, List<ReviewSummaryOption>> reviewSummaryOptionsMap = getReviewSummaryOptionsMap(reviewIds);
-        final Map<Long, VisitPurpose> visitPurposeMap = hospitalVisitPurposeRepository.findAll().stream()
-                .collect(Collectors.toMap(VisitPurpose::getId, Function.identity()));
+        final Map<Long, VisitPurpose> visitPurposeMap = getVisitPurposeMap();
 
         final Integer reviewCount = getReviewCountByHospitalId(hospitalId);
 
@@ -290,6 +288,11 @@ public class ReviewService {
                 reviews.isEmpty() ? null : reviews.getLast().getId(),
                 reviewResponses
         );
+    }
+
+    private Map<Long, VisitPurpose> getVisitPurposeMap() {
+        return hospitalVisitPurposeRepository.findAll().stream()
+                .collect(Collectors.toMap(VisitPurpose::getId, Function.identity()));
     }
 
     private List<Review> getReviews(final Long locationId, final LocationType locationType, final Long hospitalId, final Long summaryOptionId, final Long cursorId, final Long bodyId, final Pageable pageable) {
