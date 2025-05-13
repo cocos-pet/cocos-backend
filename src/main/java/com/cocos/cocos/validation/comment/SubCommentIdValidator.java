@@ -16,9 +16,10 @@ public class SubCommentIdValidator implements ConstraintValidator<SubCommentIdCo
 
     @Override
     public boolean isValid(final Long subCommentId, ConstraintValidatorContext constraintValidatorContext) {
-        if (!subCommentRepository.existsById(subCommentId)) {
+        if (subCommentId == null || subCommentRepository.existsById(subCommentId)) {
+            return true;
+        } else {
             throw new CocosException(FailMessage.BAD_REQUEST_INVALID_SUB_COMMENT_ID);
         }
-        return true;
     }
 }

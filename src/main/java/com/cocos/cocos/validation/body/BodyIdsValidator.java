@@ -19,9 +19,10 @@ public class BodyIdsValidator implements ConstraintValidator<BodyIdsConstraint, 
     @Override
     public boolean isValid(final List<Long> bodyIds, final ConstraintValidatorContext constraintValidatorContext) {
         final long validCount = bodyRepository.countByIdIn(bodyIds);
-        if( validCount != bodyIds.size() ) {
+        if( bodyIds == null || validCount == bodyIds.size() ) {
+            return true;
+        } else {
             throw new CocosException(FailMessage.BAD_REQUEST_INVALID_BODY_ID);
         }
-        return true;
     }
 }

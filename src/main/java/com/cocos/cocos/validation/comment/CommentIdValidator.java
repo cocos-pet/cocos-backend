@@ -16,9 +16,10 @@ public class CommentIdValidator implements ConstraintValidator<CommentIdConstrai
 
     @Override
     public boolean isValid(final Long commentId, ConstraintValidatorContext constraintValidatorContext) {
-        if (!commentRepository.existsById(commentId)) {
+        if (commentId == null || commentRepository.existsById(commentId)) {
+            return true;
+        } else {
             throw new CocosException(FailMessage.BAD_REQUEST_INVALID_COMMENT_ID);
         }
-        return true;
     }
 }

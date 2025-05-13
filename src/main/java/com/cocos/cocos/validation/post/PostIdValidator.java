@@ -16,9 +16,10 @@ public class PostIdValidator implements ConstraintValidator<PostIdConstraint, Lo
 
     @Override
     public boolean isValid(final Long postId, final ConstraintValidatorContext constraintValidatorContext) {
-        if (!postRepository.existsById(postId)) {
+        if (postId == null || postRepository.existsById(postId)) {
+            return true;
+        } else {
             throw new CocosException(FailMessage.BAD_REQUEST_INVALID_POST_ID);
         }
-        return true;
     }
 }
