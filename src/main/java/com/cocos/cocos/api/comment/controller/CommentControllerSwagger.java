@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -45,7 +46,7 @@ public interface CommentControllerSwagger {
             description = "요청에 성공했습니다.")
     public ResponseEntity<BaseResponse<Void>> addPostSubComment(
             @Parameter(name = "commentId", description = "댓글 아이디", in = ParameterIn.PATH, required = true, schema = @Schema(type = "Long")) @CommentIdConstraint final Long commentId,
-            @RequestBody final SubCommentContentRequest content
+            @RequestBody @Valid final SubCommentContentRequest content
     );
 
     @Operation(summary = "게시글 대댓글 삭제 API", description = "게시글의 대댓글을 삭제하는 API 입니다.")

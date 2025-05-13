@@ -28,6 +28,7 @@ public enum FailMessage {
     BAD_REQUEST_INVALID_POST_ID(HttpStatus.BAD_REQUEST, 40014, "유효하지 않은 게시글 아이디입니다. "),
     BAD_REQUEST_INVALID_COMMENT_ID(HttpStatus.BAD_REQUEST, 40015, "유효하지 않은 댓글 아이디입니다. "),
     BAD_REQUEST_INVALID_SUB_COMMENT_ID(HttpStatus.BAD_REQUEST, 40016, "유효하지 않은 대댓글 아이디입니다. "),
+    BAD_REQUEST_INVALID_MEMBER_NICKNAME(HttpStatus.BAD_REQUEST, 40017, "유효하지 않은 멤버 닉네임입니다. "),
     /**
      * 401
      */

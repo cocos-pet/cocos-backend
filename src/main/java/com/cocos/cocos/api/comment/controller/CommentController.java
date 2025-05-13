@@ -13,6 +13,7 @@ import com.cocos.cocos.util.validation.EntityExistsValidator;
 import com.cocos.cocos.validation.comment.CommentIdConstraint;
 import com.cocos.cocos.validation.comment.SubCommentIdConstraint;
 import com.cocos.cocos.validation.post.PostIdConstraint;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,9 +47,8 @@ public class CommentController implements CommentControllerSwagger {
     @PostMapping("/sub/{commentId}")
     public ResponseEntity<BaseResponse<Void>> addPostSubComment(
             @PathVariable(name = "commentId") @CommentIdConstraint final Long commentId,
-            @RequestBody final SubCommentContentRequest subCommentContentRequest
+            @RequestBody @Valid final SubCommentContentRequest subCommentContentRequest
     ) {
-        entityExistsValidator.validateMemberByNickname(subCommentContentRequest.nickname());
         entityExistsValidator.validatePetByMemberId(PrincipalHandler.getMemberIdFromPrincipal());
         commentService.addPostSubComment(commentId, subCommentContentRequest.nickname(), subCommentContentRequest.content(), PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.CREATED, null);
