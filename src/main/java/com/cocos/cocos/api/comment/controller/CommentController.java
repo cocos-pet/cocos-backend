@@ -11,6 +11,7 @@ import com.cocos.cocos.enums.message.SuccessMessage;
 import com.cocos.cocos.util.PrincipalHandler;
 import com.cocos.cocos.util.validation.EntityExistsValidator;
 import com.cocos.cocos.validation.comment.CommentIdConstraint;
+import com.cocos.cocos.validation.comment.SubCommentIdConstraint;
 import com.cocos.cocos.validation.post.PostIdConstraint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -55,7 +56,7 @@ public class CommentController implements CommentControllerSwagger {
 
     @DeleteMapping("/sub/{subCommentId}")
     public ResponseEntity<BaseResponse<Void>> deletePostSubComment(
-            @PathVariable(name = "subCommentId") final Long subCommentId
+            @PathVariable(name = "subCommentId") @SubCommentIdConstraint final Long subCommentId
     ) {
         entityExistsValidator.validateSubCommentBySubCommentId(subCommentId);
         commentService.deletePostSubComment(subCommentId, PrincipalHandler.getMemberIdFromPrincipal());
