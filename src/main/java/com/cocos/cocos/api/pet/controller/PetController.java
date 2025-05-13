@@ -1,6 +1,6 @@
 package com.cocos.cocos.api.pet.controller;
 
-import com.cocos.cocos.api.pet.dto.reponse.PetResponse;
+import com.cocos.cocos.api.pet.dto.response.PetResponse;
 import com.cocos.cocos.api.pet.dto.request.PetCreateRequest;
 import com.cocos.cocos.api.pet.dto.request.PetUpdateRequest;
 import com.cocos.cocos.api.pet.service.PetService;
