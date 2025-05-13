@@ -2,6 +2,7 @@ package com.cocos.cocos.api.disease.controller;
 
 import com.cocos.cocos.api.disease.dto.response.DiseasesOfBodiesResponse;
 import com.cocos.cocos.common.response.BaseResponse;
+import com.cocos.cocos.validation.body.BodyIdsConstraint;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -20,5 +21,5 @@ public interface DiseaseControllerSwagger {
             responseCode = "200",
             description = "질병 리스트 조회 성공")
     @Parameter(name = "bodyIds", description = "신체 부위 아이디 리스트", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "List<Long>"))
-    public ResponseEntity<BaseResponse<DiseasesOfBodiesResponse>> getDiseases(final List<Long> bodyIds);
+    public ResponseEntity<BaseResponse<DiseasesOfBodiesResponse>> getDiseases(@BodyIdsConstraint final List<Long> bodyIds);
 }
