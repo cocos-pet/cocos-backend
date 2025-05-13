@@ -63,7 +63,7 @@ public class KakaoLoginClient {
         return kakaoInfoResponse.id();
     }
 
-    final public void unlink(final Long id) {
+    public void unlink(final Long id) {
         final RestClient restClient = RestClient.create();
         final URI uri = UriComponentsBuilder
                 .fromUriString("https://kapi.kakao.com/v1/user/unlink")
