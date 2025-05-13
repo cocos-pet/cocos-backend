@@ -10,6 +10,7 @@ import com.cocos.cocos.common.response.SuccessResponse;
 import com.cocos.cocos.enums.message.SuccessMessage;
 import com.cocos.cocos.util.PrincipalHandler;
 import com.cocos.cocos.util.validation.EntityExistsValidator;
+import com.cocos.cocos.validation.comment.CommentIdConstraint;
 import com.cocos.cocos.validation.post.PostIdConstraint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -35,19 +36,17 @@ public class CommentController implements CommentControllerSwagger {
 
     @DeleteMapping("/{commentId}")
     public ResponseEntity<BaseResponse<Void>> deletePostComment(
-            @PathVariable(name = "commentId") final Long commentId
+            @PathVariable(name = "commentId") @CommentIdConstraint final Long commentId
     ) {
-        entityExistsValidator.validateCommentByCommentId(commentId);
         commentService.deletePostComment(commentId, PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.OK, null);
     }
 
     @PostMapping("/sub/{commentId}")
     public ResponseEntity<BaseResponse<Void>> addPostSubComment(
-            @PathVariable(name = "commentId") final Long commentId,
+            @PathVariable(name = "commentId") @CommentIdConstraint final Long commentId,
             @RequestBody final SubCommentContentRequest subCommentContentRequest
     ) {
-        entityExistsValidator.validateCommentByCommentId(commentId);
         entityExistsValidator.validateMemberByNickname(subCommentContentRequest.nickname());
         entityExistsValidator.validatePetByMemberId(PrincipalHandler.getMemberIdFromPrincipal());
         commentService.addPostSubComment(commentId, subCommentContentRequest.nickname(), subCommentContentRequest.content(), PrincipalHandler.getMemberIdFromPrincipal());
@@ -65,7 +64,7 @@ public class CommentController implements CommentControllerSwagger {
 
     @GetMapping("/{postId}")
     public ResponseEntity<BaseResponse<CommentsAndSubCommentsResponse>> getPostComments(
-            @PathVariable(name = "postId") final Long postId
+            @PathVariable(name = "postId") @PostIdConstraint final Long postId
     ) {
         return SuccessResponse.success(SuccessMessage.OK, commentService.getPostComments(postId, PrincipalHandler.getMemberIdFromPrincipal()));
     }
