@@ -1,6 +1,8 @@
 package com.cocos.cocos.api.pet.dto.request;
 
 import com.cocos.cocos.enums.pet.Gender;
+import com.cocos.cocos.validation.breed.BreedIdConstraint;
+import com.cocos.cocos.validation.disease.DiseaseIdsConstraint;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
@@ -8,6 +10,7 @@ import java.util.List;
 @Schema(description = "애완동물 생성 형식")
 public record PetCreateRequest(
         @Schema(description = "동물 종 아이디", example = "1")
+        @BreedIdConstraint
         Long breedId,
 
         @Schema(description = "반려동물 이름", example = "포리")
@@ -20,6 +23,7 @@ public record PetCreateRequest(
         int age,
 
         @Schema(description = "질병 아이디 리스트", example = "[1,2,3]")
+        @DiseaseIdsConstraint
         List<Long> diseaseIds,
 
         @Schema(description = "증상 아이디 리스트", example = "[1,2,3]")
