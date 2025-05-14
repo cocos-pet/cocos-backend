@@ -70,11 +70,11 @@ public class JwtProvider {
             final Claims claims = getBody(token);
             return JwtValidationType.VALID_JWT;
         } catch (MalformedJwtException ex) {
-            return JwtValidationType.INVALID_JWT_TOKEN;
+            throw new CocosException(FailMessage.UNAUTHORIZED_MALFORMED_JWT);
         } catch (ExpiredJwtException ex) {
             throw new CocosException(FailMessage.UNAUTHORIZED_EXPIRATION_JWT_EXCEPTION);
         } catch (UnsupportedJwtException ex) {
-            return JwtValidationType.UNSUPPORTED_JWT_TOKEN;
+            throw new CocosException(FailMessage.UNAUTHORIZED_UNSUPPORTED_JWT);
         } catch (IllegalArgumentException ex) {
             return JwtValidationType.EMPTY_JWT;
         }
