@@ -83,6 +83,11 @@ public class ReviewService {
         addReviewSummary(review.getId(), goodReviewIds);
         addReviewSummary(review.getId(), badReviewIds);
 
+        final Hospital hospital = hospitalRepository.findById(hospitalId).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_HOSPITAL)
+        );
+        hospital.addReview();
+
         // ToDo: 리뷰 요약 추가 로직과 비슷하기 때문에 이 부분 enum으로 구분하고 하나의 로직으로 합치는 것 고려
         if (symptomIds != null && !symptomIds.isEmpty()) {
             symptomIds.forEach(symptomId -> reviewSymptomRepository.save(
@@ -309,7 +314,8 @@ public class ReviewService {
         if (hospitalId == null) {
             return null;
         } else {
-            return hospitalRepository.findById(hospitalId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_HOSPITAL)).getReviewCount();        }
+            return hospitalRepository.findById(hospitalId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_HOSPITAL)).getReviewCount();
+        }
     }
 
 
