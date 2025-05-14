@@ -18,8 +18,7 @@ public class MemberNicknameValidator implements ConstraintValidator<MemberNickna
     public boolean isValid(final String nickname, final ConstraintValidatorContext constraintValidatorContext) {
         if (nickname == null || memberRepository.existsByNickname(nickname)) {
             return true;
-        }
-        else {
+        } else {
             throw new CocosException(FailMessage.BAD_REQUEST_INVALID_MEMBER_NICKNAME);
         }
     }

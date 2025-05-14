@@ -21,5 +21,4 @@ public class PurposeIdValidator implements ConstraintValidator<PurposeIdConstrai
         }
         throw new CocosException(FailMessage.BAD_REQUEST_INVALID_PURPOSE_ID);
     }
-
 }

@@ -16,10 +16,10 @@ public class BodyIdValidator implements ConstraintValidator<BodyIdConstraint, Lo
 
     @Override
     public boolean isValid(final Long bodyId, final ConstraintValidatorContext constraintValidatorContext) {
-       if (bodyId == null || bodyRepository.existsById(bodyId)) {
-           return true;
-       } else {
-           throw new CocosException(FailMessage.BAD_REQUEST_INVALID_BODY_ID);
-       }
+        if (bodyId == null || bodyRepository.existsById(bodyId)) {
+            return true;
+        } else {
+            throw new CocosException(FailMessage.BAD_REQUEST_INVALID_BODY_ID);
+        }
     }
 }
