@@ -13,7 +13,9 @@ import com.cocos.cocos.db.disease.repository.DiseaseRepository;
 import com.cocos.cocos.db.district.entity.District;
 import com.cocos.cocos.db.district.repository.DistrictRepository;
 import com.cocos.cocos.db.hospital.entity.Hospital;
+import com.cocos.cocos.db.hospital.entity.VisitPurpose;
 import com.cocos.cocos.db.hospital.repository.HospitalRepository;
+import com.cocos.cocos.db.hospital.repository.HospitalVisitPurposeRepository;
 import com.cocos.cocos.db.member.entity.Member;
 import com.cocos.cocos.api.review.dto.response.*;
 import com.cocos.cocos.db.member.repository.MemberRepository;
@@ -57,6 +59,7 @@ public class ReviewService {
     private final MemberRepository memberRepository;
     private final PetRepository petRepository;
     private final DistrictRepository districtRepository;
+    private final HospitalVisitPurposeRepository hospitalVisitPurposeRepository;
 
     private static final String REVIEW_IMAGE_S3_PREFIX = "reviewImage";
     private static final boolean IS_GOOD_REVIEW = true;
@@ -169,6 +172,7 @@ public class ReviewService {
         final Map<Long, Disease> diseaseMap = getDiseaseMap(reviews);
         final Map<Long, List<String>> symptomMap = getReviewIdToSymptoms(reviewIds);
         final Map<Long, List<ReviewSummaryOption>> reviewSummaryOptionsMap = getReviewSummaryOptionsMap(reviewIds);
+        final Map<Long, VisitPurpose> visitPurposeMap = getVisitPurposeMap();
 
         final List<MemberHospitalReviewResponse> reviewResponses = reviews.stream()
                 .map(review -> {
@@ -186,6 +190,7 @@ public class ReviewService {
                     final ReviewSummaryOptionListResponse summaryOptionList = ReviewSummaryOptionListResponse.of(
                             goodReviewSummaries, badReviewSummaries
                     );
+                    final String visitPurpose = visitPurposeMap.get(review.getPurposeId()).getName();
 
                     return MemberHospitalReviewResponse.of(
                             review.getId(),
@@ -201,7 +206,8 @@ public class ReviewService {
                             animal.getName(),
                             review.getGender(),
                             breed.getName(),
-                            review.getWeight()
+                            review.getWeight(),
+                            visitPurpose
                     );
                 })
                 .toList();
@@ -233,6 +239,7 @@ public class ReviewService {
         final Map<Long, Disease> diseaseMap = getDiseaseMap(reviews);
         final Map<Long, List<String>> symptomMap = getReviewIdToSymptoms(reviewIds);
         final Map<Long, List<ReviewSummaryOption>> reviewSummaryOptionsMap = getReviewSummaryOptionsMap(reviewIds);
+        final Map<Long, VisitPurpose> visitPurposeMap = getVisitPurposeMap();
 
         final Integer reviewCount = getReviewCountByHospitalId(hospitalId);
 
@@ -255,6 +262,7 @@ public class ReviewService {
                     final ReviewSummaryOptionListResponse summaryOptionList = ReviewSummaryOptionListResponse.of(
                             goodReviewSummaries, badReviewSummaries
                     );
+                    final String visitPurpose = visitPurposeMap.get(review.getPurposeId()).getName();
 
                     return HospitalReviewResponse.of(
                             review.getId(),
@@ -274,7 +282,8 @@ public class ReviewService {
                             animal.getName(),
                             review.getGender(),
                             breed.getName(),
-                            review.getWeight()
+                            review.getWeight(),
+                            visitPurpose
                     );
                 })
                 .toList();
@@ -284,6 +293,11 @@ public class ReviewService {
                 reviews.isEmpty() ? null : reviews.getLast().getId(),
                 reviewResponses
         );
+    }
+
+    private Map<Long, VisitPurpose> getVisitPurposeMap() {
+        return hospitalVisitPurposeRepository.findAll().stream()
+                .collect(Collectors.toMap(VisitPurpose::getId, Function.identity()));
     }
 
     private List<Review> getReviews(final Long locationId, final LocationType locationType, final Long hospitalId, final Long summaryOptionId, final Long cursorId, final Long bodyId, final Pageable pageable) {
