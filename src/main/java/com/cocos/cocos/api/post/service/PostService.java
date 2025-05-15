@@ -154,7 +154,16 @@ public class PostService {
     }
 
     @Transactional
-    public void deletePost(final Long postId) {
+    public void deletePost(final Long postId, final Long memberId) {
+        if (memberId == null) {
+            throw new CocosException(FailMessage.UNAUTHORIZED);
+        }
+        final Post post = postRepository.findById(postId).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_POST)
+        );
+        if (!post.getMemberId().equals(memberId)) {
+            throw new CocosException(FailMessage.FORBIDDEN_POST_DELETE);
+        }
         final List<Comment> comments = commentRepository.findAllByPostId(postId);
         comments.forEach(comment -> subCommentRepository.deleteAllByCommentId(comment.getId()));
         commentRepository.deleteAllByPostId(postId);

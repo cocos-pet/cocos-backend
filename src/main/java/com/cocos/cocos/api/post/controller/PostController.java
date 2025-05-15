@@ -33,7 +33,7 @@ public class PostController implements PostControllerSwagger {
     public ResponseEntity<BaseResponse<Void>> deletePost(
             @PathVariable(name = "postId") @PostIdConstraint final Long postId
     ) {
-        postService.deletePost(postId);
+        postService.deletePost(postId, PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.OK, null);
     }
 
