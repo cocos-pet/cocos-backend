@@ -249,7 +249,7 @@ public class PostService {
 
     private List<Post> fetchPopularPosts(final Long memberId) {
         //ToDo: 코드 의미에 따른 간격 조절
-        if (petRepository.existsByMemberId(memberId)) {
+        if (memberId != null && petRepository.existsByMemberId(memberId)) {
             final Pet pet = petRepository.findByMemberId(memberId);
             if (petDiseaseRepository.existsByPetId(pet.getId())) {
                 final List<Long> diseaseIds = petDiseaseRepository.findAllByPetId(pet.getId()).stream()
