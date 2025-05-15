@@ -24,7 +24,6 @@ import com.cocos.cocos.db.post.entity.PostCategory;
 import com.cocos.cocos.db.post.entity.PostImage;
 import com.cocos.cocos.db.post.entity.PostTag;
 import com.cocos.cocos.db.post.repository.*;
-import com.cocos.cocos.db.search.repository.SearchRepository;
 import com.cocos.cocos.db.symptom.entity.Symptom;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.message.FailMessage;
@@ -45,7 +44,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -68,7 +66,6 @@ public class PostService {
     private final SymptomRepository symptomRepository;
     private final PetDiseaseRepository petDiseaseRepository;
     private final PetSymptomRepository petSymptomRepository;
-    private final SearchRepository searchRepository;
     private final AppDataS3Client appDataS3Client;
     private final MemberDataS3Client memberDataS3Client;
 
@@ -135,11 +132,25 @@ public class PostService {
                 .images(images)
                 .category(postCategory.getName())
                 .tags(tags)
-                .isWriter(Objects.equals(memberId, post.getMemberId()))
-                .isLiked(postLikeRepository.existsByMemberIdAndPostId(memberId, postId))
+                .isWriter(isPostWriter(memberId, post.getMemberId()))
+                .isLiked(checkLiked(memberId, postId))
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .build();
+    }
+
+    private boolean isPostWriter(final Long memberId, final Long postMemberId) {
+        if (memberId == null) {
+            return false;
+        }
+        return memberId.equals(postMemberId);
+    }
+
+    private boolean checkLiked(final Long memberId, final Long postId) {
+        if (memberId == null) {
+            return false;
+        }
+        return postLikeRepository.existsByMemberIdAndPostId(memberId, postId);
     }
 
     @Transactional
