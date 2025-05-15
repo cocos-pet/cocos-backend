@@ -232,14 +232,17 @@ public class CommentService {
 
 
     @Transactional(readOnly = true)
-    public MyAllCommentsResponse getMemberComments(final String nickname, final Long memberId) {
+    public MemberAllCommentsResponse getMemberComments(final String nickname, final Long memberId) {
+        if (memberId == null) {
+            throw new CocosException(FailMessage.UNAUTHORIZED);
+        }
         final Long selectedMemberId = findMemberByNickname(nickname, memberId);
 
         final List<Comment> comments = commentRepository.findAllByMemberIdOrderByCreatedAtDesc(selectedMemberId);
-        final List<MyCommentResponse> myComments = comments.stream()
+        final List<MemberCommentResponse> memberComments = comments.stream()
                 .map(comment -> {
                     final String postTitle = postRepository.findById(comment.getPostId()).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_POST)).getTitle();
-                    return MyCommentResponse.of(
+                    return MemberCommentResponse.of(
                             comment.getId(),
                             comment.getContent(),
                             comment.getPostId(),
@@ -249,7 +252,7 @@ public class CommentService {
                 }).toList();
 
         final List<SubComment> subComments = subCommentRepository.findAllByMemberIdOrderByCreatedAtDesc(selectedMemberId);
-        final List<MySubCommentResponse> mySubComments = subComments.stream()
+        final List<MemberSubCommentResponse> memberSubComments = subComments.stream()
                 .map(subComment -> {
                     final Comment comment = commentRepository.findById(subComment.getCommentId()).orElseThrow(
                             () -> new CocosException(FailMessage.NOT_FOUND_COMMENT)
@@ -262,7 +265,7 @@ public class CommentService {
                     final Member mentionedMember = memberRepository.findById(subComment.getMentionedMemberId()).orElseThrow(
                             () -> new CocosException(FailMessage.NOT_FOUND_MEMBER)
                     );
-                    return MySubCommentResponse.of(
+                    return MemberSubCommentResponse.of(
                             subComment.getId(),
                             subComment.getContent(),
                             post.getId(),
@@ -273,9 +276,9 @@ public class CommentService {
                 })
                 .toList();
 
-        return MyAllCommentsResponse.of(
-                myComments,
-                mySubComments
+        return MemberAllCommentsResponse.of(
+                memberComments,
+                memberSubComments
         );
     }
 

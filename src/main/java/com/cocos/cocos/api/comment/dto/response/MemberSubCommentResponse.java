@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 
-public record MySubCommentResponse(
+public record MemberSubCommentResponse(
         @Schema(description = "대댓글 아이디", example = "1")
         Long id,
         @Schema(description = "대댓글 내용", example = "content")
@@ -18,7 +18,7 @@ public record MySubCommentResponse(
         @Schema(description = "언급 표시를 위한 사용자 닉네임", example = "빵빵이")
         String mentionedNickname
 ) {
-    public static MySubCommentResponse of(final Long id, final String content, final Long postId, final String postTitle, final LocalDateTime createdAt, final String mentionedNickname) {
-        return new MySubCommentResponse(id, content, postId, postTitle, createdAt, mentionedNickname);
+    public static MemberSubCommentResponse of(final Long id, final String content, final Long postId, final String postTitle, final LocalDateTime createdAt, final String mentionedNickname) {
+        return new MemberSubCommentResponse(id, content, postId, postTitle, createdAt, mentionedNickname);
     }
 }

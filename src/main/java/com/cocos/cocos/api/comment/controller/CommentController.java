@@ -3,7 +3,7 @@ package com.cocos.cocos.api.comment.controller;
 import com.cocos.cocos.api.comment.dto.request.CommentContentRequest;
 import com.cocos.cocos.api.comment.dto.request.SubCommentContentRequest;
 import com.cocos.cocos.api.comment.dto.response.CommentsAndSubCommentsResponse;
-import com.cocos.cocos.api.comment.dto.response.MyAllCommentsResponse;
+import com.cocos.cocos.api.comment.dto.response.MemberAllCommentsResponse;
 import com.cocos.cocos.api.comment.service.CommentService;
 import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.common.response.SuccessResponse;
@@ -68,7 +68,7 @@ public class CommentController implements CommentControllerSwagger {
     }
 
     @GetMapping("/members")
-    public ResponseEntity<BaseResponse<MyAllCommentsResponse>> getMemberComments(
+    public ResponseEntity<BaseResponse<MemberAllCommentsResponse>> getMemberComments(
             @RequestParam(name = "nickname", required = false) final String nickname
     ) {
         return SuccessResponse.success(SuccessMessage.OK, commentService.getMemberComments(nickname, PrincipalHandler.getMemberIdFromPrincipal()));
