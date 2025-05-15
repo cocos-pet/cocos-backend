@@ -16,9 +16,10 @@ public class HospitalIdValidator implements ConstraintValidator<HospitalIdConstr
 
     @Override
     public boolean isValid(Long hospitalId, ConstraintValidatorContext constraintValidatorContext) {
-        if (!hospitalRepository.existsById(hospitalId)) {
+        if (hospitalId == null || hospitalRepository.existsById(hospitalId)) {
+            return true;
+        } else {
             throw new CocosException(FailMessage.BAD_REQUEST_INVALID_HOSPITAL_ID);
         }
-        return true;
     }
 }

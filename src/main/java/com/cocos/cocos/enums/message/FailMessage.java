@@ -25,6 +25,19 @@ public enum FailMessage {
     BAD_REQUEST_INVALID_MEMBER_QUERY(HttpStatus.BAD_REQUEST, 40011, "회원 식별자 (id 또는 nickname)를 제공해야 합니다."),
     BAD_REQUEST_MISSING_BODY(HttpStatus.BAD_REQUEST, 40012, "필수 body가 누락되었습니다."),
     BAD_REQUEST_INVALID_REVIEW_ID(HttpStatus.BAD_REQUEST, 40013, "유효하지 않은 리뷰 아이디입니다."),
+    BAD_REQUEST_INVALID_POST_ID(HttpStatus.BAD_REQUEST, 40014, "유효하지 않은 게시글 아이디입니다. "),
+    BAD_REQUEST_INVALID_COMMENT_ID(HttpStatus.BAD_REQUEST, 40015, "유효하지 않은 댓글 아이디입니다. "),
+    BAD_REQUEST_INVALID_SUB_COMMENT_ID(HttpStatus.BAD_REQUEST, 40016, "유효하지 않은 대댓글 아이디입니다. "),
+    BAD_REQUEST_INVALID_MEMBER_NICKNAME(HttpStatus.BAD_REQUEST, 40017, "유효하지 않은 멤버 닉네임입니다. "),
+    BAD_REQUEST_INVALID_BODY_ID(HttpStatus.BAD_REQUEST, 40018, "유효하지 않은 신체 아이디입니다. "),
+    BAD_REQUEST_INVALID_PET_ID(HttpStatus.BAD_REQUEST, 40019, "유효하지 않은 펫 아이디입니다. "),
+    BAD_REQUEST_INVALID_SYMPTOM_ID(HttpStatus.BAD_REQUEST, 40020, "유효하지 않은 증상 아이디입니다."),
+    BAD_REQUEST_INVALID_CATEGORY_ID(HttpStatus.BAD_REQUEST, 40021, "유효하지 않은 카테고리 아이디입니다. "),
+    BAD_REQUEST_INVALID_ANIMAL_ID(HttpStatus.BAD_REQUEST, 40022, "유효하지 않은 동물 아이디 입니다. "),
+    BAD_REQUEST_INVALID_PURPOSE_ID(HttpStatus.BAD_REQUEST, 40023, "유효하지 않은 방문목적 아이디 입니다. "),
+    BAD_REQUEST_INVALID_SUMMARY_OPTION_ID(HttpStatus.BAD_REQUEST, 40024, "유효하지 않은 리뷰 요약 아이디입니다. "),
+    BAD_REQUEST_INVALID_GOOD_SUMMARY_OPTION_ID(HttpStatus.BAD_REQUEST, 40025, "유효하지 않은 좋은 리뷰 요약 아이디입니다. "),
+    BAD_REQUEST_INVALID_BAD_SUMMARY_OPTION_ID(HttpStatus.BAD_REQUEST, 440026, "유효하지 않은 나쁜 리뷰 요약 아이디입니다. "),
     /**
      * 401
      */

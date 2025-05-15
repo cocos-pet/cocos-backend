@@ -1,6 +1,7 @@
 package com.cocos.cocos.api.post.controller;
 
 import com.cocos.cocos.common.response.BaseResponse;
+import com.cocos.cocos.validation.post.PostIdConstraint;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -18,7 +19,7 @@ public interface PostLikeControllerSwagger {
             description = "게시글 공감 추가 성공")
     @Parameter(name = "postId", description = "게시글 아이디", in = ParameterIn.PATH, required = true, schema = @Schema(type = "Long"))
     public ResponseEntity<BaseResponse<Void>> addPostLike(
-            final Long postId
+            @PostIdConstraint final Long postId
     );
 
     @Operation(summary = "게시글 공감 삭제 API", description = "게시글 공감을 삭제하는 API입니다.")
@@ -27,6 +28,6 @@ public interface PostLikeControllerSwagger {
             description = "게시글 공감 삭제 성공")
     @Parameter(name = "postId", description = "게시글 아이디", in = ParameterIn.PATH, required = true, schema = @Schema(type = "Long"))
     public ResponseEntity<BaseResponse<Void>> deletePostLike(
-            final Long postId
+            @PostIdConstraint final Long postId
     );
 }

@@ -1,4 +1,4 @@
-package com.cocos.cocos.api.pet.dto.reponse;
+package com.cocos.cocos.api.pet.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

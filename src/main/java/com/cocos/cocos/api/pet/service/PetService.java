@@ -1,8 +1,8 @@
 package com.cocos.cocos.api.pet.service;
 
-import com.cocos.cocos.api.pet.dto.reponse.PetDiseaseResponse;
-import com.cocos.cocos.api.pet.dto.reponse.PetResponse;
-import com.cocos.cocos.api.pet.dto.reponse.PetSymptomResponse;
+import com.cocos.cocos.api.pet.dto.response.PetDiseaseResponse;
+import com.cocos.cocos.api.pet.dto.response.PetResponse;
+import com.cocos.cocos.api.pet.dto.response.PetSymptomResponse;
 import com.cocos.cocos.api.pet.dto.request.PetCreateRequest;
 import com.cocos.cocos.api.pet.dto.request.PetUpdateRequest;
 import com.cocos.cocos.common.exception.CocosException;
@@ -109,6 +109,7 @@ public class PetService {
             throw new CocosException(FailMessage.FORBIDDEN_PET_UPDATE);
         }
         if (petUpdateRequest.breedId() != null) {
+            //TODO: 리팩 필요 (if문 제거)
             if (!breedRepository.existsById(petUpdateRequest.breedId())) {
                 throw new CocosException(FailMessage.NOT_FOUND_BREED);
             }

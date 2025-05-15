@@ -1,6 +1,6 @@
 package com.cocos.cocos.api.pet.controller;
 
-import com.cocos.cocos.api.pet.dto.reponse.PetResponse;
+import com.cocos.cocos.api.pet.dto.response.PetResponse;
 import com.cocos.cocos.api.pet.dto.request.PetCreateRequest;
 import com.cocos.cocos.api.pet.dto.request.PetUpdateRequest;
 import com.cocos.cocos.api.pet.service.PetService;
@@ -8,6 +8,9 @@ import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.common.response.SuccessResponse;
 import com.cocos.cocos.enums.message.SuccessMessage;
 import com.cocos.cocos.util.PrincipalHandler;
+import com.cocos.cocos.validation.member.MemberNicknameConstraint;
+import com.cocos.cocos.validation.pet.PetIdConstraint;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +24,7 @@ public class PetController implements PetControllerSwagger {
 
     @PostMapping
     public ResponseEntity<BaseResponse<Void>> addPet(
-            @RequestBody final PetCreateRequest petCreateRequest
+            @RequestBody @Valid final PetCreateRequest petCreateRequest
     ) {
         //ToDo: 넘길 때 DTO 자체 보단, 값을 넘기는 것이 Controller에서 사용하는 DTO의 역할을 잘 지키는 것이라고 생각함
         petService.addPet(petCreateRequest, PrincipalHandler.getMemberIdFromPrincipal());
@@ -30,8 +33,8 @@ public class PetController implements PetControllerSwagger {
 
     @PatchMapping("/{petId}")
     public ResponseEntity<BaseResponse<Void>> updatePet(
-            @PathVariable(name = "petId") final Long petId,
-            @RequestBody final PetUpdateRequest petUpdateRequest
+            @PathVariable(name = "petId") @PetIdConstraint final Long petId,
+            @RequestBody @Valid final PetUpdateRequest petUpdateRequest
     ) {
         //ToDo: 넘길 때 DTO 자체 보단, 값을 넘기는 것이 Controller에서 사용하는 DTO의 역할을 잘 지키는 것이라고 생각함
         petService.updatePet(petUpdateRequest, petId, PrincipalHandler.getMemberIdFromPrincipal());
@@ -40,7 +43,7 @@ public class PetController implements PetControllerSwagger {
 
     @GetMapping
     public ResponseEntity<BaseResponse<PetResponse>> getPet(
-            @RequestParam(name = "nickname", required = false) final String nickname
+            @RequestParam(name = "nickname", required = false) @MemberNicknameConstraint final String nickname
     ) {
         return SuccessResponse.success(SuccessMessage.OK, petService.getPet(nickname, PrincipalHandler.getMemberIdFromPrincipal()));
     }

@@ -16,9 +16,10 @@ public class ReviewIdValidator implements ConstraintValidator<ReviewIdConstraint
 
     @Override
     public boolean isValid(Long reviewId, ConstraintValidatorContext constraintValidatorContext) {
-        if (!reviewRepository.existsById(reviewId)) {
+        if (reviewId == null || reviewRepository.existsById(reviewId)) {
+            return true;
+        } else {
             throw new CocosException(FailMessage.BAD_REQUEST_INVALID_REVIEW_ID);
         }
-        return true;
     }
 }

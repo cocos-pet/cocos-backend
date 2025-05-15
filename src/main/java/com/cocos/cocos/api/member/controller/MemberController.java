@@ -8,6 +8,8 @@ import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.common.response.SuccessResponse;
 import com.cocos.cocos.enums.message.SuccessMessage;
 import com.cocos.cocos.util.PrincipalHandler;
+import com.cocos.cocos.validation.hospital.HospitalIdConstraint;
+import com.cocos.cocos.validation.member.MemberNicknameConstraint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +27,7 @@ public class MemberController implements MemberControllerSwagger {
 
     @GetMapping
     public ResponseEntity<BaseResponse<MemberProfileResponse>> getMemberProfile(
-            @RequestParam(name = "nickname", required = false) final String nickname
+            @RequestParam(name = "nickname", required = false) @MemberNicknameConstraint final String nickname
     ) {
         return SuccessResponse.success(SuccessMessage.OK, memberService.getMemberProfile(nickname, PrincipalHandler.getMemberIdFromPrincipal()));
     }
@@ -79,13 +81,13 @@ public class MemberController implements MemberControllerSwagger {
 
     @GetMapping("/hospitals")
     public ResponseEntity<BaseResponse<MemberHospitalResponse>> getMemberHospital(
-            @RequestParam(name = "nickname", required = false) final String nickname
+            @RequestParam(name = "nickname", required = false) @MemberNicknameConstraint final String nickname
     ) {
         return SuccessResponse.success(SuccessMessage.OK, memberService.getMemberHospital(nickname, PrincipalHandler.getMemberIdFromPrincipal()));
     }
 
     @PatchMapping("/hospitals/{hospitalId}")
-    public ResponseEntity<BaseResponse<Void>> updateMemberHospital(@PathVariable(name = "hospitalId") final Long hospitalId) {
+    public ResponseEntity<BaseResponse<Void>> updateMemberHospital(@PathVariable(name = "hospitalId") @HospitalIdConstraint final Long hospitalId) {
         memberService.updateMemberHospital(hospitalId, PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.OK, null);
     }

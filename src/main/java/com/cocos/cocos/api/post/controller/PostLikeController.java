@@ -5,6 +5,7 @@ import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.common.response.SuccessResponse;
 import com.cocos.cocos.enums.message.SuccessMessage;
 import com.cocos.cocos.util.PrincipalHandler;
+import com.cocos.cocos.validation.post.PostIdConstraint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ public class PostLikeController implements PostLikeControllerSwagger {
 
     @PostMapping("/{postId}")
     public ResponseEntity<BaseResponse<Void>> addPostLike(
-            @PathVariable(name = "postId") final Long postId
+            @PathVariable(name = "postId") @PostIdConstraint final Long postId
     ) {
         postLikeService.addPostLike(PrincipalHandler.getMemberIdFromPrincipal(), postId);
         return SuccessResponse.success(SuccessMessage.OK, null);
@@ -26,7 +27,7 @@ public class PostLikeController implements PostLikeControllerSwagger {
 
     @DeleteMapping("/{postId}")
     public ResponseEntity<BaseResponse<Void>> deletePostLike(
-            @PathVariable(name = "postId") final Long postId
+            @PathVariable(name = "postId") @PostIdConstraint final Long postId
     ) {
         postLikeService.deletePostLike(PrincipalHandler.getMemberIdFromPrincipal(), postId);
         return SuccessResponse.success(SuccessMessage.OK, null);

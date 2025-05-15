@@ -4,6 +4,8 @@ import com.cocos.cocos.api.member.dto.request.LoginRequest;
 import com.cocos.cocos.api.member.dto.request.ProfileUpdateRequest;
 import com.cocos.cocos.api.member.dto.response.*;
 import com.cocos.cocos.common.response.BaseResponse;
+import com.cocos.cocos.validation.hospital.HospitalIdConstraint;
+import com.cocos.cocos.validation.member.MemberNicknameConstraint;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,7 +22,7 @@ public interface MemberControllerSwagger {
             responseCode = "200",
             description = "사용자 조회에 성공했습니다.")
     public ResponseEntity<BaseResponse<MemberProfileResponse>> getMemberProfile(
-            @RequestParam(name = "nickname", required = false) final String nickname
+            @RequestParam(name = "nickname", required = false) @MemberNicknameConstraint final String nickname
     );
 
     @Operation(summary = "로그인 API", description = "로그인 API 입니다.")
@@ -66,7 +68,7 @@ public interface MemberControllerSwagger {
             description = "요청에 성공했습니다."
     )
     public ResponseEntity<BaseResponse<MemberHospitalResponse>> getMemberHospital(
-            @RequestParam(name = "nickname", required = false) final String nickname
+            @RequestParam(name = "nickname", required = false) @MemberNicknameConstraint final String nickname
     );
 
     @Operation(summary = "사용자 즐겨찾는 병원 추가&수정 API", description = "사용자의 즐겨찾는 병원을 수정합니다. 이전에 등록된 병원이 없는 경우 추가합니다. ")
@@ -75,7 +77,7 @@ public interface MemberControllerSwagger {
             description = "요청에 성공했습니다."
     )
     public ResponseEntity<BaseResponse<Void>> updateMemberHospital(
-            @PathVariable(name = "hospitalId") final Long hospitalId
+            @PathVariable(name = "hospitalId") @HospitalIdConstraint final Long hospitalId
     );
 
     @Operation(summary = "리뷰 약관 동의 업데이트 API", description = "리뷰 약관 동의 여부를 업데이트하는 API입니다.")

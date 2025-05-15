@@ -16,9 +16,10 @@ public class DiseaseIdValidator implements ConstraintValidator<DiseaseIdConstrai
 
     @Override
     public boolean isValid(Long diseaseId, ConstraintValidatorContext constraintValidatorContext) {
-        if (!diseaseRepository.existsById(diseaseId)) {
+        if (diseaseId == null || diseaseRepository.existsById(diseaseId)) {
+            return true;
+        } else {
             throw new CocosException(FailMessage.BAD_REQUEST_INVALID_DISEASE_ID);
         }
-        return true;
     }
 }

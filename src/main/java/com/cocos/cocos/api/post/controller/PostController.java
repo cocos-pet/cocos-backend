@@ -8,6 +8,9 @@ import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.common.response.SuccessResponse;
 import com.cocos.cocos.enums.message.SuccessMessage;
 import com.cocos.cocos.util.PrincipalHandler;
+import com.cocos.cocos.validation.member.MemberNicknameConstraint;
+import com.cocos.cocos.validation.post.PostIdConstraint;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,14 +24,14 @@ public class PostController implements PostControllerSwagger {
 
     @GetMapping("/{postId}")
     public ResponseEntity<BaseResponse<PostDetailResponse>> getPostDetail(
-            @PathVariable(name = "postId") final Long postId
+            @PathVariable(name = "postId") @PostIdConstraint final Long postId
     ) {
         return SuccessResponse.success(SuccessMessage.OK, postService.getPostDetail(postId, PrincipalHandler.getMemberIdFromPrincipal()));
     }
 
     @DeleteMapping("/{postId}")
     public ResponseEntity<BaseResponse<Void>> deletePost(
-            @PathVariable(name = "postId") final Long postId
+            @PathVariable(name = "postId") @PostIdConstraint final Long postId
     ) {
         postService.deletePost(postId);
         return SuccessResponse.success(SuccessMessage.OK, null);
@@ -41,7 +44,7 @@ public class PostController implements PostControllerSwagger {
 
     @PostMapping
     public ResponseEntity<BaseResponse<PostImagesResponse>> addPost(
-            @RequestBody final PostRequest postRequest
+            @RequestBody @Valid final PostRequest postRequest
     ) {
         return SuccessResponse.success(SuccessMessage.OK, postService.addPost(
                 PrincipalHandler.getMemberIdFromPrincipal(), postRequest.categoryId(), postRequest.title(),
@@ -57,7 +60,7 @@ public class PostController implements PostControllerSwagger {
 
     @PostMapping("/filters")
     public ResponseEntity<BaseResponse<PostListResponse>> getPosts(
-            @RequestBody final PostListRequest postListRequest
+            @RequestBody @Valid final PostListRequest postListRequest
     ) {
         return SuccessResponse.success(SuccessMessage.OK, postService.getPosts(PrincipalHandler.getMemberIdFromPrincipal(), postListRequest.keyword(),
                 postListRequest.animalIds(), postListRequest.symptomIds(), postListRequest.diseaseIds(),
@@ -67,7 +70,7 @@ public class PostController implements PostControllerSwagger {
 
     @GetMapping("/members")
     public ResponseEntity<BaseResponse<MemberPostsResponse>> getMemberPosts(
-            @RequestParam(name = "nickname", required = false) final String nickname
+            @RequestParam(name = "nickname", required = false) @MemberNicknameConstraint final String nickname
     ) {
         return SuccessResponse.success(SuccessMessage.OK, postService.getMemberPosts(PrincipalHandler.getMemberIdFromPrincipal(), nickname));
     }
