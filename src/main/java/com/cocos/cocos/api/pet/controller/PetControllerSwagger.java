@@ -1,5 +1,6 @@
 package com.cocos.cocos.api.pet.controller;
 
+import com.cocos.cocos.api.pet.dto.response.PetOwnerCheckResponse;
 import com.cocos.cocos.api.pet.dto.response.PetResponse;
 import com.cocos.cocos.api.pet.dto.request.PetCreateRequest;
 import com.cocos.cocos.api.pet.dto.request.PetUpdateRequest;
@@ -14,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -44,4 +46,11 @@ public interface PetControllerSwagger {
     public ResponseEntity<BaseResponse<PetResponse>> getPet(
             @RequestParam @MemberNicknameConstraint final String nickname
     );
+
+    @Operation(summary = "반려동물 등록 API", description = "사용자가 반려동물을 등록했는지 확인하는 API입니다. ")
+    @ApiResponse(
+            responseCode = "200",
+            description = "요청이 성공했습니다.")
+    @GetMapping("/owner/check")
+    public ResponseEntity<BaseResponse<PetOwnerCheckResponse>> checkOwner();
 }

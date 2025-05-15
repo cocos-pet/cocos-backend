@@ -1,6 +1,7 @@
 package com.cocos.cocos.api.pet.service;
 
 import com.cocos.cocos.api.pet.dto.response.PetDiseaseResponse;
+import com.cocos.cocos.api.pet.dto.response.PetOwnerCheckResponse;
 import com.cocos.cocos.api.pet.dto.response.PetResponse;
 import com.cocos.cocos.api.pet.dto.response.PetSymptomResponse;
 import com.cocos.cocos.api.pet.dto.request.PetCreateRequest;
@@ -185,6 +186,13 @@ public class PetService {
                 animal.getName(),
                 diseases.stream().map(disease -> PetDiseaseResponse.of(disease.getId(), disease.getName())).toList(),
                 symptoms.stream().map(symptom -> PetSymptomResponse.of(symptom.getId(), symptom.getName())).toList()
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public PetOwnerCheckResponse checkPetOwner(final Long memberId) {
+        return PetOwnerCheckResponse.of(
+                petRepository.existsByMemberId(memberId)
         );
     }
 }
