@@ -276,7 +276,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PostListResponse getPosts(final Long memberId, final String keyword, final List<Long> animalIds, final List<Long> symptomIds,
+    public PostListResponse getPosts(final String keyword, final List<Long> animalIds, final List<Long> symptomIds,
                                      final List<Long> diseaseIds, final PostSortCriteria sortBy, final Long cursorId,
                                      final Long categoryId, final Long likeCount, final LocalDateTime createAt, final Long bodyId) {
         Specification<Post> spec = (root, query, criteriaBuilder) -> null;
