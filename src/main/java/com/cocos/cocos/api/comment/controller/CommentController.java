@@ -31,7 +31,6 @@ public class CommentController implements CommentControllerSwagger {
             @PathVariable(name = "postId") @PostIdConstraint final Long postId,
             @RequestBody final CommentContentRequest commentContentRequest
     ) {
-        entityExistsValidator.validatePetByMemberId(PrincipalHandler.getMemberIdFromPrincipal());
         commentService.addPostComment(postId, commentContentRequest.content(), PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.CREATED, null);
     }
@@ -49,7 +48,6 @@ public class CommentController implements CommentControllerSwagger {
             @PathVariable(name = "commentId") @CommentIdConstraint final Long commentId,
             @RequestBody @Valid final SubCommentContentRequest subCommentContentRequest
     ) {
-        entityExistsValidator.validatePetByMemberId(PrincipalHandler.getMemberIdFromPrincipal());
         commentService.addPostSubComment(commentId, subCommentContentRequest.nickname(), subCommentContentRequest.content(), PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.CREATED, null);
     }
