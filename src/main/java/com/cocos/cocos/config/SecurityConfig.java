@@ -4,6 +4,7 @@ import com.cocos.cocos.auth.CustomAccessDeniedHandler;
 import com.cocos.cocos.auth.CustomJwtAuthenticationEntryPoint;
 import com.cocos.cocos.auth.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -22,6 +23,8 @@ public class SecurityConfig {
     private final CustomJwtAuthenticationEntryPoint customJwtAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
+    @Value("{api.prefix}")
+    private static String apiPrefix;
 
     private static final String[] AUTH_WHITE_LIST = {"/api/dev/members/login",
             "/swagger-ui/**",
@@ -36,6 +39,19 @@ public class SecurityConfig {
             "/api/dev/hospitals/reviews/member",
             "/api/local/hospitals/reviews/filter",
             "/api/dev/hospitals/reviews/filter"
+    };
+
+    private static final String[] AUTH_WHITE_URL_LIST = {
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            apiPrefix + "/symptoms",
+            apiPrefix + "/diseases",
+            apiPrefix + "/bodies",
+            apiPrefix + "/breeds",
+            apiPrefix + "/animals",
+            apiPrefix + "/posts/**",
+            apiPrefix + "/comments/**",
+            apiPrefix + "/members/login",
     };
 
     @Bean
