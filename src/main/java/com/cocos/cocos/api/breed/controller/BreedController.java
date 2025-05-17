@@ -5,6 +5,7 @@ import com.cocos.cocos.api.breed.service.BreedService;
 import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.common.response.SuccessResponse;
 import com.cocos.cocos.enums.message.SuccessMessage;
+import com.cocos.cocos.validation.animal.AnimalIdConstraint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class BreedController implements BreedControllerSwagger {
     @GetMapping
     public ResponseEntity<BaseResponse<BreedsResponse>> getBreeds(
             @RequestParam(name = "breedName", required = false) final String breedName,
-            @RequestParam(name = "animalId") final Long animalId
+            @RequestParam(name = "animalId") @AnimalIdConstraint final Long animalId
     ) {
         return SuccessResponse.success(SuccessMessage.OK, breedService.getBreeds(breedName, animalId));
     }
