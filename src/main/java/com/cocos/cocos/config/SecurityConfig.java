@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -26,7 +27,7 @@ public class SecurityConfig {
     @Value("{api.prefix}")
     private static String apiPrefix;
 
-    private static final String[] AUTH_WHITE_LIST = {"/api/dev/members/login",
+/*    private static final String[] AUTH_WHITE_LIST = {"/api/dev/members/login",
             "/swagger-ui/**",
             "/api/dev/members/refresh",
             "/v3/api-docs/**",
@@ -39,9 +40,9 @@ public class SecurityConfig {
             "/api/dev/hospitals/reviews/member",
             "/api/local/hospitals/reviews/filter",
             "/api/dev/hospitals/reviews/filter"
-    };
+    };*/
 
-    private static final String[] AUTH_WHITE_URL_LIST = {
+    private static final String[] WHITE_LIST_URL = {
             "/swagger-ui/**",
             "/v3/api-docs/**",
             apiPrefix + "/symptoms",
@@ -52,6 +53,29 @@ public class SecurityConfig {
             apiPrefix + "/posts/**",
             apiPrefix + "/comments/**",
             apiPrefix + "/members/login",
+            //TODO: 클라쌤들의 개발을 위해 임시로 추가
+            apiPrefix + "/hospitals/**",
+    };
+
+    private static final String[] BLACK_LIST_GET_METHOD_URL_IN_WHITE_LIST = {
+            apiPrefix + "/posts/members",
+            apiPrefix + "/comments/members",
+    };
+
+    private static final String[] BLACK_LIST_POST_METHOD_URL_IN_WHITE_LIST = {
+            apiPrefix + "/posts",
+            apiPrefix + "/comments/{postId}",
+            apiPrefix + "/comments/sub/{commentId}",
+    };
+
+    private static final String[] BLACK_LIST_PATCH_METHOD_URL_IN_WHITE_LIST = {
+
+    };
+
+    private static final String[] BLACK_LIST_DELETE_METHOD_URL_IN_WHITE_LIST = {
+            apiPrefix + "/posts/{postId}",
+            apiPrefix + "/comments/{commentId}",
+            apiPrefix + "/comments/sub/{subCommentId}",
     };
 
     @Bean
@@ -68,7 +92,19 @@ public class SecurityConfig {
                 });
 
         http.authorizeHttpRequests(auth -> {
-                    auth.requestMatchers(AUTH_WHITE_LIST).permitAll();
+                    auth.requestMatchers(WHITE_LIST_URL).permitAll();
+                    auth.requestMatchers(HttpMethod.GET,
+                                    BLACK_LIST_GET_METHOD_URL_IN_WHITE_LIST)
+                            .authenticated();
+                    auth.requestMatchers(HttpMethod.POST,
+                                    BLACK_LIST_POST_METHOD_URL_IN_WHITE_LIST)
+                            .authenticated();
+                    auth.requestMatchers(HttpMethod.PATCH,
+                                    BLACK_LIST_PATCH_METHOD_URL_IN_WHITE_LIST)
+                            .authenticated();
+                    auth.requestMatchers(HttpMethod.DELETE,
+                                    BLACK_LIST_DELETE_METHOD_URL_IN_WHITE_LIST)
+                            .authenticated();
                     auth.anyRequest().authenticated();
                 })
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -91,7 +127,19 @@ public class SecurityConfig {
                     exception.accessDeniedHandler(customAccessDeniedHandler);
                 });
         http.authorizeHttpRequests(auth -> {
-                    auth.requestMatchers(AUTH_WHITE_LIST).permitAll();
+                    auth.requestMatchers(WHITE_LIST_URL).permitAll();
+                    auth.requestMatchers(HttpMethod.GET,
+                                    BLACK_LIST_GET_METHOD_URL_IN_WHITE_LIST)
+                            .authenticated();
+                    auth.requestMatchers(HttpMethod.POST,
+                                    BLACK_LIST_POST_METHOD_URL_IN_WHITE_LIST)
+                            .authenticated();
+                    auth.requestMatchers(HttpMethod.PATCH,
+                                    BLACK_LIST_PATCH_METHOD_URL_IN_WHITE_LIST)
+                            .authenticated();
+                    auth.requestMatchers(HttpMethod.DELETE,
+                                    BLACK_LIST_DELETE_METHOD_URL_IN_WHITE_LIST)
+                            .authenticated();
                     auth.anyRequest().authenticated();
                 })
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
