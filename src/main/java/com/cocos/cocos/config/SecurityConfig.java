@@ -3,7 +3,9 @@ package com.cocos.cocos.config;
 import com.cocos.cocos.auth.CustomAccessDeniedHandler;
 import com.cocos.cocos.auth.CustomJwtAuthenticationEntryPoint;
 import com.cocos.cocos.auth.JwtAuthenticationFilter;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,13 +21,59 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
+@Slf4j
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomJwtAuthenticationEntryPoint customJwtAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
-    @Value("{api.prefix}")
-    private static String apiPrefix;
+    @Value("${api.prefix}")
+    private String apiPrefix;
+
+    private String[] WHITE_LIST_URL;
+    private String[] BLACK_LIST_GET_METHOD_URL_IN_WHITE_LIST;
+    private String[] BLACK_LIST_POST_METHOD_URL_IN_WHITE_LIST;
+    private String[] BLACK_LIST_PATCH_METHOD_URL_IN_WHITE_LIST;
+    private String[] BLACK_LIST_DELETE_METHOD_URL_IN_WHITE_LIST;
+
+    @PostConstruct
+    private void initUrlList() {
+        WHITE_LIST_URL = new String[]{
+                "/swagger-ui/**",
+                "/v3/api-docs/**",
+                apiPrefix + "/symptoms",
+                apiPrefix + "/diseases",
+                apiPrefix + "/bodies",
+                apiPrefix + "/breeds",
+                apiPrefix + "/animals",
+                apiPrefix + "/posts/**",
+                apiPrefix + "/comments/**",
+                apiPrefix + "/members/login",
+                //TODO: 클라쌤들의 개발을 위해 임시로 추가
+                apiPrefix + "/hospitals/**",
+        };
+
+        BLACK_LIST_GET_METHOD_URL_IN_WHITE_LIST = new String[]{
+                apiPrefix + "/posts/members",
+                apiPrefix + "/comments/members",
+        };
+
+        BLACK_LIST_POST_METHOD_URL_IN_WHITE_LIST = new String[]{
+                apiPrefix + "/posts",
+                apiPrefix + "/comments/{postId}",
+                apiPrefix + "/comments/sub/{commentId}",
+        };
+
+        BLACK_LIST_PATCH_METHOD_URL_IN_WHITE_LIST = new String[]{
+
+        };
+
+        BLACK_LIST_DELETE_METHOD_URL_IN_WHITE_LIST = new String[]{
+                apiPrefix + "/posts/{postId}",
+                apiPrefix + "/comments/{commentId}",
+                apiPrefix + "/comments/sub/{subCommentId}",
+        };
+    }
 
 /*    private static final String[] AUTH_WHITE_LIST = {"/api/dev/members/login",
             "/swagger-ui/**",
@@ -42,41 +90,6 @@ public class SecurityConfig {
             "/api/dev/hospitals/reviews/filter"
     };*/
 
-    private static final String[] WHITE_LIST_URL = {
-            "/swagger-ui/**",
-            "/v3/api-docs/**",
-            apiPrefix + "/symptoms",
-            apiPrefix + "/diseases",
-            apiPrefix + "/bodies",
-            apiPrefix + "/breeds",
-            apiPrefix + "/animals",
-            apiPrefix + "/posts/**",
-            apiPrefix + "/comments/**",
-            apiPrefix + "/members/login",
-            //TODO: 클라쌤들의 개발을 위해 임시로 추가
-            apiPrefix + "/hospitals/**",
-    };
-
-    private static final String[] BLACK_LIST_GET_METHOD_URL_IN_WHITE_LIST = {
-            apiPrefix + "/posts/members",
-            apiPrefix + "/comments/members",
-    };
-
-    private static final String[] BLACK_LIST_POST_METHOD_URL_IN_WHITE_LIST = {
-            apiPrefix + "/posts",
-            apiPrefix + "/comments/{postId}",
-            apiPrefix + "/comments/sub/{commentId}",
-    };
-
-    private static final String[] BLACK_LIST_PATCH_METHOD_URL_IN_WHITE_LIST = {
-
-    };
-
-    private static final String[] BLACK_LIST_DELETE_METHOD_URL_IN_WHITE_LIST = {
-            apiPrefix + "/posts/{postId}",
-            apiPrefix + "/comments/{commentId}",
-            apiPrefix + "/comments/sub/{subCommentId}",
-    };
 
     @Bean
     @Profile("dev")
@@ -92,7 +105,6 @@ public class SecurityConfig {
                 });
 
         http.authorizeHttpRequests(auth -> {
-                    auth.requestMatchers(WHITE_LIST_URL).permitAll();
                     auth.requestMatchers(HttpMethod.GET,
                                     BLACK_LIST_GET_METHOD_URL_IN_WHITE_LIST)
                             .authenticated();
@@ -105,6 +117,7 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.DELETE,
                                     BLACK_LIST_DELETE_METHOD_URL_IN_WHITE_LIST)
                             .authenticated();
+                    auth.requestMatchers(WHITE_LIST_URL).permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -127,7 +140,6 @@ public class SecurityConfig {
                     exception.accessDeniedHandler(customAccessDeniedHandler);
                 });
         http.authorizeHttpRequests(auth -> {
-                    auth.requestMatchers(WHITE_LIST_URL).permitAll();
                     auth.requestMatchers(HttpMethod.GET,
                                     BLACK_LIST_GET_METHOD_URL_IN_WHITE_LIST)
                             .authenticated();
@@ -140,6 +152,7 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.DELETE,
                                     BLACK_LIST_DELETE_METHOD_URL_IN_WHITE_LIST)
                             .authenticated();
+                    auth.requestMatchers(WHITE_LIST_URL).permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
