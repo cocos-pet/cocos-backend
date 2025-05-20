@@ -8,6 +8,7 @@ import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.common.response.SuccessResponse;
 import com.cocos.cocos.enums.message.SuccessMessage;
 import com.cocos.cocos.util.PrincipalHandler;
+import com.cocos.cocos.util.validation.EntityExistsValidator;
 import com.cocos.cocos.validation.member.MemberNicknameConstraint;
 import com.cocos.cocos.validation.post.PostIdConstraint;
 import jakarta.validation.Valid;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class PostController implements PostControllerSwagger {
 
     private final PostService postService;
+    private final EntityExistsValidator entityExistsValidator;
 
     @GetMapping("/{postId}")
     public ResponseEntity<BaseResponse<PostDetailResponse>> getPostDetail(
@@ -46,6 +48,7 @@ public class PostController implements PostControllerSwagger {
     public ResponseEntity<BaseResponse<PostImagesResponse>> addPost(
             @RequestBody @Valid final PostRequest postRequest
     ) {
+        entityExistsValidator.validatePetByMemberId(PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.OK, postService.addPost(
                 PrincipalHandler.getMemberIdFromPrincipal(), postRequest.categoryId(), postRequest.title(),
                 postRequest.content(), postRequest.images(), postRequest.animalId(),
