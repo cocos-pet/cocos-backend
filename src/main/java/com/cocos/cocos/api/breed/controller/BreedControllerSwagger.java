@@ -18,7 +18,7 @@ public interface BreedControllerSwagger {
             responseCode = "200",
             description = "품종 리스트 조회 성공")
     @Parameter(name = "breedName", description = "품종 이름", in = ParameterIn.QUERY, required = false, schema = @Schema(type = "String"))
-    @Parameter(name = "animalId", description = "동물 아이디", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "Long"))
+    @Parameter(name = "animalId", description = "동물 아이디", in = ParameterIn.PATH, required = true, schema = @Schema(type = "Long"))
     public ResponseEntity<BaseResponse<BreedsResponse>> getBreeds(
             final String breedName,
             final Long animalId
