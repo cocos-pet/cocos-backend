@@ -216,7 +216,7 @@ public class PostServiceTest {
         BDDMockito.given(commentRepository.findAllByPostId(any())).willReturn(comments);
 
         // when
-        postService.deletePost(postId);
+        postService.deletePost(postId, memberId);
 
         // then
         BDDMockito.verify(subCommentRepository, times(1)).deleteAllByCommentId(any());

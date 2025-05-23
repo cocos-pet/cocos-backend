@@ -21,8 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -39,7 +37,10 @@ public class CommentService {
 
     @Transactional
     public void addPostComment(final Long postId, final String content, final Long memberId) {
-        //TODO: pet이 없는 member는 댓글을 달지 못함.
+        if (memberId == null) {
+            throw new CocosException(FailMessage.UNAUTHORIZED);
+        }
+
         commentRepository.save(
                 Comment.builder()
                         .content(content)
@@ -51,6 +52,10 @@ public class CommentService {
 
     @Transactional
     public void deletePostComment(final Long commentId, final Long memberId) {
+        if (memberId == null) {
+            throw new CocosException(FailMessage.UNAUTHORIZED);
+        }
+
         final Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new CocosException(FailMessage.NOT_FOUND_COMMENT)
         );
@@ -64,12 +69,15 @@ public class CommentService {
 
     @Transactional
     public void addPostSubComment(final Long commentId, final String nickname, final String content, final Long memberId) {
-        //TODO: pet이 없는 member는 대댓글을 달지 못함.
-        final Member member = memberRepository.findByNickname(nickname).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
+        if (memberId == null) {
+            throw new CocosException(FailMessage.UNAUTHORIZED);
+        }
+
+        final Member mentionedMember = memberRepository.findByNickname(nickname).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
         subCommentRepository.save(
                 SubComment.builder()
                         .commentId(commentId)
-                        .mentionedMemberId(member.getId())
+                        .mentionedMemberId(mentionedMember.getId())
                         .content(content)
                         .memberId(memberId)
                         .build()
@@ -78,6 +86,10 @@ public class CommentService {
 
     @Transactional
     public void deletePostSubComment(final Long subCommentId, final Long memberId) {
+        if (memberId == null) {
+            throw new CocosException(FailMessage.UNAUTHORIZED);
+        }
+
         final SubComment subComment = subCommentRepository.findById(subCommentId).orElseThrow(
                 () -> new CocosException(FailMessage.NOT_FOUND_SUB_COMMENT)
         );
@@ -99,9 +111,7 @@ public class CommentService {
                 .toList();
 
         final List<SubComment> subComments = subCommentRepository.findByCommentIdInOrderByCreatedAtAsc(commentIds);
-        //ToDo: Map을 이용하여 한번에 stream을 돌리는 것 보단, (1) 각 comment에 대한 모든 subComments 조회, (2) subComments에 대한 정보를 담은 DTO 생성, (3) subCommentDTO를 포함하여 commentDTO생성 하면 보다 직관적이고 메소드의 수를 줄일 수 있을 것 같음
-        Map<Long, List<SubComment>> subCommentsGroupedByCommentId = subComments.stream()
-                .collect(Collectors.groupingBy(SubComment::getCommentId));
+
         final List<Long> memberIds = Stream.concat(
                 comments.stream().map(Comment::getMemberId),
                 Stream.concat(
@@ -112,62 +122,127 @@ public class CommentService {
 
         final List<Member> members = memberRepository.findAllById(memberIds);
         final List<Pet> pets = petRepository.findAllByMemberIdIn(memberIds);
+
         final List<Long> breedIds = pets.stream()
                 .map(Pet::getBreedId)
                 .distinct()
                 .toList();
         final List<Breed> breeds = breedRepository.findAllById(breedIds);
 
-        Map<Long, Member> memberMap = members.stream()
-                .collect(Collectors.toMap(Member::getId, member -> member));
-        Map<Long, List<Pet>> petMap = pets.stream()
-                .collect(Collectors.groupingBy(Pet::getMemberId));
-        Map<Long, String> breedMap = breeds.stream()
-                .collect(Collectors.toMap(Breed::getId, Breed::getName));
-
-        List<CommentAndSubCommentsResponse> commentDtos = comments.stream()
+        List<CommentAndSubCommentsResponse> commentsAndSubCommentsResponses = comments.stream()
                 .map(comment -> {
-                    List<SubCommentResponse> subCommentDtos =
-                            subCommentsGroupedByCommentId.getOrDefault(comment.getId(), List.of()).stream()
-                                    .map(subComment -> SubCommentResponse.of(
-                                            subComment.getId(),
-                                            getOrDefaultNickname(subComment.getMemberId(), memberMap),
-                                            memberDataS3Client.getPresignedUrl(getOrDefaultProfileImage(subComment.getMemberId(), memberMap)),
-                                            getOrDefaultBreedName(subComment.getMemberId(), petMap, breedMap),
-                                            getOrDefaultPetAge(subComment.getMemberId(), petMap),
-                                            subComment.getContent(),
-                                            subComment.getCreatedAt(),
-                                            subComment.getMemberId().equals(memberId),
-                                            getOrDefaultNickname(subComment.getMentionedMemberId(), memberMap),
-                                            subComment.getMemberId().equals(post.getMemberId())
-                                    )).toList();
+                    final Member commentMember = findMemberById(members, comment.getMemberId());
+                    final Pet commentPet = findPetByMemberId(pets, commentMember.getId());
+                    final Breed commentBreed = findBreedById(breeds, commentPet.getBreedId());
+                    final List<SubComment> subCommentsByCommentId = findSubCommentsByCommentId(subComments, comment.getId());
 
-                    return CommentAndSubCommentsResponse.of(
-                            comment.getId(),
-                            getOrDefaultNickname(comment.getMemberId(), memberMap),
-                            memberDataS3Client.getPresignedUrl(getOrDefaultProfileImage(comment.getMemberId(), memberMap)),
-                            getOrDefaultBreedName(comment.getMemberId(), petMap, breedMap),
-                            getOrDefaultPetAge(comment.getMemberId(), petMap),
-                            comment.getContent(),
-                            comment.getCreatedAt(),
-                            comment.getMemberId().equals(memberId),
-                            comment.getMemberId().equals(post.getMemberId()),
-                            subCommentDtos
-                    );
+                    return mapToCommentAndSubCommentsResponse(comment, commentMember, commentPet, commentBreed,
+                            subCommentsByCommentId, members, pets, breeds,
+                            memberId, post);
                 }).toList();
 
-        return CommentsAndSubCommentsResponse.of(commentDtos);
+        return CommentsAndSubCommentsResponse.of(commentsAndSubCommentsResponses);
     }
 
+    private Member findMemberById(final List<Member> members, final Long memberId) {
+        return members.stream()
+                .filter(member -> member.getId().equals(memberId))
+                .findFirst()
+                .orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
+    }
+
+    private Pet findPetByMemberId(final List<Pet> pets, final Long memberId) {
+        return pets.stream()
+                .filter(pet -> pet.getMemberId().equals(memberId))
+                .findFirst()
+                .orElseThrow(
+                        () -> new CocosException(FailMessage.NOT_FOUND_PET)
+                );
+    }
+
+    private Breed findBreedById(final List<Breed> breeds, final Long breedId) {
+        return breeds.stream()
+                .filter(breed -> breed.getId().equals(breedId))
+                .findFirst()
+                .orElseThrow(
+                        () -> new CocosException(FailMessage.NOT_FOUND_BREED)
+                );
+    }
+
+    private List<SubComment> findSubCommentsByCommentId(final List<SubComment> subComments, final Long commentId) {
+        return subComments.stream()
+                .filter(subComment -> subComment.getCommentId().equals(commentId))
+                .toList();
+    }
+
+    private boolean isCommentWriter(final Long commentMemberId, final Long memberId) {
+        if (memberId == null) {
+            return false;
+        }
+        return commentMemberId.equals(memberId);
+    }
+
+    private boolean isPostWriter(final Long commentMemberId, final Long postMemberId) {
+        return commentMemberId.equals(postMemberId);
+    }
+
+    private CommentAndSubCommentsResponse mapToCommentAndSubCommentsResponse(final Comment comment, final Member commentMember,
+                                                                             final Pet commentPet, final Breed commentBreed,
+                                                                             final List<SubComment> subComments, final List<Member> members,
+                                                                             final List<Pet> pets, final List<Breed> breeds,
+                                                                             final Long memberId, final Post post) {
+        return CommentAndSubCommentsResponse.of(
+                comment.getId(),
+                commentMember.getNickname(),
+                memberDataS3Client.getPresignedUrl(commentMember.getImage()),
+                commentBreed.getName(),
+                commentPet.getAge(),
+                comment.getContent(),
+                comment.getCreatedAt(),
+                isCommentWriter(comment.getMemberId(), memberId),
+                isPostWriter(comment.getMemberId(), post.getMemberId()),
+                subComments.stream()
+                        .map(subComment -> {
+                            final Member subCommentMember = findMemberById(members, subComment.getMemberId());
+                            final Member mentionedMember = findMemberById(members, subComment.getMentionedMemberId());
+                            final Pet subCommentPet = findPetByMemberId(pets, subCommentMember.getId());
+                            final Breed subCommentBreed = findBreedById(breeds, subCommentPet.getBreedId());
+
+                            return mapToSubCommentResponse(subComment, subCommentMember, mentionedMember, subCommentPet, subCommentBreed, memberId, post);
+                        })
+                        .toList()
+        );
+    }
+
+    private SubCommentResponse mapToSubCommentResponse(final SubComment subComment, final Member subCommentMember,
+                                                       final Member mentionedMember, final Pet subCommentPet,
+                                                       final Breed subCommentBreed, final Long memberId, final Post post) {
+        return SubCommentResponse.of(
+                subComment.getId(),
+                subCommentMember.getNickname(),
+                memberDataS3Client.getPresignedUrl(subCommentMember.getImage()),
+                subCommentBreed.getName(),
+                subCommentPet.getAge(),
+                subComment.getContent(),
+                subComment.getCreatedAt(),
+                isCommentWriter(subComment.getMemberId(), memberId),
+                mentionedMember.getNickname(),
+                isPostWriter(subComment.getMemberId(), post.getMemberId()));
+    }
+
+
     @Transactional(readOnly = true)
-    public MyAllCommentsResponse getMemberComments(final String nickname, final Long memberId) {
+    public MemberAllCommentsResponse getMemberComments(final String nickname, final Long memberId) {
+        if (memberId == null) {
+            throw new CocosException(FailMessage.UNAUTHORIZED);
+        }
         final Long selectedMemberId = findMemberByNickname(nickname, memberId);
 
         final List<Comment> comments = commentRepository.findAllByMemberIdOrderByCreatedAtDesc(selectedMemberId);
-        final List<MyCommentResponse> myComments = comments.stream()
+        final List<MemberCommentResponse> memberComments = comments.stream()
                 .map(comment -> {
                     final String postTitle = postRepository.findById(comment.getPostId()).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_POST)).getTitle();
-                    return MyCommentResponse.of(
+                    return MemberCommentResponse.of(
                             comment.getId(),
                             comment.getContent(),
                             comment.getPostId(),
@@ -177,7 +252,7 @@ public class CommentService {
                 }).toList();
 
         final List<SubComment> subComments = subCommentRepository.findAllByMemberIdOrderByCreatedAtDesc(selectedMemberId);
-        final List<MySubCommentResponse> mySubComments = subComments.stream()
+        final List<MemberSubCommentResponse> memberSubComments = subComments.stream()
                 .map(subComment -> {
                     final Comment comment = commentRepository.findById(subComment.getCommentId()).orElseThrow(
                             () -> new CocosException(FailMessage.NOT_FOUND_COMMENT)
@@ -190,7 +265,7 @@ public class CommentService {
                     final Member mentionedMember = memberRepository.findById(subComment.getMentionedMemberId()).orElseThrow(
                             () -> new CocosException(FailMessage.NOT_FOUND_MEMBER)
                     );
-                    return MySubCommentResponse.of(
+                    return MemberSubCommentResponse.of(
                             subComment.getId(),
                             subComment.getContent(),
                             post.getId(),
@@ -201,37 +276,10 @@ public class CommentService {
                 })
                 .toList();
 
-        return MyAllCommentsResponse.of(
-                myComments,
-                mySubComments
+        return MemberAllCommentsResponse.of(
+                memberComments,
+                memberSubComments
         );
-    }
-
-    private String getOrDefaultNickname(Long memberId, Map<Long, Member> memberMap) {
-        return Optional.ofNullable(memberMap.get(memberId))
-                .map(Member::getNickname)
-                .orElse("탈퇴한 회원입니다");
-    }
-
-    private String getOrDefaultProfileImage(Long memberId, Map<Long, Member> memberMap) {
-        return Optional.ofNullable(memberMap.get(memberId))
-                .map(Member::getImage)
-                .orElse("탈퇴한 회원입니다");
-    }
-
-    private String getOrDefaultBreedName(Long memberId, Map<Long, List<Pet>> petMap, Map<Long, String> breedMap) {
-        return petMap.getOrDefault(memberId, List.of()).stream()
-                .findFirst()
-                .map(pet -> Optional.ofNullable(breedMap.get(pet.getBreedId()))
-                        .orElseThrow(() -> new CocosException(FailMessage.INTERNAL_SERVER_ERROR_BREED_ID)))
-                .orElseThrow(() -> new CocosException(FailMessage.INTERNAL_SERVER_ERROR_PET_ID_FOR_MEMBER));
-    }
-
-    private int getOrDefaultPetAge(Long memberId, Map<Long, List<Pet>> petMap) {
-        return petMap.getOrDefault(memberId, List.of()).stream()
-                .findFirst()
-                .map(Pet::getAge)
-                .orElseThrow(() -> new CocosException(FailMessage.INTERNAL_SERVER_ERROR_PET_AGE));
     }
 
     private Long findMemberByNickname(final String nickname, final Long memberId) {

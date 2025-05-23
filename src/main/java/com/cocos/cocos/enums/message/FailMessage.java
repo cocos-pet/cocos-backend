@@ -54,6 +54,8 @@ public enum FailMessage {
     FORBIDDEN(HttpStatus.FORBIDDEN, 40300, "권한이 없습니다. "),
     FORBIDDEN_COMMENT_DELETE(HttpStatus.FORBIDDEN, 40301, "댓글을 삭제할 권한이 없습니다. "),
     FORBIDDEN_PET_UPDATE(HttpStatus.FORBIDDEN, 40302, "애완동물 정보를 수정할 권리가 없습니다. "),
+    FORBIDDEN_POST_DELETE(HttpStatus.FORBIDDEN, 40303, "게시글을 삭제할 권리가 없습니다. "),
+
     /**
      * 404
      */

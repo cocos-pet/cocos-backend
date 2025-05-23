@@ -1,5 +1,6 @@
 package com.cocos.cocos.api.pet.controller;
 
+import com.cocos.cocos.api.pet.dto.response.PetOwnerCheckResponse;
 import com.cocos.cocos.api.pet.dto.response.PetResponse;
 import com.cocos.cocos.api.pet.dto.request.PetCreateRequest;
 import com.cocos.cocos.api.pet.dto.request.PetUpdateRequest;
@@ -47,4 +48,10 @@ public class PetController implements PetControllerSwagger {
     ) {
         return SuccessResponse.success(SuccessMessage.OK, petService.getPet(nickname, PrincipalHandler.getMemberIdFromPrincipal()));
     }
+
+    @GetMapping("/owner/check")
+    public ResponseEntity<BaseResponse<PetOwnerCheckResponse>> checkOwner() {
+        return SuccessResponse.success(SuccessMessage.OK, petService.checkPetOwner(PrincipalHandler.getMemberIdFromPrincipal()));
+    }
+
 }

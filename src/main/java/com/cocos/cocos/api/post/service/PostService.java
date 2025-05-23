@@ -24,7 +24,6 @@ import com.cocos.cocos.db.post.entity.PostCategory;
 import com.cocos.cocos.db.post.entity.PostImage;
 import com.cocos.cocos.db.post.entity.PostTag;
 import com.cocos.cocos.db.post.repository.*;
-import com.cocos.cocos.db.search.repository.SearchRepository;
 import com.cocos.cocos.db.symptom.entity.Symptom;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.message.FailMessage;
@@ -45,7 +44,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -68,7 +66,6 @@ public class PostService {
     private final SymptomRepository symptomRepository;
     private final PetDiseaseRepository petDiseaseRepository;
     private final PetSymptomRepository petSymptomRepository;
-    private final SearchRepository searchRepository;
     private final AppDataS3Client appDataS3Client;
     private final MemberDataS3Client memberDataS3Client;
 
@@ -135,15 +132,38 @@ public class PostService {
                 .images(images)
                 .category(postCategory.getName())
                 .tags(tags)
-                .isWriter(Objects.equals(memberId, post.getMemberId()))
-                .isLiked(postLikeRepository.existsByMemberIdAndPostId(memberId, postId))
+                .isWriter(isPostWriter(memberId, post.getMemberId()))
+                .isLiked(checkLiked(memberId, postId))
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .build();
     }
 
+    private boolean isPostWriter(final Long memberId, final Long postMemberId) {
+        if (memberId == null) {
+            return false;
+        }
+        return memberId.equals(postMemberId);
+    }
+
+    private boolean checkLiked(final Long memberId, final Long postId) {
+        if (memberId == null) {
+            return false;
+        }
+        return postLikeRepository.existsByMemberIdAndPostId(memberId, postId);
+    }
+
     @Transactional
-    public void deletePost(final Long postId) {
+    public void deletePost(final Long postId, final Long memberId) {
+        if (memberId == null) {
+            throw new CocosException(FailMessage.UNAUTHORIZED);
+        }
+        final Post post = postRepository.findById(postId).orElseThrow(
+                () -> new CocosException(FailMessage.NOT_FOUND_POST)
+        );
+        if (!post.getMemberId().equals(memberId)) {
+            throw new CocosException(FailMessage.FORBIDDEN_POST_DELETE);
+        }
         final List<Comment> comments = commentRepository.findAllByPostId(postId);
         comments.forEach(comment -> subCommentRepository.deleteAllByCommentId(comment.getId()));
         commentRepository.deleteAllByPostId(postId);
@@ -166,8 +186,8 @@ public class PostService {
     public PostImagesResponse addPost(final Long memberId, final Long categoryId, final String title,
                                       final String content, final List<String> images, final Long animalId,
                                       final List<Long> symptomIds, final List<Long> diseaseIds) {
-        if (!petRepository.existsByMemberId(memberId)) {
-            throw new CocosException(FailMessage.NOT_FOUND_PET);
+        if (memberId == null) {
+            throw new CocosException(FailMessage.UNAUTHORIZED);
         }
         final Post post = postRepository.save(Post.builder()
                 .title(title)
@@ -238,7 +258,7 @@ public class PostService {
 
     private List<Post> fetchPopularPosts(final Long memberId) {
         //ToDo: 코드 의미에 따른 간격 조절
-        if (petRepository.existsByMemberId(memberId)) {
+        if (memberId != null && petRepository.existsByMemberId(memberId)) {
             final Pet pet = petRepository.findByMemberId(memberId);
             if (petDiseaseRepository.existsByPetId(pet.getId())) {
                 final List<Long> diseaseIds = petDiseaseRepository.findAllByPetId(pet.getId()).stream()
@@ -265,7 +285,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PostListResponse getPosts(final Long memberId, final String keyword, final List<Long> animalIds, final List<Long> symptomIds,
+    public PostListResponse getPosts(final String keyword, final List<Long> animalIds, final List<Long> symptomIds,
                                      final List<Long> diseaseIds, final PostSortCriteria sortBy, final Long cursorId,
                                      final Long categoryId, final Long likeCount, final LocalDateTime createAt, final Long bodyId) {
         Specification<Post> spec = (root, query, criteriaBuilder) -> null;

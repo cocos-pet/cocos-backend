@@ -3,7 +3,7 @@ package com.cocos.cocos.api.comment.controller;
 import com.cocos.cocos.api.comment.dto.request.CommentContentRequest;
 import com.cocos.cocos.api.comment.dto.request.SubCommentContentRequest;
 import com.cocos.cocos.api.comment.dto.response.CommentsAndSubCommentsResponse;
-import com.cocos.cocos.api.comment.dto.response.MyAllCommentsResponse;
+import com.cocos.cocos.api.comment.dto.response.MemberAllCommentsResponse;
 import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.validation.comment.CommentIdConstraint;
 import com.cocos.cocos.validation.comment.SubCommentIdConstraint;
@@ -69,7 +69,7 @@ public interface CommentControllerSwagger {
     @ApiResponse(
             responseCode = "200",
             description = "요청에 성공했습니다.")
-    public ResponseEntity<BaseResponse<MyAllCommentsResponse>> getMemberComments(
+    public ResponseEntity<BaseResponse<MemberAllCommentsResponse>> getMemberComments(
             @RequestParam final String nickname
     );
 }
