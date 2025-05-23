@@ -75,22 +75,6 @@ public class SecurityConfig {
         };
     }
 
-/*    private static final String[] AUTH_WHITE_LIST = {"/api/dev/members/login",
-            "/swagger-ui/**",
-            "/api/dev/members/refresh",
-            "/v3/api-docs/**",
-            "/api/dev/test/**",
-            "/api/dev/locations",
-            "/api/local/hospitals/*",
-            "/api/dev/hospitals/*",
-            "/api/local/members/login",
-            "/api/local/hospitals/reviews/member",
-            "/api/dev/hospitals/reviews/member",
-            "/api/local/hospitals/reviews/filter",
-            "/api/dev/hospitals/reviews/filter"
-    };*/
-
-
     @Bean
     @Profile("dev")
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
