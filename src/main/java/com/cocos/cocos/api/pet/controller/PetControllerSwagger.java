@@ -47,7 +47,7 @@ public interface PetControllerSwagger {
             @RequestParam @MemberNicknameConstraint final String nickname
     );
 
-    @Operation(summary = "반려동물 등록 API", description = "사용자가 반려동물을 등록했는지 확인하는 API입니다. ")
+    @Operation(summary = "반려동물 등록 여부 확인 API", description = "사용자가 반려동물을 등록했는지 확인하는 API입니다. ")
     @ApiResponse(
             responseCode = "200",
             description = "요청이 성공했습니다.")
