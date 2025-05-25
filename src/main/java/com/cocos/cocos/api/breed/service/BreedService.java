@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -18,17 +19,28 @@ public class BreedService {
 
     @Transactional(readOnly = true)
     public BreedsResponse getBreeds(final String breedName, final Long animalId) {
+
+        final List<Breed> allBreeds = getBreedsByBreedNameAndAnimalId(breedName, animalId);
+        allBreeds.sort(Comparator.comparing(Breed::isEtc));
+
+        return BreedsResponse.of(allBreeds.stream()
+                .map(breed -> BreedResponse.of(breed.getId(), breed.getName()))
+                .toList());
+    }
+
+    private List<Breed> getBreedsByBreedNameAndAnimalId(final String breedName, final Long animalId) {
         if (breedName == null || breedName.isEmpty()) {
-            final List<Breed> allBreeds = breedRepository.findAllByAnimalId(animalId);
-            return BreedsResponse.of(allBreeds.stream()
-                    .map(breed -> BreedResponse.of(breed.getId(), breed.getName()))
-                    .toList());
+            return breedRepository.findAllByAnimalId(animalId);
         } else {
             final List<Breed> breeds = breedRepository.findAllByNameContainingAndAnimalId(breedName, animalId);
-            return BreedsResponse.of(breeds.stream()
-                    .map(breed -> BreedResponse.of(breed.getId(), breed.getName()))
-                    .toList()
-            );
+            final boolean containsEtc = breeds.stream().anyMatch(Breed::isEtc);
+            if (!containsEtc) {
+                final Breed etcBreed = breedRepository.findByAnimalIdAndIsEtcTrue(animalId);
+                if (etcBreed != null) {
+                    breeds.add(etcBreed);
+                }
+            }
+            return breeds;
         }
     }
 }

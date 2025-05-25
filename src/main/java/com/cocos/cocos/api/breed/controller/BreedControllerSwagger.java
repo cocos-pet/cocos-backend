@@ -2,6 +2,7 @@ package com.cocos.cocos.api.breed.controller;
 
 import com.cocos.cocos.api.breed.dto.response.BreedsResponse;
 import com.cocos.cocos.common.response.BaseResponse;
+import com.cocos.cocos.validation.animal.AnimalIdConstraint;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -21,6 +22,6 @@ public interface BreedControllerSwagger {
     @Parameter(name = "animalId", description = "동물 아이디", in = ParameterIn.PATH, required = true, schema = @Schema(type = "Long"))
     public ResponseEntity<BaseResponse<BreedsResponse>> getBreeds(
             final String breedName,
-            final Long animalId
+            final @AnimalIdConstraint Long animalId
     );
 }
