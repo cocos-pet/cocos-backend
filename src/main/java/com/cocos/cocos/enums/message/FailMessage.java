@@ -53,7 +53,7 @@ public enum FailMessage {
      */
     FORBIDDEN(HttpStatus.FORBIDDEN, 40300, "권한이 없습니다. "),
     FORBIDDEN_COMMENT_DELETE(HttpStatus.FORBIDDEN, 40301, "댓글을 삭제할 권한이 없습니다. "),
-    FORBIDDEN_PET_UPDATE(HttpStatus.FORBIDDEN, 40302, "애완동물 정보를 수정할 권리가 없습니다. "),
+    FORBIDDEN_PET_UPDATE(HttpStatus.FORBIDDEN, 40302, "반려동물 정보를 수정할 권리가 없습니다. "),
     FORBIDDEN_POST_DELETE(HttpStatus.FORBIDDEN, 40303, "게시글을 삭제할 권리가 없습니다. "),
 
     /**
@@ -74,7 +74,7 @@ public enum FailMessage {
     NOT_FOUND_POSTTAG(HttpStatus.NOT_FOUND, 40412, "태그를 찾을 수 없습니다."),
     NOT_FOUND_COMMENT(HttpStatus.NOT_FOUND, 40413, "댓글을 찾을 수 없습니다."),
     NOT_FOUND_SUB_COMMENT(HttpStatus.NOT_FOUND, 40414, "대댓글을 찾을 수 없습니다."),
-    NOT_FOUND_PET(HttpStatus.NOT_FOUND, 40415, "애완동물을 찾을 수 없습니다. "),
+    NOT_FOUND_PET(HttpStatus.NOT_FOUND, 40415, "반려동물을 찾을 수 없습니다. "),
     NOT_FOUND_MENTIONED_MEMBER(HttpStatus.NOT_FOUND, 40416, "언급된 사용자를 찾을 수 없습니다. "),
     NOT_FOUND_TOWN(HttpStatus.NOT_FOUND, 40417, "동을 찾을 수 없습니다. "),
     NOT_FOUND_MEMBER_ADDRESS(HttpStatus.NOT_FOUND, 40418, "사용자 위치를 찾을 수 없습니다."),
@@ -95,7 +95,7 @@ public enum FailMessage {
     CONFLICT(HttpStatus.CONFLICT, 40900, "데이터 충돌이 발생했습니다. "),
     INTEGRITY_CONFLICT(HttpStatus.CONFLICT, 40901, "데이터 무결성 위반입니다."),
     CONFLICT_POSTLIKE(HttpStatus.CONFLICT, 40902, "이미 존재하는 게시글 공감입니다."),
-    CONFLICT_PET(HttpStatus.CONFLICT, 40903, "이미 사용자의 애완동물이 존재합니다."),
+    CONFLICT_PET(HttpStatus.CONFLICT, 40903, "이미 사용자의 반려동물이 존재합니다."),
     CONFLICT_MEMBER_HOSPITAL(HttpStatus.CONFLICT, 40904, "이미 사용자의 즐겨찾는 병원이 존재합니다."),
 
     /**

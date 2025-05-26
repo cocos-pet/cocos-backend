@@ -50,19 +50,20 @@ public class SecurityConfig {
                 apiPrefix + "/posts/**",
                 apiPrefix + "/comments/**",
                 apiPrefix + "/members/login",
-                //TODO: 클라쌤들의 개발을 위해 임시로 추가
-                apiPrefix + "/hospitals/**",
+                apiPrefix + "/hospitals/**"
         };
 
         BLACK_LIST_GET_METHOD_URL_IN_WHITE_LIST = new String[]{
                 apiPrefix + "/posts/members",
                 apiPrefix + "/comments/members",
+                apiPrefix + "/hospitals/reviews/members"
         };
 
         BLACK_LIST_POST_METHOD_URL_IN_WHITE_LIST = new String[]{
                 apiPrefix + "/posts",
                 apiPrefix + "/comments/{postId}",
                 apiPrefix + "/comments/sub/{commentId}",
+                apiPrefix + "/hospitals/{hospitalId}/reviews"
         };
 
         BLACK_LIST_PATCH_METHOD_URL_IN_WHITE_LIST = new String[]{
@@ -73,6 +74,7 @@ public class SecurityConfig {
                 apiPrefix + "/posts/{postId}",
                 apiPrefix + "/comments/{commentId}",
                 apiPrefix + "/comments/sub/{subCommentId}",
+                apiPrefix + "/hospitals/reviews/{reviewId}"
         };
     }
 

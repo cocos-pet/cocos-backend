@@ -13,6 +13,7 @@ import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.common.response.SuccessResponse;
 import com.cocos.cocos.enums.message.SuccessMessage;
 import com.cocos.cocos.util.PrincipalHandler;
+import com.cocos.cocos.util.validation.EntityExistsValidator;
 import com.cocos.cocos.validation.hospital.HospitalIdConstraint;
 import com.cocos.cocos.validation.member.MemberNicknameConstraint;
 import com.cocos.cocos.validation.review.ReviewIdConstraint;
@@ -31,12 +32,14 @@ import org.springframework.web.bind.annotation.*;
 public class ReviewController implements ReviewControllerSwagger {
 
     private final ReviewService reviewService;
+    private final EntityExistsValidator entityExistsValidator;
 
     @PostMapping("/hospitals/{hospitalId}/reviews")
     public ResponseEntity<BaseResponse<ReviewAddResponse>> addReview(
             @PathVariable(name = "hospitalId") @HospitalIdConstraint final Long hospitalId,
             @RequestBody @Valid final ReviewAddRequest reviewAddRequest
     ) {
+        entityExistsValidator.validatePetByMemberId(PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.CREATED, reviewService.addReview(
                 PrincipalHandler.getMemberIdFromPrincipal(), hospitalId, reviewAddRequest.breedId(), reviewAddRequest.gender(),
                 reviewAddRequest.weight(), reviewAddRequest.visitedAt(), reviewAddRequest.content(),
@@ -63,6 +66,7 @@ public class ReviewController implements ReviewControllerSwagger {
             @RequestParam(name = "cursorId", required = false) @ReviewIdConstraint final Long cursorId,
             @RequestParam(name = "size", defaultValue = "10") @Min(value = 1) @Max(value = 20) final int size
     ) {
+        entityExistsValidator.validatePetByMemberId(PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.OK, reviewService.getMemberHospitalReviewList(nickname, cursorId, size, PrincipalHandler.getMemberIdFromPrincipal()));
     }
 
