@@ -278,7 +278,7 @@ public class ReviewService {
                             summaryOptionList,
                             imageUrls,
                             symptoms,
-                            disease.getName(),
+                            disease != null ? disease.getName() : null,
                             animal.getName(),
                             review.getGender(),
                             breed.getName(),
@@ -354,7 +354,10 @@ public class ReviewService {
     }
 
     private Map<Long, Disease> getDiseaseMap(final List<Review> reviews) {
-        final Set<Long> diseaseIds = reviews.stream().map(Review::getDiseaseId).collect(Collectors.toSet());
+        final Set<Long> diseaseIds = reviews.stream()
+                .map(Review::getDiseaseId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
         final Map<Long, Disease> diseaseMap = diseaseRepository.findAllById(diseaseIds).stream()
                 .collect(Collectors.toMap(Disease::getId, Function.identity()));
 

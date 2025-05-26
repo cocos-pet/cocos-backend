@@ -43,7 +43,7 @@ public class Review extends BaseTime {
     @Column(name = "breed_id", nullable = false)
     private Long breedId;
 
-    @Column(name = "disease_id", nullable = false)
+    @Column(name = "disease_id")
     private Long diseaseId;
 
     @Builder
