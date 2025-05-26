@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/dev/test")
+@RequestMapping("${api.prefix}/test")
 public class TestController implements TestControllerSwagger {
 
     @GetMapping("/health-check")

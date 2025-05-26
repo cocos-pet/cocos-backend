@@ -41,6 +41,7 @@ public class SecurityConfig {
         WHITE_LIST_URL = new String[]{
                 "/swagger-ui/**",
                 "/v3/api-docs/**",
+                apiPrefix + "/test/health-check",
                 apiPrefix + "/symptoms",
                 apiPrefix + "/diseases",
                 apiPrefix + "/bodies",
