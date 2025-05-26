@@ -22,9 +22,13 @@ public class Breed {
     @Column(name = "animal_id", nullable = false)
     private Long animalId;
 
+    @Column(name = "is_etc", nullable = false)
+    private boolean isEtc;
+
     @Builder
-    public Breed(String name, Long animalId) {
+    public Breed(String name, Long animalId, boolean isEtc) {
         this.name = name;
         this.animalId = animalId;
+        this.isEtc = isEtc;
     }
 }
