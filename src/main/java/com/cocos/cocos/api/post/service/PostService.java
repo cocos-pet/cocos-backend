@@ -419,6 +419,9 @@ public class PostService {
         final Member member = findMember(memberId, nickname);
         final List<Post> posts = postRepository.findAllByMemberId(member.getId());
         final Pet pet = petRepository.findByMemberId(member.getId());
+        if (pet == null) {
+            throw new CocosException(FailMessage.NOT_FOUND_PET);
+        }
         final Breed breed = breedRepository.findById(pet.getBreedId()).orElseThrow(
                 () -> new CocosException(FailMessage.NOT_FOUND_BREED)
         );
