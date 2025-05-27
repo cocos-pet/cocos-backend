@@ -85,7 +85,6 @@ public class MemberController implements MemberControllerSwagger {
     public ResponseEntity<BaseResponse<MemberHospitalResponse>> getMemberHospital(
             @RequestParam(name = "nickname", required = false) @MemberNicknameConstraint final String nickname
     ) {
-        entityExistsValidator.validatePetByMemberId(PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.OK, memberService.getMemberHospital(nickname, PrincipalHandler.getMemberIdFromPrincipal()));
     }
 
