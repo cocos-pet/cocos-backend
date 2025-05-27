@@ -66,7 +66,6 @@ public class ReviewController implements ReviewControllerSwagger {
             @RequestParam(name = "cursorId", required = false) @ReviewIdConstraint final Long cursorId,
             @RequestParam(name = "size", defaultValue = "10") @Min(value = 1) @Max(value = 20) final int size
     ) {
-        entityExistsValidator.validatePetByMemberId(PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.OK, reviewService.getMemberHospitalReviewList(nickname, cursorId, size, PrincipalHandler.getMemberIdFromPrincipal()));
     }
 
