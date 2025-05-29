@@ -202,7 +202,7 @@ public class ReviewService {
                             summaryOptionList,
                             imageUrls,
                             symptoms,
-                            disease.getName(),
+                            disease != null ? disease.getName() : null,
                             animal.getName(),
                             review.getGender(),
                             breed.getName(),
