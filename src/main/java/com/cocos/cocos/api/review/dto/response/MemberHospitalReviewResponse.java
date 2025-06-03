@@ -34,7 +34,7 @@ public record MemberHospitalReviewResponse(
         @Schema(description = "종 이름", example = "말티즈")
         String breed,
         @Schema(description = "몸무게", example = "2.7")
-        double weight,
+        Double weight,
         @Schema(description = "방문 목적", example = "수술")
         String visitPurpose
 ) {
@@ -42,7 +42,7 @@ public record MemberHospitalReviewResponse(
             final Long id, final Long hospitalId, final String hospitalName, final String visitedAt, final String hospitalAddress,
             final String content, final ReviewSummaryOptionListResponse reviewSummary,
             final List<String> images, final List<String> symptoms, final String disease,
-            final String animal, final Gender gender, final String breed, final double weight, final String visitPurpose
+            final String animal, final Gender gender, final String breed, final Double weight, final String visitPurpose
     ) {
         return new MemberHospitalReviewResponse(id, hospitalId, hospitalName, visitedAt, hospitalAddress,
                 content, reviewSummary, images, symptoms,

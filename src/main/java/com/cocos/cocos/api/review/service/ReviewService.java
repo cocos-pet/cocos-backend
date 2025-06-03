@@ -67,7 +67,7 @@ public class ReviewService {
 
     @Transactional
     public ReviewAddResponse addReview(final Long memberId, final Long hospitalId, final Long breedId, final Gender gender,
-                                       final Integer weight, final String visitedAt, final String content,
+                                       final Double weight, final String visitedAt, final String content,
                                        final Long purposeId, final Long diseaseId, final List<Long> symptomIds,
                                        final List<Long> goodReviewIds, final List<Long> badReviewIds, final List<String> images) {
         //ToDo: id 검증 로직 필요
