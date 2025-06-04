@@ -18,7 +18,7 @@ public record ReviewAddRequest(
         @Schema(description = "성별", nullable = true, example = "F | M")
         Gender gender,
         @Schema(description = "몸무게", nullable = true, example = "5")
-        Integer weight,
+        Double weight,
         @Schema(description = "방문 날짜", nullable = true, example = "2025.04.22")
         String visitedAt,
         @Schema(description = "내용", nullable = true, example = "병원 시설이 너무 깔끔해요.")

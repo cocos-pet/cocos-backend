@@ -65,7 +65,7 @@ public class ReviewServiceTest {
         final Long hospitalId = 2L;
         final Long breedId = 1L;
         final Gender gender = Gender.F;
-        final Integer weight = 7;
+        final double weight = 7.0;
         final String visitedAt = "2025.04.22";
         final String content = "내용";
         final Long purposeId = 2L;

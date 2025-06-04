@@ -25,8 +25,8 @@ public class Review extends BaseTime {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Column(name = "weight", nullable = false)
-    private int weight;
+    @Column(name = "weight")
+    private Double weight;
 
     @Column(name = "purpose_id", nullable = false)
     private Long purposeId;
@@ -47,7 +47,7 @@ public class Review extends BaseTime {
     private Long diseaseId;
 
     @Builder
-    public Review(final String visitedAt, final Gender gender, final int weight, final Long purposeId, final String content, final Long hospitalId, final Long memberId, final Long breedId, final Long diseaseId) {
+    public Review(final String visitedAt, final Gender gender, final Double weight, final Long purposeId, final String content, final Long hospitalId, final Long memberId, final Long breedId, final Long diseaseId) {
         this.visitedAt = visitedAt;
         this.gender = gender;
         this.weight = weight;
