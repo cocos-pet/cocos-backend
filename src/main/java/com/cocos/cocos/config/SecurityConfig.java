@@ -50,7 +50,8 @@ public class SecurityConfig {
                 apiPrefix + "/posts/**",
                 apiPrefix + "/comments/**",
                 apiPrefix + "/members/login",
-                apiPrefix + "/hospitals/**"
+                apiPrefix + "/hospitals/**",
+                apiPrefix + "/locations",
         };
 
         BLACK_LIST_GET_METHOD_URL_IN_WHITE_LIST = new String[]{
