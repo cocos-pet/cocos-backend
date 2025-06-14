@@ -146,7 +146,9 @@ public class HospitalService {
                 hospitalTags,
                 hospital.getIntroduction(),
                 hospital.getDisplayAddress(),
-                appDataS3Client.getPresignedUrl(hospital.getImage())
+                appDataS3Client.getPresignedUrl(hospital.getImage()),
+                hospital.getKeywords(),
+                hospital.getHomepageUrl()
         );
     }
 

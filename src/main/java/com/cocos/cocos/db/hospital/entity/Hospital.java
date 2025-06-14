@@ -46,8 +46,14 @@ public class Hospital {
     @Column(name = "introduction", nullable = true)
     private String introduction;
 
+    @Column(name = "keywords", nullable = true)
+    private String keywords;
+
+    @Column(name = "homepage_url", nullable = true)
+    private String homepageUrl;
+
     @Builder
-    public Hospital(final String name, final String address, final String roadAddress, final String image, final Double latitude, final Double longitude, final int reviewCount, final Long districtId, final String phoneNumber, final String introduction) {
+    public Hospital(final String name, final String address, final String roadAddress, final String image, final Double latitude, final Double longitude, final int reviewCount, final Long districtId, final String phoneNumber, final String introduction, final String keywords, final String homepageUrl) {
         this.name = name;
         this.address = address;
         this.roadAddress = roadAddress;
@@ -58,6 +64,8 @@ public class Hospital {
         this.phoneNumber = phoneNumber;
         this.introduction = introduction;
         this.districtId = districtId;
+        this.keywords = keywords;
+        this.homepageUrl = homepageUrl;
     }
 
     public void addReview() {
