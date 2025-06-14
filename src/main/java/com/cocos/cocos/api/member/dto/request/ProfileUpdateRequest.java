@@ -4,9 +4,7 @@ import com.cocos.cocos.enums.location.LocationType;
 import com.cocos.cocos.validation.location.HasLocation;
 import com.cocos.cocos.validation.location.LocationConstraint;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
 
-@Builder
 @LocationConstraint
 public record ProfileUpdateRequest(
         @Schema(description = "닉네임", example = "코코스")

@@ -10,9 +10,7 @@ import com.cocos.cocos.validation.review.SummaryOptionIdConstraint;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import lombok.Builder;
 
-@Builder
 @LocationConstraint
 public record ReviewListRequest(
         @Schema(description = "리뷰 요약 아이디", example = "1", nullable = true)

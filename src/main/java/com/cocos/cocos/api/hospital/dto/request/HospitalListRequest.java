@@ -8,9 +8,7 @@ import com.cocos.cocos.validation.location.LocationConstraint;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import lombok.Builder;
 
-@Builder
 @LocationConstraint
 public record HospitalListRequest(
 
