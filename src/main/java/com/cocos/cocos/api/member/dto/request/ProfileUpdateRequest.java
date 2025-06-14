@@ -1,8 +1,11 @@
 package com.cocos.cocos.api.member.dto.request;
 
 import com.cocos.cocos.enums.location.LocationType;
+import com.cocos.cocos.validation.location.HasLocation;
+import com.cocos.cocos.validation.location.LocationConstraint;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+@LocationConstraint
 public record ProfileUpdateRequest(
         @Schema(description = "닉네임", example = "코코스")
         String nickname,
@@ -21,8 +24,8 @@ public record ProfileUpdateRequest(
         @Schema(description = "경도", example = "128.xxx")
         Double longitude,
         @Schema(description = "위치 아이디", example = "1")
-        Long locationId,  // TODO: 유효성 검증 로직 추가
+        Long locationId,
         @Schema(description = "위치 종류", example = "CITY | DISTRICT")
         LocationType locationType
-) {
+) implements HasLocation {
 }

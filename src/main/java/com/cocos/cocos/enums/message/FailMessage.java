@@ -37,7 +37,9 @@ public enum FailMessage {
     BAD_REQUEST_INVALID_PURPOSE_ID(HttpStatus.BAD_REQUEST, 40023, "유효하지 않은 방문목적 아이디 입니다. "),
     BAD_REQUEST_INVALID_SUMMARY_OPTION_ID(HttpStatus.BAD_REQUEST, 40024, "유효하지 않은 리뷰 요약 아이디입니다. "),
     BAD_REQUEST_INVALID_GOOD_SUMMARY_OPTION_ID(HttpStatus.BAD_REQUEST, 40025, "유효하지 않은 좋은 리뷰 요약 아이디입니다. "),
-    BAD_REQUEST_INVALID_BAD_SUMMARY_OPTION_ID(HttpStatus.BAD_REQUEST, 440026, "유효하지 않은 나쁜 리뷰 요약 아이디입니다. "),
+    BAD_REQUEST_INVALID_BAD_SUMMARY_OPTION_ID(HttpStatus.BAD_REQUEST, 40026, "유효하지 않은 나쁜 리뷰 요약 아이디입니다. "),
+    BAD_REQUEST_INVALID_CITY_ID(HttpStatus.BAD_REQUEST, 40027, "유효하지 않은 도시 아이디입니다. "),
+    BAD_REQUEST_INVALID_DISTRICT_ID(HttpStatus.BAD_REQUEST, 40028, "유효하지 않은 지역 아이디입니다. "),
     /**
      * 401
      */
