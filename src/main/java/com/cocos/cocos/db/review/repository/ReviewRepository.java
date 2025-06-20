@@ -21,7 +21,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findAllByMemberId(final Long memberId, final Pageable pageable);
 
     @Query("""
-                SELECT r FROM Review r
+                SELECT DISTINCT r FROM Review r
                 JOIN ReviewSummary s ON r.id = s.reviewId
                 WHERE r.hospitalId = :hospitalId
                 AND (:summaryOptionId IS NULL OR s.reviewSummaryOptionId = :summaryOptionId)
@@ -32,7 +32,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     );
 
     @Query("""
-                SELECT r FROM Review r
+                SELECT DISTINCT r FROM Review r
                 JOIN ReviewSummary s ON r.id = s.reviewId
                 WHERE (:reviewIds IS NULL OR r.id IN :reviewIds)
                 AND (:summaryOptionId IS NULL OR s.reviewSummaryOptionId = :summaryOptionId)
