@@ -36,7 +36,7 @@ public class Pet extends BaseTime {
     @Column(name = "breed_id", nullable = false)
     private Long breedId;
 
-    @Column(name = "image",nullable = false)
+    @Column(name = "image", nullable = false)
     private String image;
 
     @Builder
@@ -50,10 +50,17 @@ public class Pet extends BaseTime {
     }
 
     public void updateFields(final String name, final Gender gender, final Integer age, final Long breedId) {
-        //ToDo: {}작성하는 것이 의미를 더 명확하고 이후 예기치 못한 오류를 예방할 수 있어 보임
-        if (name != null) this.name = name;
-        if (gender != null) this.gender = gender;
-        if (age != null) this.age = age;
-        if (breedId != null) this.breedId = breedId;
+        if (name != null) {
+            this.name = name;
+        }
+        if (gender != null) {
+            this.gender = gender;
+        }
+        if (age != null) {
+            this.age = age;
+        }
+        if (breedId != null) {
+            this.breedId = breedId;
+        }
     }
 }
