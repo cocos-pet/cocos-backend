@@ -3,6 +3,7 @@ package com.cocos.cocos.db.pet.entity;
 import com.cocos.cocos.db.BaseTime;
 import com.cocos.cocos.enums.pet.Gender;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,6 +27,7 @@ public class Pet extends BaseTime {
     private Gender gender;
 
     @Column(name = "age", nullable = false)
+    @Min(1)
     private int age;
 
     @Column(name = "member_id", nullable = false)
