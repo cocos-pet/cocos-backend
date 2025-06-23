@@ -7,11 +7,12 @@ import com.cocos.cocos.db.city.entity.City;
 import com.cocos.cocos.db.city.repository.CityRepository;
 import com.cocos.cocos.db.district.entity.District;
 import com.cocos.cocos.db.district.repository.DistrictRepository;
+import com.cocos.cocos.enums.location.LocationType;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +21,8 @@ public class LocationService {
     private final DistrictRepository districtRepository;
     private final CityRepository cityRepository;
 
+    private static final String ALL_CITY_LABEL = " 전체";
+
     @Transactional(readOnly = true)
     public LocationResponse getLocations() {
         final List<City> cities = cityRepository.findAll();
@@ -27,12 +30,22 @@ public class LocationService {
                 cities.stream()
                         .map(city -> {
                             final List<District> districts = districtRepository.findAllByCityId(city.getId());
+                            final List<DistrictResponse> districtResponses = new ArrayList<>(List.of(
+                                    DistrictResponse.of(city.getId(), city.getName() + ALL_CITY_LABEL,
+                                            LocationType.CITY.toString())
+                            ));
+                            districtResponses.addAll(
+                                    districts.stream()
+                                            .map(district -> DistrictResponse.of(district.getId(), district.getName(),
+                                                    LocationType.DISTRICT.toString()))
+                                            .toList()
+                            );
+
                             return CityResponse.of(
                                     city.getId(),
                                     city.getName(),
-                                    districts.stream()
-                                            .map(district -> DistrictResponse.of(district.getId(), district.getName()))
-                                            .toList());
+                                    districtResponses
+                            );
 
                         })
                         .toList()

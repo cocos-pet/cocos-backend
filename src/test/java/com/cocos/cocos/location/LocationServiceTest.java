@@ -8,6 +8,7 @@ import com.cocos.cocos.db.city.entity.City;
 import com.cocos.cocos.db.city.repository.CityRepository;
 import com.cocos.cocos.db.district.entity.District;
 import com.cocos.cocos.db.district.repository.DistrictRepository;
+import com.cocos.cocos.enums.location.LocationType;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -62,9 +63,14 @@ public class LocationServiceTest {
         BDDMockito.given(cityRepository.findAll()).willReturn(cities);
         BDDMockito.given(districtRepository.findAllByCityId(any())).willReturn(districts);
 
-        final DistrictResponse districtResponse1 = DistrictResponse.of(district1.getId(), district1.getName());
-        final DistrictResponse districtResponse2 = DistrictResponse.of(district2.getId(), district2.getName());
-        final CityResponse cityResponse = CityResponse.of(city.getId(), city.getName(), List.of(districtResponse1, districtResponse2));
+        final DistrictResponse districtResponse1 = DistrictResponse.of(district1.getId(), district1.getName(),
+                LocationType.DISTRICT.toString());
+        final DistrictResponse districtResponse2 = DistrictResponse.of(district2.getId(), district2.getName(),
+                LocationType.DISTRICT.toString());
+        final DistrictResponse cityDistrictResponse = DistrictResponse.of(city.getId(), city.getName() + " 전체",
+                LocationType.CITY.toString());
+        final CityResponse cityResponse = CityResponse.of(city.getId(), city.getName(),
+                List.of(cityDistrictResponse, districtResponse1, districtResponse2));
         final LocationResponse expected = LocationResponse.of(List.of(cityResponse));
 
         // when
