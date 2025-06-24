@@ -32,12 +32,12 @@ public class LocationService {
                             final List<District> districts = districtRepository.findAllByCityId(city.getId());
                             final List<DistrictResponse> districtResponses = new ArrayList<>(List.of(
                                     DistrictResponse.of(city.getId(), city.getName() + ALL_CITY_NAME_SUFFIX,
-                                            LocationType.CITY.toString())
+                                            LocationType.CITY.name())
                             ));
                             districtResponses.addAll(
                                     districts.stream()
                                             .map(district -> DistrictResponse.of(district.getId(), district.getName(),
-                                                    LocationType.DISTRICT.toString()))
+                                                    LocationType.DISTRICT.name()))
                                             .toList()
                             );
 
