@@ -5,6 +5,7 @@ import com.cocos.cocos.validation.breed.BreedIdConstraint;
 import com.cocos.cocos.validation.disease.DiseaseIdsConstraint;
 import com.cocos.cocos.validation.symptom.SymptomIdsConstraint;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ public record PetCreateRequest(
         Gender gender,
 
         @Schema(description = "나이", example = "12")
+        @Min(1)
         int age,
 
         @Schema(description = "질병 아이디 리스트", example = "[1,2,3]")

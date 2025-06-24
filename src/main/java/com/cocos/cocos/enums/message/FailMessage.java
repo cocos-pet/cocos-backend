@@ -40,6 +40,7 @@ public enum FailMessage {
     BAD_REQUEST_INVALID_BAD_SUMMARY_OPTION_ID(HttpStatus.BAD_REQUEST, 40026, "유효하지 않은 나쁜 리뷰 요약 아이디입니다. "),
     BAD_REQUEST_INVALID_CITY_ID(HttpStatus.BAD_REQUEST, 40027, "유효하지 않은 도시 아이디입니다. "),
     BAD_REQUEST_INVALID_DISTRICT_ID(HttpStatus.BAD_REQUEST, 40028, "유효하지 않은 지역 아이디입니다. "),
+    BAD_REQUEST_VALIDATION_ERROR(HttpStatus.BAD_REQUEST, 40029, "요청에 유효하지 않은 데이터가 있습니다. "),
     /**
      * 401
      */

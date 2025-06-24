@@ -17,10 +17,13 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -94,6 +97,16 @@ public class GlobalExceptionHandler {
             return FailResponse.failure(FailMessage.INTEGRITY_CONFLICT);
         }
     }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<BaseResponse<?>> handleHandlerMethodValidationException(HandlerMethodValidationException e) {
+        final String errorMessage = Arrays.stream(Objects.requireNonNull(e.getDetailMessageArguments()))
+                .map(Object::toString)
+                .collect(Collectors.joining("\n"));
+
+        return FailResponse.failure(FailMessage.BAD_REQUEST_VALIDATION_ERROR, errorMessage);
+    }
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<BaseResponse<?>> handleGeneralException(Exception e) {
