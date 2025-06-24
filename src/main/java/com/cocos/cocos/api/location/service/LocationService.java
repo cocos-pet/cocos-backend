@@ -21,7 +21,7 @@ public class LocationService {
     private final DistrictRepository districtRepository;
     private final CityRepository cityRepository;
 
-    private static final String ALL_CITY_LABEL = " 전체";
+    private static final String ALL_CITY_NAME_SUFFIX = " 전체";
 
     @Transactional(readOnly = true)
     public LocationResponse getLocations() {
@@ -31,7 +31,7 @@ public class LocationService {
                         .map(city -> {
                             final List<District> districts = districtRepository.findAllByCityId(city.getId());
                             final List<DistrictResponse> districtResponses = new ArrayList<>(List.of(
-                                    DistrictResponse.of(city.getId(), city.getName() + ALL_CITY_LABEL,
+                                    DistrictResponse.of(city.getId(), city.getName() + ALL_CITY_NAME_SUFFIX,
                                             LocationType.CITY.toString())
                             ));
                             districtResponses.addAll(
