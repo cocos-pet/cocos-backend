@@ -26,8 +26,7 @@
 - GitHub Actions를 활용한 CI/CD 파이프라인이 구성되어 있어, `main`, `dev` 브랜치 머지 시 자동으로 Docker 이미지 빌드 및 서버 반영이 이루어집니다. 
 - 무중단 배포를 위해 블루그린 배포 전략을 적용하여, 새 버전 배포 시에도 사용자에게 영향 없이 서비스가 전환됩니다.
 <br><br>
-![Image](https://github.com/user-attachments/assets/2509893e-6e3a-40df-9e35-74e39efcbe98)
-
+  ![Image](https://github.com/user-attachments/assets/73474caa-ba24-4813-b45f-5f99638ab6ca)
 ---
 ## 🐹 ERD
 - 데이터 모델링 시 정규화를 통해 반복 필드를 제거하고, N:M 관계는 조인 테이블을 통해 명확히 분리하였습니다. 
