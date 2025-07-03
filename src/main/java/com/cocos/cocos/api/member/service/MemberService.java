@@ -263,6 +263,10 @@ public class MemberService {
     private void deleteAboutPet(final Long memberId) {
         final Pet pet = petRepository.findByMemberId(memberId);
 
+        if (pet == null) {
+            return;
+        }
+
         petSymptomRepository.deleteAllByPetId(pet.getId());
         petDiseaseRepository.deleteAllByPetId(pet.getId());
         petRepository.deleteById(pet.getId());
