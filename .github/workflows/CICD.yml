@@ -12,6 +12,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # 브랜치 필터링 확인
+      - name: Validate branch for tag
+        run: |
+          echo "Checking if tag is from the prod branch..."
+          git fetch origin prod --depth=1
+          COMMIT_HASH=$(git rev-parse HEAD)
+          PROD_HASH=$(git rev-parse origin/prod)
+          if [ "$COMMIT_HASH" != "$PROD_HASH" ]; then
+            echo "Tag is not from the prod branch. Exiting workflow."
+            exit 1
+          fi
+
       - name: create application.yml
         run: |
           mkdir ./src/main/resources
