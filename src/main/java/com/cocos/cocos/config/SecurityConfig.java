@@ -81,7 +81,7 @@ public class SecurityConfig {
 
     @Bean
     @Profile("dev")
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChainDev(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .requestCache(RequestCacheConfigurer::disable)
@@ -144,6 +144,42 @@ public class SecurityConfig {
                     auth.anyRequest().authenticated();
                 })
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+
+    @Bean
+    @Profile("prod")
+    SecurityFilterChain securityFilterChainProd(HttpSecurity http) throws Exception {
+        http.csrf(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .requestCache(RequestCacheConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .exceptionHandling(exception ->
+                {
+                    exception.authenticationEntryPoint(customJwtAuthenticationEntryPoint);
+                    exception.accessDeniedHandler(customAccessDeniedHandler);
+                });
+
+        http.authorizeHttpRequests(auth -> {
+                    auth.requestMatchers(HttpMethod.GET,
+                                    BLACK_LIST_GET_METHOD_URL_IN_WHITE_LIST)
+                            .authenticated();
+                    auth.requestMatchers(HttpMethod.POST,
+                                    BLACK_LIST_POST_METHOD_URL_IN_WHITE_LIST)
+                            .authenticated();
+                    auth.requestMatchers(HttpMethod.PATCH,
+                                    BLACK_LIST_PATCH_METHOD_URL_IN_WHITE_LIST)
+                            .authenticated();
+                    auth.requestMatchers(HttpMethod.DELETE,
+                                    BLACK_LIST_DELETE_METHOD_URL_IN_WHITE_LIST)
+                            .authenticated();
+                    auth.requestMatchers(WHITE_LIST_URL).permitAll();
+                    auth.anyRequest().authenticated();
+                })
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        http.cors(cors -> cors.configurationSource(CorsConfig.corsConfigurationSource()));
 
         return http.build();
     }
