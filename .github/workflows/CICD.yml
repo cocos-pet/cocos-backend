@@ -12,6 +12,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # 브랜치 필터링 확인
+      - name: Validate branch for tag
+        run: |
+          echo "Checking if tag is from the main branch..."
+          git fetch origin main --depth=1
+          COMMIT_HASH=$(git rev-parse HEAD)
+          MAIN_HASH=$(git rev-parse origin/main)
+          if [ "$COMMIT_HASH" != "$MAIN_HASH" ]; then
+            echo "Tag is not from the main branch. Exiting workflow."
+            exit 1
+          fi
+
       - name: create application.yml
         run: |
           mkdir ./src/main/resources
