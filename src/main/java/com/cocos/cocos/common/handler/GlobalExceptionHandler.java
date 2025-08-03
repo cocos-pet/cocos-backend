@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(CocosException.class)
-    public ResponseEntity<BaseResponse<?>> handleAgodaException(final CocosException e) {
+    public ResponseEntity<BaseResponse<?>> handleCocosException(final CocosException e) {
         return FailResponse.failure(e.getFailMessage());
     }
 
@@ -103,14 +103,7 @@ public class GlobalExceptionHandler {
         final String errorMessage = Arrays.stream(Objects.requireNonNull(e.getDetailMessageArguments()))
                 .map(Object::toString)
                 .collect(Collectors.joining("\n"));
-
         return FailResponse.failure(FailMessage.BAD_REQUEST_VALIDATION_ERROR, errorMessage);
-    }
-
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<BaseResponse<?>> handleGeneralException(Exception e) {
-        return FailResponse.failure(FailMessage.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(ValidationException.class)
@@ -120,4 +113,10 @@ public class GlobalExceptionHandler {
         }
         return FailResponse.failure(FailMessage.BAD_REQUEST);
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<BaseResponse<?>> handleGeneralException(Exception e) {
+        return FailResponse.failure(FailMessage.INTERNAL_SERVER_ERROR);
+    }
+
 }
