@@ -6,7 +6,7 @@
               value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level
 method=%X{method:-} uri=%X{uri:-} status=%X{status:-}
 duration=%X{duration:-}ms concurrent=%X{concurrent:-} sqlCount=%X{sqlCount:-}
-ip=%X{ip:-} userId=%X{userId:-} - %msg%n"/>
+ip=%X{ip:-} - %msg%n"/>
 
     <logger name="org.hibernate.SQL" level="WARN"/>
     <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="WARN"/>
