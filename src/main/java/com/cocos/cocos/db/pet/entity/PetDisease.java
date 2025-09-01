@@ -8,7 +8,10 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "pet_disease")
+@Table(name = "pet_disease",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"pet_id", "disease_id"})
+        })
 public class PetDisease {
 
     @Id

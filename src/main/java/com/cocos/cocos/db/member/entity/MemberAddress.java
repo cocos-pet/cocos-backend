@@ -20,7 +20,7 @@ public class MemberAddress {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "member_id", nullable = false)
+    @Column(name = "member_id", nullable = false, unique = true)
     private Long memberId;
 
     @Column(name = "address", nullable = false)

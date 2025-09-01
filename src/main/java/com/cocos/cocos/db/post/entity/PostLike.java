@@ -9,7 +9,10 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "post_like")
+@Table(name = "post_like",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"member_id", "post_id"})
+        })
 public class PostLike extends BaseTime {
 
     @Id
