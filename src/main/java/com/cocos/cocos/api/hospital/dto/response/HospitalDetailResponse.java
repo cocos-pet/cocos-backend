@@ -20,9 +20,13 @@ public record HospitalDetailResponse(
         @Schema(description = "병원 키워드들", example = "#친절함, #강아지")
         String keywords,
         @Schema(description = "병원 홈페이지 URL", example = "https://www.~~")
-        String homepageUrl
+        String homepageUrl,
+        @Schema(description = "병원 위도", example = "36.68372225927701")
+        Double latitude,
+        @Schema(description = "병원 경도", example = "126.82909060661319")
+        Double longitude
 ) {
-    public static HospitalDetailResponse of(final String name, final String phoneNumber, final List<String> tags, final String introduction, final String address, final String image, final String keywords, final String homepageUrl) {
-        return new HospitalDetailResponse(name, phoneNumber, tags, introduction, address, image, keywords, homepageUrl);
+    public static HospitalDetailResponse of(final String name, final String phoneNumber, final List<String> tags, final String introduction, final String address, final String image, final String keywords, final String homepageUrl, final Double latitude, final Double longitude) {
+        return new HospitalDetailResponse(name, phoneNumber, tags, introduction, address, image, keywords, homepageUrl, latitude, longitude);
     }
 }
