@@ -43,7 +43,7 @@ public class Hospital {
     @Column(name = "phone_number", nullable = true)
     private String phoneNumber;
 
-    @Column(name = "introduction", nullable = true)
+    @Column(name = "introduction", columnDefinition = "text", nullable = true)
     private String introduction;
 
     @Column(name = "keywords", nullable = true)
@@ -53,7 +53,10 @@ public class Hospital {
     private String homepageUrl;
 
     @Builder
-    public Hospital(final String name, final String address, final String roadAddress, final String image, final Double latitude, final Double longitude, final int reviewCount, final Long districtId, final String phoneNumber, final String introduction, final String keywords, final String homepageUrl) {
+    public Hospital(final String name, final String address, final String roadAddress, final String image,
+                    final Double latitude, final Double longitude, final int reviewCount, final Long districtId,
+                    final String phoneNumber, final String introduction, final String keywords,
+                    final String homepageUrl) {
         this.name = name;
         this.address = address;
         this.roadAddress = roadAddress;

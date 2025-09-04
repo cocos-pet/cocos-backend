@@ -30,7 +30,7 @@ public class Pet extends BaseTime {
     @Min(1)
     private int age;
 
-    @Column(name = "member_id", nullable = false)
+    @Column(name = "member_id", nullable = false, unique = true)
     private Long memberId;
 
     @Column(name = "breed_id", nullable = false)
@@ -40,7 +40,8 @@ public class Pet extends BaseTime {
     private String image;
 
     @Builder
-    public Pet(final String name, final Gender gender, final int age, final Long memberId, final Long breedId, final String image) {
+    public Pet(final String name, final Gender gender, final int age, final Long memberId, final Long breedId,
+               final String image) {
         this.name = name;
         this.gender = gender;
         this.age = age;

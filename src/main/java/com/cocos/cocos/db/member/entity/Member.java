@@ -37,7 +37,7 @@ public class Member extends BaseTime {
     @Enumerated(EnumType.STRING)
     private Platform platform;
 
-    @Column(name = "sub", nullable = false)
+    @Column(name = "sub", nullable = false, unique = true)
     private String sub;
 
     @Column(name = "is_admin", nullable = false)
@@ -55,7 +55,8 @@ public class Member extends BaseTime {
     private LocalDateTime reviewTermsAgreeAt;
 
     @Builder
-    public Member(final String nickname, final String email, final String image, final Platform platform, final String sub, final boolean isAdmin, final Long myHospitalId) {
+    public Member(final String nickname, final String email, final String image, final Platform platform,
+                  final String sub, final boolean isAdmin, final Long myHospitalId) {
         this.nickname = nickname;
         this.email = email;
         this.image = image;
@@ -73,7 +74,9 @@ public class Member extends BaseTime {
     }
 
     public void updateNickname(final String nickname) {
-        if (nickname != null) this.nickname = nickname;
+        if (nickname != null) {
+            this.nickname = nickname;
+        }
     }
 
     public void updateMyHospitalId(final Long myHospitalId) {

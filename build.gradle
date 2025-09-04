@@ -68,6 +68,10 @@ dependencies {
 
     testAnnotationProcessor "io.github.openfeign.querydsl:querydsl-apt:7.0:jpa"
     testAnnotationProcessor 'jakarta.persistence:jakarta.persistence-api'
+
+    // flyway
+    implementation "org.flywaydb:flyway-core"
+    implementation "org.flywaydb:flyway-mysql"
 }
 
 tasks.named('test') {
