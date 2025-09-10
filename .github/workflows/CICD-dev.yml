@@ -13,7 +13,7 @@ jobs:
 
       - name: create application.yml
         run: |
-          mkdir ./src/main/resources
+          mkdir -p ./src/main/resources
           cd ./src/main/resources
           
           touch ./application.yml
