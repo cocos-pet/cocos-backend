@@ -101,7 +101,9 @@ public class HospitalServiceTest {
                 new ArrayList<>(List.of("라벨1")),
                 "병원 소개",
                 "병원 도로명주소",
-                "병원 이미지"
+                "병원 이미지",
+                "",
+                ""
         );
 
         //when
@@ -158,7 +160,9 @@ public class HospitalServiceTest {
                 new ArrayList<>(List.of("라벨1")),
                 "병원 소개",
                 "병원 주소",
-                "병원 이미지"
+                "병원 이미지",
+                "",
+                ""
         );
 
         //when
@@ -219,4 +223,3 @@ public class HospitalServiceTest {
         Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
     }
 }
-

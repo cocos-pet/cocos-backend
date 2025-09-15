@@ -23,7 +23,7 @@ public class MemberToken extends BaseTime {
     @Column(name = "kakao_refresh_token", nullable = false)
     private String KakaoRefreshToken;
 
-    @Column(name = "member_id", nullable = false)
+    @Column(name = "member_id", nullable = false, unique = true)
     private Long memberId;
 
     @Builder

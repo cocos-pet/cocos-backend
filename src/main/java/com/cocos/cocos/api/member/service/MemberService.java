@@ -104,7 +104,9 @@ public class MemberService {
             final MemberToken memberToken = memberTokenRepository.findByMemberId(member.getId());
             memberToken.updateRefreshToken(refreshToken);
         } else {
-            memberTokenRepository.save(MemberToken.builder().memberId(member.getId()).refreshToken(refreshToken).kakaoRefreshToken("").build());
+            memberTokenRepository.save(
+                    MemberToken.builder().memberId(member.getId()).refreshToken(refreshToken).kakaoRefreshToken("")
+                            .build());
         }
         if (!memberAddressRepository.existsByMemberId(member.getId())) {
             memberAddressRepository.save(
@@ -145,9 +147,8 @@ public class MemberService {
                 () -> new CocosException(FailMessage.NOT_FOUND_MEMBER)
         );
 
-        if (address != null && roadAddress != null) {
-            updateMemberLocation(memberId, address, roadAddress, locationId, locationType, latitude, longitude);
-
+        if (locationId != null && locationType != null) {
+            updateMemberLocation(memberId, locationId, locationType);
         }
 
         if (memberRepository.existsByNickname(nickname)) {
@@ -190,7 +191,8 @@ public class MemberService {
             return null;
         }
 
-        final Hospital hospital = hospitalRepository.findById(member.getMyHospitalId()).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_HOSPITAL));
+        final Hospital hospital = hospitalRepository.findById(member.getMyHospitalId())
+                .orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_HOSPITAL));
         return MemberHospitalResponse.of(
                 hospital.getId(),
                 hospital.getName(),
@@ -204,24 +206,24 @@ public class MemberService {
         if (!hospitalRepository.existsById(hospitalId)) {
             throw new CocosException(FailMessage.NOT_FOUND_HOSPITAL);
         }
-        final Member member = memberRepository.findById(memberId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
+        final Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
         member.updateMyHospitalId(hospitalId);
     }
 
     private Member findMember(final String nickname, final Long memberId) {
         if (nickname != null) {
-            return memberRepository.findByNickname(nickname).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
+            return memberRepository.findByNickname(nickname)
+                    .orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
         }
         return memberRepository.findById(memberId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
     }
 
-    private void updateMemberLocation(final Long memberId, final String address, final String roadAddress,
-                                      final Long locationId, final LocationType locationType,
-                                      final Double latitude, final Double longitude) {
+    private void updateMemberLocation(final Long memberId, final Long locationId, final LocationType locationType) {
         final MemberAddress memberAddress = memberAddressRepository.findByMemberId(memberId).orElseThrow(
                 () -> new CocosException(FailMessage.NOT_FOUND_MEMBER_ADDRESS)
         );
-        memberAddress.updateAddress(address, roadAddress, locationId, latitude, longitude, locationType);
+        memberAddress.updateLocation(locationId, locationType);
     }
 
     @Transactional
@@ -296,7 +298,8 @@ public class MemberService {
     }
 
     private void deleteAboutComment(final List<Long> memberWritePostIds, final Long memberId) {
-        final List<Comment> memberWriteOrDeleteTargetComments = commentRepository.findAllByPostIdInOrMemberId(memberWritePostIds, memberId);
+        final List<Comment> memberWriteOrDeleteTargetComments = commentRepository.findAllByPostIdInOrMemberId(
+                memberWritePostIds, memberId);
         final List<Long> memberWriteOrDeleteTargetCommentsIds = memberWriteOrDeleteTargetComments.stream()
                 .map(Comment::getId)
                 .toList();

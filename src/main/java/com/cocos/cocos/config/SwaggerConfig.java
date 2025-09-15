@@ -47,7 +47,7 @@ public class SwaggerConfig {
         return new Info()
                 .title("COCOS API Swagger")
                 .description(SWAGGER_DESCRIPTION)
-                .version("dev");
+                .version("v.0.0.0");
     }
 
 

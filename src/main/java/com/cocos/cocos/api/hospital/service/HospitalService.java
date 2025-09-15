@@ -148,7 +148,9 @@ public class HospitalService {
                 hospital.getDisplayAddress(),
                 appDataS3Client.getPresignedUrl(hospital.getImage()),
                 hospital.getKeywords(),
-                hospital.getHomepageUrl()
+                hospital.getHomepageUrl(),
+                hospital.getLatitude(),
+                hospital.getLongitude()
         );
     }
 
