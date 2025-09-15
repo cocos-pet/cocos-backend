@@ -1,12 +1,11 @@
 <configuration>
+    <!-- 기본 로그 패턴 (파일 저장용, 평문) -->
     <property name="DEFAULT_LOG_PATTERN"
               value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
 
-    <property name="ACCESS_LOG_PATTERN"
-              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level
-method=%X{method:-} uri=%X{uri:-} status=%X{status:-}
-duration=%X{duration:-}ms concurrent=%X{concurrent:-} sqlCount=%X{sqlCount:-}
-ip=%X{ip:-} - %msg%n"/>
+    <!-- 컬러 로그 패턴 (콘솔 출력용) -->
+    <property name="COLOR_LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %highlight(%-5level) %cyan(%logger{36}) - %msg%n"/>
 
     <logger name="org.hibernate.SQL" level="WARN"/>
     <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="WARN"/>
@@ -14,30 +13,27 @@ ip=%X{ip:-} - %msg%n"/>
     <logger name="org.hibernate.engine.internal.StatisticalLoggingSessionEventListener" level="WARN"/>
     <logger name="org.hibernate.engine.jdbc.spi.SqlStatementLogger" level="WARN"/>
 
-    <appender name="DEFAULT_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <!-- 공통: 콘솔 컬러 로그 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>${DEFAULT_LOG_PATTERN}</pattern>
+            <pattern>${COLOR_LOG_PATTERN}</pattern>
         </encoder>
     </appender>
 
-    <appender name="ACCESS_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>${ACCESS_LOG_PATTERN}</pattern>
-        </encoder>
-    </appender>
-
+    <!-- local 프로파일 -->
     <springProfile name="local">
         <logger name="com.cocos.cocos.common.filter.RequestLoggingFilter" level="INFO" additivity="false">
-            <appender-ref ref="ACCESS_CONSOLE"/>
+            <appender-ref ref="CONSOLE"/>
         </logger>
 
         <logger name="com.cocos" level="DEBUG"/>
 
         <root level="INFO">
-            <appender-ref ref="DEFAULT_CONSOLE"/>
+            <appender-ref ref="CONSOLE"/>
         </root>
     </springProfile>
 
+    <!-- dev 프로파일 -->
     <springProfile name="dev">
         <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <file>logs/dev-app.log</file>
@@ -53,16 +49,17 @@ ip=%X{ip:-} - %msg%n"/>
         </appender>
 
         <logger name="com.cocos.cocos.common.filter.RequestLoggingFilter" level="INFO" additivity="false">
-            <appender-ref ref="ACCESS_CONSOLE"/>
+            <appender-ref ref="CONSOLE"/>
             <appender-ref ref="FILE"/>
         </logger>
 
         <root level="INFO">
-            <appender-ref ref="DEFAULT_CONSOLE"/>
+            <appender-ref ref="CONSOLE"/>
             <appender-ref ref="FILE"/>
         </root>
     </springProfile>
 
+    <!-- prod 프로파일 -->
     <springProfile name="prod">
         <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <file>/var/log/cocos/app.log</file>
@@ -78,12 +75,12 @@ ip=%X{ip:-} - %msg%n"/>
         </appender>
 
         <logger name="com.cocos.cocos.common.filter.RequestLoggingFilter" level="INFO" additivity="false">
-            <appender-ref ref="ACCESS_CONSOLE"/>
+            <appender-ref ref="CONSOLE"/>
             <appender-ref ref="FILE"/>
         </logger>
 
         <root level="INFO">
-            <appender-ref ref="DEFAULT_CONSOLE"/>
+            <appender-ref ref="CONSOLE"/>
             <appender-ref ref="FILE"/>
         </root>
     </springProfile>
