@@ -20,7 +20,7 @@ public class MemberAddress {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "member_id", nullable = false)
+    @Column(name = "member_id", nullable = false, unique = true)
     private Long memberId;
 
     @Column(name = "address", nullable = false)
@@ -49,7 +49,8 @@ public class MemberAddress {
     private Double longitude;
 
     @Builder
-    public MemberAddress(final Long memberId, final String address, final String roadAddress, final Long locationId, final Double latitude, final Double longitude, final LocationType locationType) {
+    public MemberAddress(final Long memberId, final String address, final String roadAddress, final Long locationId,
+                         final Double latitude, final Double longitude, final LocationType locationType) {
         this.memberId = memberId;
         this.address = address;
         this.roadAddress = roadAddress;
@@ -59,12 +60,18 @@ public class MemberAddress {
         this.locationType = locationType;
     }
 
-    public void updateAddress(final String address, final String roadAddress, final Long locationId, final Double latitude, final Double longitude, final LocationType locationType) {
+    public void updateAddress(final String address, final String roadAddress, final Long locationId,
+                              final Double latitude, final Double longitude, final LocationType locationType) {
         this.address = address;
         this.roadAddress = roadAddress;
         this.locationId = locationId;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.locationType = locationType;
+    }
+
+    public void updateLocation(final Long locationId, final LocationType locationType) {
+        this.locationId = locationId;
         this.locationType = locationType;
     }
 
