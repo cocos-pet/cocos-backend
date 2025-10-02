@@ -29,7 +29,6 @@ jobs:
         run: |
           docker build \
             --build-arg SPRING_PROFILES_ACTIVE=dev \
-            -f Dockerfile-dev \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/cocos-dev .
 
       - name: Docker Hub push
