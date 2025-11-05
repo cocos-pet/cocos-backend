@@ -5,7 +5,7 @@ import com.cocos.cocos.api.animal.dto.response.AnimalsResponse;
 import com.cocos.cocos.api.animal.service.AnimalService;
 import com.cocos.cocos.db.animal.entity.Animal;
 import com.cocos.cocos.db.animal.repository.AnimalRepository;
-import com.cocos.cocos.external.AppDataS3Client;
+import com.cocos.cocos.external.CloudfrontClient;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -34,7 +34,7 @@ public class AnimalServiceTest {
     private AnimalRepository animalRepository;
 
     @Mock
-    private AppDataS3Client appDataS3Client;
+    private CloudfrontClient cloudfrontClient;
 
     @Test
     @DisplayName("동물 리스트를 조회할 수 있다.")
@@ -55,7 +55,7 @@ public class AnimalServiceTest {
                         .toList()
         );
         BDDMockito.given(animalRepository.findAll()).willReturn(animals);
-        BDDMockito.given(appDataS3Client.getPresignedUrl(any())).willReturn("image");
+        BDDMockito.given(cloudfrontClient.getAppCloudfrontUrl(any())).willReturn("image");
 
         //when
         final AnimalsResponse actual = animalService.getAnimals();
