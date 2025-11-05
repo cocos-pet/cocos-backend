@@ -15,7 +15,7 @@ import com.cocos.cocos.db.pet.repository.PetRepository;
 import com.cocos.cocos.db.post.entity.Post;
 import com.cocos.cocos.db.post.repository.PostRepository;
 import com.cocos.cocos.enums.message.FailMessage;
-import com.cocos.cocos.external.MemberDataS3Client;
+import com.cocos.cocos.external.CloudfrontClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +33,7 @@ public class CommentService {
     private final PetRepository petRepository;
     private final BreedRepository breedRepository;
     private final PostRepository postRepository;
-    private final MemberDataS3Client memberDataS3Client;
+    private final CloudfrontClient cloudfrontClient;
 
     @Transactional
     public void addPostComment(final Long postId, final String content, final Long memberId) {
@@ -194,7 +194,7 @@ public class CommentService {
         return CommentAndSubCommentsResponse.of(
                 comment.getId(),
                 commentMember.getNickname(),
-                memberDataS3Client.getPresignedUrl(commentMember.getImage()),
+                cloudfrontClient.getMemberCloudfrontUrl(commentMember.getImage()),
                 commentBreed.getName(),
                 commentPet.getAge(),
                 comment.getContent(),
@@ -220,7 +220,7 @@ public class CommentService {
         return SubCommentResponse.of(
                 subComment.getId(),
                 subCommentMember.getNickname(),
-                memberDataS3Client.getPresignedUrl(subCommentMember.getImage()),
+                cloudfrontClient.getMemberCloudfrontUrl(subCommentMember.getImage()),
                 subCommentBreed.getName(),
                 subCommentPet.getAge(),
                 subComment.getContent(),

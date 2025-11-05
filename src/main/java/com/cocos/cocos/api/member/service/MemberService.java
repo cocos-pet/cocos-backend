@@ -37,6 +37,7 @@ import com.cocos.cocos.enums.location.LocationType;
 import com.cocos.cocos.enums.member.Platform;
 import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.external.AppDataS3Client;
+import com.cocos.cocos.external.CloudfrontClient;
 import com.cocos.cocos.external.KakaoLoginClient;
 import com.cocos.cocos.external.MemberDataS3Client;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +51,6 @@ import java.util.List;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private final MemberDataS3Client memberDataS3Client;
     private final KakaoLoginClient kakaoLoginClient;
     private final JwtProvider jwtProvider;
     private final MemberTokenRepository memberTokenRepository;
@@ -72,12 +72,12 @@ public class MemberService {
     private final ReviewImageRepository reviewImageRepository;
     private final ReviewSummaryRepository reviewSummaryRepository;
     private final ReviewSymptomRepository reviewSymptomRepository;
-    private final AppDataS3Client appDataS3Client;
+    private final CloudfrontClient cloudfrontClient;
 
     @Transactional(readOnly = true)
     public MemberProfileResponse getMemberProfile(final String nickname, final Long memberId) {
         final Member member = findMember(nickname, memberId);
-        return MemberProfileResponse.of(member.getNickname(), memberDataS3Client.getPresignedUrl(member.getImage()));
+        return MemberProfileResponse.of(member.getNickname(), cloudfrontClient.getMemberCloudfrontUrl(member.getImage()));
     }
 
     @Transactional
@@ -197,7 +197,7 @@ public class MemberService {
                 hospital.getId(),
                 hospital.getName(),
                 hospital.getDisplayAddress(),
-                appDataS3Client.getPresignedUrl(hospital.getImage())
+                cloudfrontClient.getAppCloudfrontUrl(hospital.getImage())
         );
     }
 

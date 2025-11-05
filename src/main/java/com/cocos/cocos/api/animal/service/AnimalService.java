@@ -4,7 +4,7 @@ import com.cocos.cocos.api.animal.dto.response.AnimalResponse;
 import com.cocos.cocos.api.animal.dto.response.AnimalsResponse;
 import com.cocos.cocos.db.animal.entity.Animal;
 import com.cocos.cocos.db.animal.repository.AnimalRepository;
-import com.cocos.cocos.external.AppDataS3Client;
+import com.cocos.cocos.external.CloudfrontClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,14 +16,14 @@ import java.util.List;
 public class AnimalService {
 
     private final AnimalRepository animalRepository;
-    private final AppDataS3Client appDataS3Client;
+    private final CloudfrontClient cloudfrontClient;
 
     @Transactional(readOnly = true)
     public AnimalsResponse getAnimals() {
         final List<Animal> animals = animalRepository.findAll();
         return AnimalsResponse.of(
                 animals.stream()
-                        .map(animal -> AnimalResponse.of(animal.getId(), animal.getName(), appDataS3Client.getPresignedUrl(animal.getImage())))
+                        .map(animal -> AnimalResponse.of(animal.getId(), animal.getName(), cloudfrontClient.getAppCloudfrontUrl(animal.getImage())))
                         .toList()
         );
     }

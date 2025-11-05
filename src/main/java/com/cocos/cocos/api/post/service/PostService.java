@@ -30,6 +30,7 @@ import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.enums.post.PostSortCriteria;
 import com.cocos.cocos.enums.tag.TagType;
 import com.cocos.cocos.external.AppDataS3Client;
+import com.cocos.cocos.external.CloudfrontClient;
 import com.cocos.cocos.external.MemberDataS3Client;
 import com.cocos.cocos.util.PostSpecification;
 import lombok.RequiredArgsConstructor;
@@ -66,8 +67,8 @@ public class PostService {
     private final SymptomRepository symptomRepository;
     private final PetDiseaseRepository petDiseaseRepository;
     private final PetSymptomRepository petSymptomRepository;
-    private final AppDataS3Client appDataS3Client;
     private final MemberDataS3Client memberDataS3Client;
+    private final CloudfrontClient cloudfrontClient;
 
     @Transactional(readOnly = true)
     public PostDetailResponse getPostDetail(final Long postId, final Long memberId) {
@@ -82,7 +83,7 @@ public class PostService {
                 () -> new CocosException(FailMessage.NOT_FOUND_BREED)
         );
         final List<String> images = postImageRepository.findAllByPostId(postId).stream()
-                .map(postImage -> memberDataS3Client.getPresignedUrl(postImage.getImage()))
+                .map(postImage -> cloudfrontClient.getMemberCloudfrontUrl(postImage.getImage()))
                 .toList();
         final PostCategory postCategory = postCategoryRepository.findById(post.getCategoryId()).orElseThrow(
                 () -> new CocosException(FailMessage.NOT_FOUND_CATEGORY)
@@ -122,7 +123,7 @@ public class PostService {
 
         return PostDetailResponse.builder()
                 .nickname(member.getNickname())
-                .profileImage(memberDataS3Client.getPresignedUrl(member.getImage()))
+                .profileImage(cloudfrontClient.getMemberCloudfrontUrl(member.getImage()))
                 .breed(breed.getName())
                 .petAge(pet.getAge())
                 .likeCounts(likeCounts)
@@ -178,7 +179,7 @@ public class PostService {
     public PostCategoriesResponse getCategories() {
         final List<PostCategory> postCategories = postCategoryRepository.findAll();
         return PostCategoriesResponse.of(postCategories.stream()
-                .map(postCategory -> PostCategoryResponse.of(postCategory.getId(), postCategory.getName(), appDataS3Client.getPresignedUrl(postCategory.getImage())))
+                .map(postCategory -> PostCategoryResponse.of(postCategory.getId(), postCategory.getName(), cloudfrontClient.getAppCloudfrontUrl(postCategory.getImage())))
                 .toList());
     }
 
@@ -409,7 +410,7 @@ public class PostService {
 
     private String getFirstImage(final List<PostImage> postImages) {
         if (!postImages.isEmpty()) {
-            return memberDataS3Client.getPresignedUrl(postImages.getFirst().getImage());
+            return cloudfrontClient.getMemberCloudfrontUrl(postImages.getFirst().getImage());
         }
         return null;
     }

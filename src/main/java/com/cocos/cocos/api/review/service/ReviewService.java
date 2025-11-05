@@ -28,6 +28,7 @@ import com.cocos.cocos.db.symptom.entity.Symptom;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.location.LocationType;
 import com.cocos.cocos.enums.pet.Gender;
+import com.cocos.cocos.external.CloudfrontClient;
 import com.cocos.cocos.external.MemberDataS3Client;
 import com.cocos.cocos.util.SortConstants;
 import lombok.RequiredArgsConstructor;
@@ -60,6 +61,7 @@ public class ReviewService {
     private final PetRepository petRepository;
     private final DistrictRepository districtRepository;
     private final HospitalVisitPurposeRepository hospitalVisitPurposeRepository;
+    private  final CloudfrontClient cloudfrontClient;
 
     private static final String REVIEW_IMAGE_S3_PREFIX = "reviewImage";
     private static final boolean IS_GOOD_REVIEW = true;
@@ -429,7 +431,7 @@ public class ReviewService {
         return reviewImages.stream()
                 .collect(Collectors.groupingBy(
                         ReviewImage::getReviewId,
-                        Collectors.mapping(img -> memberDataS3Client.getPresignedUrl(img.getImage()), Collectors.toList())
+                        Collectors.mapping(img -> cloudfrontClient.getMemberCloudfrontUrl(img.getImage()), Collectors.toList())
                 ));
     }
 

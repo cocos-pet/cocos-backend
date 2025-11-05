@@ -23,6 +23,7 @@ import com.cocos.cocos.db.pet.repository.PetSymptomRepository;
 import com.cocos.cocos.db.symptom.entity.Symptom;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.message.FailMessage;
+import com.cocos.cocos.external.CloudfrontClient;
 import com.cocos.cocos.external.MemberDataS3Client;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,7 @@ public class PetService {
     private final DiseaseRepository diseaseRepository;
     private final SymptomRepository symptomRepository;
     private final MemberRepository memberRepository;
-    private final MemberDataS3Client memberDataS3Client;
+    private final CloudfrontClient cloudfrontClient;
 
     //ToDo: yml에 추가하는 방향 고민 중
     private static final String PET_BASE_IMAGE_URL = "member/basePetImage.png";
@@ -176,7 +177,7 @@ public class PetService {
 
         return PetResponse.of(
                 pet.getId(),
-                memberDataS3Client.getPresignedUrl(pet.getImage()),
+                cloudfrontClient.getMemberCloudfrontUrl(pet.getImage()),
                 pet.getName(),
                 pet.getAge(),
                 pet.getGender(),
