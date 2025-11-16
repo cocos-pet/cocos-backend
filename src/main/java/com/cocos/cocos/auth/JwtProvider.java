@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.util.Base64;
 import java.util.Date;
 
 @Component
@@ -18,15 +17,16 @@ public class JwtProvider {
 
     private static final String MEMBER_ID = "memberId";
 
-    //1분
-    //1주일 1000ms = 1초
-    private static final Long ACCESS_TOKEN_EXPIRATION_TIME = 1000L * 60 * 60 * 24 * 7;
-    // 3분
+    // 2시간
+    private static final Long ACCESS_TOKEN_EXPIRATION_TIME = 1000L * 60 * 60 * 2;
     // 1주일
     private static final Long REFRESH_TOKEN_EXPIRATION_TIME = 1000L * 60 * 60 * 24 * 7;
 
-    @Value("${jwt.secret}")
-    private String JWT_SECRET;
+    private final SecretKey signingKey;
+
+    public JwtProvider(@Value("${jwt.secret}") String secret) {
+        this.signingKey =  Keys.hmacShaKeyFor(secret.getBytes());
+    }
 
     public TokenResponse reissueToken(Long memberId) {
         return TokenResponse.of(
@@ -46,7 +46,7 @@ public class JwtProvider {
         return Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE) // Header
                 .setClaims(claims) // Claim
-                .signWith(getSigningKey()) // Signature
+                .signWith(signingKey) // Signature
                 .compact();
     }
 
@@ -61,7 +61,7 @@ public class JwtProvider {
         return Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE) // Header
                 .setClaims(claims) // Claim
-                .signWith(getSigningKey()) // Signature
+                .signWith(signingKey) // Signature
                 .compact();
     }
 
@@ -80,14 +80,9 @@ public class JwtProvider {
         }
     }
 
-    private SecretKey getSigningKey() {
-        String encodedKey = Base64.getEncoder().encodeToString(JWT_SECRET.getBytes()); //SecretKey 통해 서명 생성
-        return Keys.hmacShaKeyFor(encodedKey.getBytes());   //일반적으로 HMAC (Hash-based Message Authentication Code) 알고리즘 사용
-    }
-
     private Claims getBody(final String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
+                .setSigningKey(signingKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
