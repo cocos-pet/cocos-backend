@@ -352,59 +352,58 @@ class ReviewServiceTest {
 
     }
 
-        @Test
+    @Test
 
-        @DisplayName("병원 ID 필터링 조건으로 병원 리뷰 목록을 조회할 수 있다.")
+    @DisplayName("병원 ID 필터링 조건으로 병원 리뷰 목록을 조회할 수 있다.")
+    void getHospitalReviewListWithHospitalIdFilter() {
 
-        void getHospitalReviewListWithHospitalIdFilter() {
+        //given
+        final Long hospitalId = 1L;
+        final Long memberId = 1L;
+        final Long reviewId = 1L;
+        final Long breedId = 1L;
+        final Long animalId = 1L;
+        final Long diseaseId = 1L;
+        final Long purposeId = 1L;
 
-            //given
-            final Long hospitalId = 1L;
-            final Long memberId = 1L;
-            final Long reviewId = 1L;
-            final Long breedId = 1L;
-            final Long animalId = 1L;
-            final Long diseaseId = 1L;
-            final Long purposeId = 1L;
+        final Review review = Review.builder().hospitalId(hospitalId).memberId(memberId).breedId(breedId).diseaseId(diseaseId).purposeId(purposeId).build();
+        ReflectionTestUtils.setField(review, "id", reviewId);
+        final Hospital hospital = Hospital.builder().name("테스트 병원").build();
+        ReflectionTestUtils.setField(hospital, "id", hospitalId);
+        final Member member = Member.builder().nickname("테스트유저").build();
+        ReflectionTestUtils.setField(member, "id", memberId);
+        final Pet pet = Pet.builder().memberId(memberId).breedId(breedId).age(1).build();
+        ReflectionTestUtils.setField(pet, "id", 1L);
+        final Breed breed = Breed.builder().name("테스트견종").animalId(animalId).build();
+        ReflectionTestUtils.setField(breed, "id", breedId);
+        final Animal animal = Animal.builder().name("개").build();
+        ReflectionTestUtils.setField(animal, "id", animalId);
+        final Disease disease = Disease.builder().name("테스트질병").build();
+        ReflectionTestUtils.setField(disease, "id", diseaseId);
+        final VisitPurpose visitPurpose = VisitPurpose.builder().name("테스트목적").build();
+        ReflectionTestUtils.setField(visitPurpose, "id", purposeId);
 
-            final Review review = Review.builder().hospitalId(hospitalId).memberId(memberId).breedId(breedId).diseaseId(diseaseId).purposeId(purposeId).build();
-            ReflectionTestUtils.setField(review, "id", reviewId);
-            final Hospital hospital = Hospital.builder().name("테스트 병원").build();
-            ReflectionTestUtils.setField(hospital, "id", hospitalId);
-            final Member member = Member.builder().nickname("테스트유저").build();
-            ReflectionTestUtils.setField(member, "id", memberId);
-            final Pet pet = Pet.builder().memberId(memberId).breedId(breedId).age(1).build();
-            ReflectionTestUtils.setField(pet, "id", 1L);
-            final Breed breed = Breed.builder().name("테스트견종").animalId(animalId).build();
-            ReflectionTestUtils.setField(breed, "id", breedId);
-            final Animal animal = Animal.builder().name("개").build();
-            ReflectionTestUtils.setField(animal, "id", animalId);
-            final Disease disease = Disease.builder().name("테스트질병").build();
-            ReflectionTestUtils.setField(disease, "id", diseaseId);
-            final VisitPurpose visitPurpose = VisitPurpose.builder().name("테스트목적").build();
-            ReflectionTestUtils.setField(visitPurpose, "id", purposeId);
+        BDDMockito.given(reviewQueryService.findReviews(any())).willReturn(List.of(review));
+        BDDMockito.given(hospitalRepository.findAllById(any())).willReturn(List.of(hospital));
+        BDDMockito.given(memberRepository.findAllById(any())).willReturn(List.of(member));
+        BDDMockito.given(petRepository.findAllByMemberIdIn(any(java.util.Set.class))).willReturn(List.of(pet));
+        BDDMockito.given(breedRepository.findAllById(any())).willReturn(List.of(breed));
+        BDDMockito.given(animalRepository.findAllById(any())).willReturn(List.of(animal));
+        BDDMockito.given(diseaseRepository.findAllById(any())).willReturn(List.of(disease));
+        BDDMockito.given(hospitalVisitPurposeRepository.findAll()).willReturn(List.of(visitPurpose));
+        BDDMockito.given(hospitalRepository.findById(hospitalId)).willReturn(Optional.of(Hospital.builder().reviewCount(1).build()));
+        BDDMockito.given(reviewImageRepository.findAllByReviewIdIn(any())).willReturn(List.of());
+        BDDMockito.given(reviewSymptomRepository.findByReviewIdIn(any())).willReturn(List.of());
+        BDDMockito.given(reviewSummaryRepository.findByReviewIdIn(any())).willReturn(List.of());
 
-            BDDMockito.given(reviewQueryService.findReviews(any())).willReturn(List.of(review));
-            BDDMockito.given(hospitalRepository.findAllById(any())).willReturn(List.of(hospital));
-            BDDMockito.given(memberRepository.findAllById(any())).willReturn(List.of(member));
-            BDDMockito.given(petRepository.findAllByMemberIdIn(any(java.util.Set.class))).willReturn(List.of(pet));
-            BDDMockito.given(breedRepository.findAllById(any())).willReturn(List.of(breed));
-            BDDMockito.given(animalRepository.findAllById(any())).willReturn(List.of(animal));
-            BDDMockito.given(diseaseRepository.findAllById(any())).willReturn(List.of(disease));
-            BDDMockito.given(hospitalVisitPurposeRepository.findAll()).willReturn(List.of(visitPurpose));
-            BDDMockito.given(hospitalRepository.findById(hospitalId)).willReturn(Optional.of(Hospital.builder().reviewCount(1).build()));
-            BDDMockito.given(reviewImageRepository.findAllByReviewIdIn(any())).willReturn(List.of());
-            BDDMockito.given(reviewSymptomRepository.findByReviewIdIn(any())).willReturn(List.of());
-            BDDMockito.given(reviewSummaryRepository.findByReviewIdIn(any())).willReturn(List.of());
+        //when
+        final HospitalReviewListResponse actual = reviewService.getHospitalReviewList(hospitalId, null, null, 5, null, null, null, memberId);
+        //then
 
-            //when
-            final HospitalReviewListResponse actual = reviewService.getHospitalReviewList(hospitalId, null, null, 5, null, null, null, memberId);
-            //then
-
-            Assertions.assertThat(actual.reviews()).hasSize(1);
-            Assertions.assertThat(actual.reviews().get(0).nickname()).isEqualTo("테스트유저");
-            Assertions.assertThat(actual.reviewCount()).isEqualTo(1);
-        }
+        Assertions.assertThat(actual.reviews()).hasSize(1);
+        Assertions.assertThat(actual.reviews().get(0).nickname()).isEqualTo("테스트유저");
+        Assertions.assertThat(actual.reviewCount()).isEqualTo(1);
+    }
 
     @Test
     @DisplayName("bodyId, locationId, locationType 필터링 조건으로 병원 리뷰 목록을 조회할 수 있다.")
