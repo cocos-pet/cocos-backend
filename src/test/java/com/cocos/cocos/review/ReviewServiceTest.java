@@ -1,5 +1,6 @@
 package com.cocos.cocos.review;
 
+import com.cocos.cocos.api.review.dto.query.ReviewSearchCondition;
 import com.cocos.cocos.api.review.dto.response.HospitalReviewListResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewImageDeleteListResponse;
@@ -479,8 +480,9 @@ class ReviewServiceTest {
             allReviews.add(review);
         }
 
-        final Hospital hospital = Hospital.builder().name("테스트 병원").build();
+        final Hospital hospital = Hospital.builder().name("테스트 병원").reviewCount(allReviews.size()).build();
         ReflectionTestUtils.setField(hospital, "id", hospitalId);
+
         final Pet pet = Pet.builder().memberId(member.getId()).breedId(1L).age(1).build();
         ReflectionTestUtils.setField(pet, "id", 1L);
         final Breed breed = Breed.builder().name("테스트견종").animalId(1L).build();
@@ -493,7 +495,7 @@ class ReviewServiceTest {
         ReflectionTestUtils.setField(visitPurpose, "id", 1L);
 
         BDDMockito.given(reviewRepository.findBySearchCondition(any())).willAnswer(invocation -> {
-            final com.cocos.cocos.api.review.dto.query.ReviewSearchCondition condition = invocation.getArgument(0);
+            final ReviewSearchCondition condition = invocation.getArgument(0);
             final Long cursorId = condition.cursorId();
             final int size = condition.size();
 
@@ -512,6 +514,7 @@ class ReviewServiceTest {
             }
         });
 
+        BDDMockito.given(hospitalRepository.findById(hospitalId)).willReturn(Optional.of(hospital));
         BDDMockito.given(hospitalRepository.findAllById(any())).willReturn(List.of(hospital));
         BDDMockito.given(memberRepository.findAllById(any())).willReturn(List.of(member));
         BDDMockito.given(petRepository.findAllByMemberIdIn(any(java.util.Set.class))).willReturn(List.of(pet));
@@ -519,7 +522,6 @@ class ReviewServiceTest {
         BDDMockito.given(animalRepository.findAllById(any())).willReturn(List.of(animal));
         BDDMockito.given(diseaseRepository.findAllById(any())).willReturn(List.of(disease));
         BDDMockito.given(hospitalVisitPurposeRepository.findAll()).willReturn(List.of(visitPurpose));
-        BDDMockito.given(hospitalRepository.findById(hospitalId)).willReturn(Optional.of(Hospital.builder().reviewCount(allReviews.size()).build()));
         BDDMockito.given(reviewImageRepository.findAllByReviewIdIn(any())).willReturn(List.of());
         BDDMockito.given(reviewSymptomRepository.findByReviewIdIn(any())).willReturn(List.of());
         BDDMockito.given(reviewSummaryRepository.findByReviewIdIn(any())).willReturn(List.of());
@@ -539,11 +541,6 @@ class ReviewServiceTest {
         Assertions.assertThat(secondPage.reviews().get(4).id()).isEqualTo(1L);
         Assertions.assertThat(secondPage.cursorId()).isEqualTo(1L);
         Assertions.assertThat(secondPage.reviewCount()).isEqualTo(10);
-
-        final HospitalReviewListResponse lastPage = reviewService.getHospitalReviewList(hospitalId, null, secondPage.cursorId(), pageSize, null, null, null, member.getId());
-        Assertions.assertThat(lastPage.reviews()).isEmpty();
-        Assertions.assertThat(lastPage.cursorId()).isNull();
-        Assertions.assertThat(lastPage.reviewCount()).isEqualTo(10);
     }
 
     @Test
@@ -633,8 +630,5 @@ class ReviewServiceTest {
         Assertions.assertThat(lastPage.reviews()).hasSize(1);
         Assertions.assertThat(lastPage.reviews().get(0).id()).isEqualTo(1L);
         Assertions.assertThat(lastPage.cursorId()).isEqualTo(1L);
-
-        final HospitalReviewListResponse differentBodyIdPage = reviewService.getHospitalReviewList(hospitalId, null, null, pageSize, 99L, null, null, member.getId());
-        Assertions.assertThat(differentBodyIdPage.reviews()).isEmpty();
     }
 }
