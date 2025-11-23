@@ -48,7 +48,7 @@ import com.cocos.cocos.db.hospital.repository.HospitalVisitPurposeRepository;
 import com.cocos.cocos.db.member.repository.MemberRepository;
 import com.cocos.cocos.db.pet.repository.PetRepository;
 import com.cocos.cocos.enums.location.LocationType;
-import com.cocos.cocos.api.review.service.ReviewQueryService;
+
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import com.cocos.cocos.api.review.dto.response.HospitalReviewResponse;
@@ -110,8 +110,7 @@ class ReviewServiceTest {
     @Mock
     HospitalVisitPurposeRepository hospitalVisitPurposeRepository;
 
-    @Mock
-    ReviewQueryService reviewQueryService;
+
 
     @Mock
     SymptomRepository symptomRepository;
@@ -383,7 +382,7 @@ class ReviewServiceTest {
         final VisitPurpose visitPurpose = VisitPurpose.builder().name("테스트목적").build();
         ReflectionTestUtils.setField(visitPurpose, "id", purposeId);
 
-        BDDMockito.given(reviewQueryService.findReviews(any())).willReturn(List.of(review));
+        BDDMockito.given(reviewRepository.findBySearchCondition(any())).willReturn(List.of(review));
         BDDMockito.given(hospitalRepository.findAllById(any())).willReturn(List.of(hospital));
         BDDMockito.given(memberRepository.findAllById(any())).willReturn(List.of(member));
         BDDMockito.given(petRepository.findAllByMemberIdIn(any(java.util.Set.class))).willReturn(List.of(pet));
@@ -435,7 +434,7 @@ class ReviewServiceTest {
         final VisitPurpose visitPurpose = VisitPurpose.builder().name("테스트목적").build();
         ReflectionTestUtils.setField(visitPurpose, "id", purposeId);
 
-        BDDMockito.given(reviewQueryService.findReviews(any())).willReturn(List.of(review));
+        BDDMockito.given(reviewRepository.findBySearchCondition(any())).willReturn(List.of(review));
         BDDMockito.given(hospitalRepository.findAllById(any())).willReturn(List.of(hospital));
         BDDMockito.given(memberRepository.findAllById(any())).willReturn(List.of(member));
         BDDMockito.given(petRepository.findAllByMemberIdIn(any(java.util.Set.class))).willReturn(List.of(pet));
@@ -493,10 +492,10 @@ class ReviewServiceTest {
         final VisitPurpose visitPurpose = VisitPurpose.builder().name("테스트목적").build();
         ReflectionTestUtils.setField(visitPurpose, "id", 1L);
 
-        BDDMockito.given(reviewQueryService.findReviews(any())).willAnswer(invocation -> {
+        BDDMockito.given(reviewRepository.findBySearchCondition(any())).willAnswer(invocation -> {
             final com.cocos.cocos.api.review.dto.query.ReviewSearchCondition condition = invocation.getArgument(0);
-            final Long cursorId = condition.getCursorId();
-            final int size = condition.getSize();
+            final Long cursorId = condition.cursorId();
+            final int size = condition.size();
 
             if (cursorId == null) {
                 return allReviews.subList(0, Math.min(size, allReviews.size()));
@@ -583,11 +582,11 @@ class ReviewServiceTest {
         final VisitPurpose visitPurpose = VisitPurpose.builder().name("테스트목적").build();
         ReflectionTestUtils.setField(visitPurpose, "id", 1L);
 
-        BDDMockito.given(reviewQueryService.findReviews(any())).willAnswer(invocation -> {
+        BDDMockito.given(reviewRepository.findBySearchCondition(any())).willAnswer(invocation -> {
             final com.cocos.cocos.api.review.dto.query.ReviewSearchCondition condition = invocation.getArgument(0);
-            final Long cursorId = condition.getCursorId();
-            final int size = condition.getSize();
-            final Long actualBodyId = condition.getBodyId();
+            final Long cursorId = condition.cursorId();
+            final int size = condition.size();
+            final Long actualBodyId = condition.bodyId();
 
             if (!bodyId.equals(actualBodyId)) {
                 return List.of();
