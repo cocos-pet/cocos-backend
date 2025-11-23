@@ -58,7 +58,7 @@ public class ReviewService {
     private final MemberRepository memberRepository;
     private final PetRepository petRepository;
     private final HospitalVisitPurposeRepository hospitalVisitPurposeRepository;
-    private final ReviewQueryService reviewQueryService;
+
 
     private static final String REVIEW_IMAGE_S3_PREFIX = "reviewImage";
     private static final boolean IS_GOOD_REVIEW = true;
@@ -234,7 +234,7 @@ public class ReviewService {
                 .size(pageable.getPageSize())
                 .build();
 
-        final List<Review> reviews = reviewQueryService.findReviews(reviewSearchCondition);
+        final List<Review> reviews = reviewRepository.findBySearchCondition(reviewSearchCondition);
         final Map<Long, Hospital> hospitalMap = getHospitalMap(reviews);
         final List<Long> reviewIds = reviews.stream().map(Review::getId).toList();
         final Set<Long> memberIds = reviews.stream().map(Review::getMemberId).collect(Collectors.toSet());
