@@ -86,6 +86,7 @@ public enum FailMessage {
     NOT_FOUND_HOSPITAL(HttpStatus.NOT_FOUND, 40421, "병원을 찾을 수 없습니다."),
     NOT_FOUND_REVIEW(HttpStatus.NOT_FOUND, 40422, "리뷰를 찾을 수 없습니다."),
     NOT_FOUND_SUMMARY_OPTION(HttpStatus.NOT_FOUND, 40423, "리뷰 요약 옵션을 찾을 수 없습니다."),
+    NOT_FOUND_VISIT_PURPOSE(HttpStatus.NOT_FOUND, 40424, "방문 목적을 찾을 수 없습니다."),
 
     /**
      * 405

@@ -1,5 +1,6 @@
 package com.cocos.cocos.api.review.service;
 
+import com.cocos.cocos.api.review.dto.query.ReviewSearchCondition;
 import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewSummaryListResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewSummaryResponse;
@@ -10,8 +11,6 @@ import com.cocos.cocos.db.breed.entity.Breed;
 import com.cocos.cocos.db.breed.repository.BreedRepository;
 import com.cocos.cocos.db.disease.entity.Disease;
 import com.cocos.cocos.db.disease.repository.DiseaseRepository;
-import com.cocos.cocos.db.district.entity.District;
-import com.cocos.cocos.db.district.repository.DistrictRepository;
 import com.cocos.cocos.db.hospital.entity.Hospital;
 import com.cocos.cocos.db.hospital.entity.VisitPurpose;
 import com.cocos.cocos.db.hospital.repository.HospitalRepository;
@@ -58,8 +57,8 @@ public class ReviewService {
     private final SymptomRepository symptomRepository;
     private final MemberRepository memberRepository;
     private final PetRepository petRepository;
-    private final DistrictRepository districtRepository;
     private final HospitalVisitPurposeRepository hospitalVisitPurposeRepository;
+
 
     private static final String REVIEW_IMAGE_S3_PREFIX = "reviewImage";
     private static final boolean IS_GOOD_REVIEW = true;
@@ -70,7 +69,6 @@ public class ReviewService {
                                        final Double weight, final String visitedAt, final String content,
                                        final Long purposeId, final Long diseaseId, final List<Long> symptomIds,
                                        final List<Long> goodReviewIds, final List<Long> badReviewIds, final List<String> images) {
-        //ToDo: id 검증 로직 필요
         final Review review = reviewRepository.save(Review.builder()
                 .breedId(breedId)
                 .gender(gender)
@@ -165,11 +163,11 @@ public class ReviewService {
         final List<Long> reviewIds = reviews.stream().map(Review::getId).toList();
 
         // TODO: 팀 컨벤션 측면에서, Map방식과 filter 방식 중 적절한 방식 논의 필요
-        final Map<Long, Hospital> hospitalMap = getHospitalMap(reviews);
+        final Map<Long, Hospital> hospitalMap = getHospitalMapWithValidation(reviews);
         final Map<Long, List<String>> reviewIdToImageUrls = getReviewIdToImageUrls(reviewIds);
         final Map<Long, Breed> breedMap = getBreedMapFromReviews(reviews);
-        final Map<Long, Animal> animalMap = getAnimalMap(breedMap);
-        final Map<Long, Disease> diseaseMap = getDiseaseMap(reviews);
+        final Map<Long, Animal> animalMap = getAnimalMapWithValidation(breedMap);
+        final Map<Long, Disease> diseaseMap = getDiseaseMapWithValidation(reviews);
         final Map<Long, List<String>> symptomMap = getReviewIdToSymptoms(reviewIds);
         final Map<Long, List<ReviewSummaryOption>> reviewSummaryOptionsMap = getReviewSummaryOptionsMap(reviewIds);
         final Map<Long, VisitPurpose> visitPurposeMap = getVisitPurposeMap();
@@ -190,7 +188,9 @@ public class ReviewService {
                     final ReviewSummaryOptionListResponse summaryOptionList = ReviewSummaryOptionListResponse.of(
                             goodReviewSummaries, badReviewSummaries
                     );
-                    final String visitPurpose = visitPurposeMap.get(review.getPurposeId()).getName();
+                    final VisitPurpose visitPurpose = Optional.ofNullable(
+                            visitPurposeMap.get(review.getPurposeId())
+                    ).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_VISIT_PURPOSE));
 
                     return MemberHospitalReviewResponse.of(
                             review.getId(),
@@ -207,7 +207,7 @@ public class ReviewService {
                             review.getGender(),
                             breed.getName(),
                             review.getWeight(),
-                            visitPurpose
+                            visitPurpose.getName()
                     );
                 })
                 .toList();
@@ -221,22 +221,34 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public HospitalReviewListResponse getHospitalReviewList(final Long hospitalId, final Long summaryOptionId, final Long cursorId, final int size, final Long bodyId, final Long locationId, final LocationType locationType, final Long memberId) {
         final int searchSize = memberId == null ? DEFAULT_PAGE_SIZE : size;
+        final Long searchCursorId = memberId == null ? null : cursorId;
         final Pageable pageable = PageRequest.of(0, searchSize, Sort.by(
                 SortConstants.ID_DESC
         ));
 
-        final List<Review> reviews = getReviews(locationId, locationType, hospitalId, summaryOptionId, cursorId, bodyId, pageable);
+        final ReviewSearchCondition reviewSearchCondition = ReviewSearchCondition.builder()
+                .locationId(locationId)
+                .locationType(locationType)
+                .hospitalId(hospitalId)
+                .summaryOptionId(summaryOptionId)
+                .cursorId(searchCursorId)
+                .bodyId(bodyId)
+                .size(pageable.getPageSize())
+                .build();
 
-        final Map<Long, Hospital> hospitalMap = getHospitalMap(reviews);
+        final List<Review> reviews = reviewRepository.findBySearchCondition(reviewSearchCondition);
+        final Map<Long, Hospital> hospitalMap = getHospitalMapWithValidation(reviews);
+
         final List<Long> reviewIds = reviews.stream().map(Review::getId).toList();
         final Set<Long> memberIds = reviews.stream().map(Review::getMemberId).collect(Collectors.toSet());
 
         final Map<Long, List<String>> reviewIdToImageUrls = getReviewIdToImageUrls(reviewIds);
-        final Map<Long, Member> memberMap = getMemberMap(memberIds);
-        final Map<Long, Pet> petMap = getPetMap(memberIds);
+
+        final Map<Long, Member> memberMap = getMemberMapWithValidation(memberIds);
+        final Map<Long, Pet> petMap = getPetMapWithValidation(memberIds);
         final Map<Long, Breed> breedMap = getBreedMapFromReviewsAndPets(reviews, petMap);
-        final Map<Long, Animal> animalMap = getAnimalMap(breedMap);
-        final Map<Long, Disease> diseaseMap = getDiseaseMap(reviews);
+        final Map<Long, Animal> animalMap = getAnimalMapWithValidation(breedMap);
+        final Map<Long, Disease> diseaseMap = getDiseaseMapWithValidation(reviews);
         final Map<Long, List<String>> symptomMap = getReviewIdToSymptoms(reviewIds);
         final Map<Long, List<ReviewSummaryOption>> reviewSummaryOptionsMap = getReviewSummaryOptionsMap(reviewIds);
         final Map<Long, VisitPurpose> visitPurposeMap = getVisitPurposeMap();
@@ -249,8 +261,10 @@ public class ReviewService {
                     final Breed breed = breedMap.get(review.getBreedId());
                     final Member member = memberMap.get(review.getMemberId());
                     final Pet pet = petMap.get(review.getMemberId());
+
                     final Breed memberBreed = breedMap.get(pet.getBreedId());
                     final Animal animal = animalMap.get(breed.getAnimalId());
+
                     final Disease disease = diseaseMap.get(review.getDiseaseId());
                     final List<String> imageUrls = reviewIdToImageUrls.getOrDefault(review.getId(), List.of());
                     final List<String> symptoms = symptomMap.getOrDefault(review.getId(), List.of());
@@ -262,7 +276,9 @@ public class ReviewService {
                     final ReviewSummaryOptionListResponse summaryOptionList = ReviewSummaryOptionListResponse.of(
                             goodReviewSummaries, badReviewSummaries
                     );
-                    final String visitPurpose = visitPurposeMap.get(review.getPurposeId()).getName();
+                    final VisitPurpose visitPurpose = Optional.ofNullable(
+                            visitPurposeMap.get(review.getPurposeId())
+                    ).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_VISIT_PURPOSE));
 
                     return HospitalReviewResponse.of(
                             review.getId(),
@@ -283,7 +299,7 @@ public class ReviewService {
                             review.getGender(),
                             breed.getName(),
                             review.getWeight(),
-                            visitPurpose
+                            visitPurpose.getName()
                     );
                 })
                 .toList();
@@ -300,30 +316,6 @@ public class ReviewService {
                 .collect(Collectors.toMap(VisitPurpose::getId, Function.identity()));
     }
 
-    private List<Review> getReviews(final Long locationId, final LocationType locationType, final Long hospitalId, final Long summaryOptionId, final Long cursorId, final Long bodyId, final Pageable pageable) {
-
-        if (bodyId != null && locationId != null && locationType != null) {
-            final List<Long> symptomIds = symptomRepository.findAllByBodyId(bodyId).stream()
-                    .map(Symptom::getId)
-                    .toList();
-
-            final List<Long> districtIds = getDistrictIds(locationId, locationType);
-            final List<Long> hospitalIds = hospitalRepository.findAllByDistrictIdIn(districtIds).stream()
-                    .map(Hospital::getId)
-                    .toList();
-
-            final List<Long> reviewIds = reviewSymptomRepository.findBySymptomIdIn(symptomIds).stream()
-                    .map(ReviewSymptom::getReviewId)
-                    .toList();
-
-            return reviewRepository.findByBodyAndLocationAndSummaryOptionIdAndCursorId(reviewIds, hospitalIds, summaryOptionId, cursorId, pageable);
-        } else if (hospitalId != null) {
-            return reviewRepository.findByHospitalIdAndSummaryOptionIdAndCursorId(hospitalId, summaryOptionId, cursorId, pageable);
-        } else {
-            throw new CocosException(FailMessage.BAD_REQUEST_MISSING_BODY);
-        }
-    }
-
     private Integer getReviewCountByHospitalId(final Long hospitalId) {
         if (hospitalId == null) {
             return null;
@@ -332,28 +324,28 @@ public class ReviewService {
         }
     }
 
-
-    private Map<Long, Member> getMemberMap(final Set<Long> memberIds) {
-        final Map<Long, Member> membermap = memberRepository.findAllById(memberIds).stream()
+    private Map<Long, Member> getMemberMapWithValidation(final Set<Long> memberIds) {
+        final Map<Long, Member> memberMap = memberRepository.findAllById(memberIds).stream()
                 .collect(Collectors.toMap(Member::getId, Function.identity()));
 
-        if (membermap.size() != memberIds.size()) {
+        if (memberMap.size() != memberIds.size()) {
             throw new CocosException(FailMessage.NOT_FOUND_MEMBER);
         }
-        return membermap;
+        return memberMap;
     }
 
-    private Map<Long, Pet> getPetMap(final Set<Long> memberIds) {
+    private Map<Long, Pet> getPetMapWithValidation(final Set<Long> memberIds) {
         final Map<Long, Pet> petMap = petRepository.findAllByMemberIdIn(memberIds).stream()
-                .collect(Collectors.toMap(Pet::getMemberId, Function.identity()));
+                .collect(Collectors.toMap(Pet::getMemberId, Function.identity(), (pet1, pet2) -> pet1));
 
-        if (memberIds.size() != petMap.size()) {
+        if (petMap.size() != memberIds.size()) {
             throw new CocosException(FailMessage.NOT_FOUND_PET);
         }
+
         return petMap;
     }
 
-    private Map<Long, Disease> getDiseaseMap(final List<Review> reviews) {
+    private Map<Long, Disease> getDiseaseMapWithValidation(final List<Review> reviews) {
         final Set<Long> diseaseIds = reviews.stream()
                 .map(Review::getDiseaseId)
                 .filter(Objects::nonNull)
@@ -367,7 +359,7 @@ public class ReviewService {
         return diseaseMap;
     }
 
-    private Map<Long, Animal> getAnimalMap(final Map<Long, Breed> breedMap) {
+    private Map<Long, Animal> getAnimalMapWithValidation(final Map<Long, Breed> breedMap) {
         final Set<Long> animalIds = breedMap.values().stream()
                 .map(Breed::getAnimalId)
                 .collect(Collectors.toSet());
@@ -377,6 +369,7 @@ public class ReviewService {
         if (animalMap.size() != animalIds.size()) {
             throw new CocosException(FailMessage.NOT_FOUND_ANIMAL);
         }
+
         return animalMap;
     }
 
@@ -393,17 +386,17 @@ public class ReviewService {
         allBreedIds.addAll(breedIdsFromReviews);
         allBreedIds.addAll(breedIdsFromPets);
 
-        return fetchBreedMap(allBreedIds);
+        return fetchBreedMapWithValidation(allBreedIds);
     }
 
     private Map<Long, Breed> getBreedMapFromReviews(final List<Review> reviews) {
         final Set<Long> breedIds = reviews.stream()
                 .map(Review::getBreedId)
                 .collect(Collectors.toSet());
-        return fetchBreedMap(breedIds);
+        return fetchBreedMapWithValidation(breedIds);
     }
 
-    private Map<Long, Breed> fetchBreedMap(final Set<Long> breedIds) {
+    private Map<Long, Breed> fetchBreedMapWithValidation(final Set<Long> breedIds) {
         final Map<Long, Breed> breedMap = breedRepository.findAllById(breedIds).stream()
                 .collect(Collectors.toMap(Breed::getId, Function.identity()));
 
@@ -413,7 +406,7 @@ public class ReviewService {
         return breedMap;
     }
 
-    private Map<Long, Hospital> getHospitalMap(final List<Review> reviews) {
+    private Map<Long, Hospital> getHospitalMapWithValidation(final List<Review> reviews) {
         final Set<Long> hospitalIds = reviews.stream().map(Review::getHospitalId).collect(Collectors.toSet());
         final Map<Long, Hospital> hospitalMap = hospitalRepository.findAllById(hospitalIds).stream()
                 .collect(Collectors.toMap(Hospital::getId, Function.identity()));
@@ -421,6 +414,7 @@ public class ReviewService {
         if (hospitalMap.size() != hospitalIds.size()) {
             throw new CocosException(FailMessage.NOT_FOUND_HOSPITAL);
         }
+
         return hospitalMap;
     }
 
@@ -553,16 +547,5 @@ public class ReviewService {
         reviewRepository.deleteById(reviewId);
 
         return ReviewImageDeleteListResponse.of(reviewImages);
-    }
-
-    // TODO: hospitalService와 중복. 공용으로 관리하도록 리팩 필요
-    private List<Long> getDistrictIds(final Long locationId, final LocationType locationType) {
-        if (locationType == LocationType.CITY) {
-            return districtRepository.findAllByCityId(locationId).stream().map(District::getId).toList();
-        }
-        if (locationType == LocationType.DISTRICT) {
-            return List.of(locationId);
-        }
-        throw new CocosException(FailMessage.BAD_REQUEST_INVALID_LOCATION_TYPE);
     }
 }
