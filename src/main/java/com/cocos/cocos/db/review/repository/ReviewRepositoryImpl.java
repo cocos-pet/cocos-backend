@@ -23,6 +23,21 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
 
+    /**
+     * 리뷰 검색 조건에 따라 리뷰 목록을 조회한다.
+     *
+     * <p>1) bodyId, summaryOptionId 조건은 JOIN 시 전체 row 수가 크게 증가하는 요인이므로
+     *    먼저 reviewId만 선별해 가볍게 필터링한다. (쿼리 비용 최소화)</p>
+     *
+     * <p>2) cursorId 기반 페이지네이션을 적용하여
+     *    review.id < cursorId 조건을 통해 안정적인 Keyset Pagination을 수행한다.</p>
+     *
+     * <p>3) Location 조건은 병원/지역 테이블을 JOIN하여 필터링하며,
+     *    CITY와 DISTRICT의 계층 구조에 따라 조회 기준이 달라진다.</p>
+     *
+     * <p>4) bodyId + summaryOptionId가 함께 들어오면
+     *    사전 필터링된 reviewId 목록의 교집합(retainAll)을 통해 AND 조건을 구현한다.</p>
+     */
     @Override
     public List<Review> findBySearchCondition(final ReviewSearchCondition condition) {
 
