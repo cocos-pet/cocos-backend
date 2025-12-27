@@ -6,8 +6,15 @@ import com.cocos.cocos.db.comment.entity.Comment;
 import com.cocos.cocos.db.comment.entity.SubComment;
 import com.cocos.cocos.db.comment.repository.CommentRepository;
 import com.cocos.cocos.db.comment.repository.SubCommentRepository;
+import com.cocos.cocos.db.member.entity.Member;
+import com.cocos.cocos.db.member.repository.MemberRepository;
 import com.cocos.cocos.db.post.repository.PostRepository;
-import org.junit.jupiter.api.*;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
@@ -34,6 +41,8 @@ class CommentServiceTest {
     SubCommentRepository subCommentRepository;
     @Mock
     PostRepository postRepository;
+    @Mock
+    MemberRepository memberRepository;
 
     @Test
     @DisplayName("게시글에 댓글을 추가할 수 있다.")
@@ -42,8 +51,6 @@ class CommentServiceTest {
         final Long memberId = 1L;
         final Long postId = 2L;
         final String content = "댓글 내용";
-
-        BDDMockito.given(postRepository.existsById(any())).willReturn(true);
 
         // when
         commentService.addPostComment(postId, content, memberId);
@@ -118,7 +125,7 @@ class CommentServiceTest {
                 .build();
 
         ReflectionTestUtils.setField(comment, "id", commentId);
-        BDDMockito.given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+        BDDMockito.given(memberRepository.findByNickname(nickname)).willReturn(Optional.of(Member.builder().build()));
 
         // when
         commentService.addPostSubComment(commentId, nickname, content, memberId);
