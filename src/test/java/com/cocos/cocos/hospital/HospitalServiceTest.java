@@ -34,7 +34,7 @@ import static org.mockito.ArgumentMatchers.any;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("병원 서비스 테스트")
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-public class HospitalServiceTest {
+class HospitalServiceTest {
 
     @InjectMocks
     private HospitalService hospitalService;
@@ -71,15 +71,13 @@ public class HospitalServiceTest {
                 .latitude(35.0)
                 .longitude(128.0)
                 .reviewCount(0)
+                .keywords("")
+                .homepageUrl("")
                 .districtId(1L)
                 .build();
 
         final HospitalTag hospitalTag1 = HospitalTag.builder()
                 .label("라벨1")
-                .build();
-
-        final HospitalTag hospitalTag2 = HospitalTag.builder()
-                .label("라벨2")
                 .build();
 
         final HospitalTagMapping hospitalTagMapping = HospitalTagMapping.builder()
@@ -103,7 +101,9 @@ public class HospitalServiceTest {
                 "병원 도로명주소",
                 "병원 이미지",
                 "",
-                ""
+                "",
+                35.0,
+                128.0
         );
 
         //when
@@ -127,6 +127,8 @@ public class HospitalServiceTest {
                 .introduction("병원 소개")
                 .phoneNumber("병원 전화번호")
                 .address("병원 주소")
+                .keywords("")
+                .homepageUrl("")
                 .latitude(35.0)
                 .longitude(128.0)
                 .reviewCount(0)
@@ -135,10 +137,6 @@ public class HospitalServiceTest {
 
         final HospitalTag hospitalTag1 = HospitalTag.builder()
                 .label("라벨1")
-                .build();
-
-        final HospitalTag hospitalTag2 = HospitalTag.builder()
-                .label("라벨2")
                 .build();
 
         final HospitalTagMapping hospitalTagMapping = HospitalTagMapping.builder()
@@ -162,7 +160,9 @@ public class HospitalServiceTest {
                 "병원 주소",
                 "병원 이미지",
                 "",
-                ""
+               "",
+                35.0,
+                128.0
         );
 
         //when
