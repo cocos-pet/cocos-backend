@@ -1,6 +1,11 @@
 package com.cocos.cocos.post;
 
-import com.cocos.cocos.api.post.dto.response.*;
+import com.cocos.cocos.api.post.dto.response.PopularPostResponse;
+import com.cocos.cocos.api.post.dto.response.PopularPostsResponse;
+import com.cocos.cocos.api.post.dto.response.PostCategoriesResponse;
+import com.cocos.cocos.api.post.dto.response.PostCategoryResponse;
+import com.cocos.cocos.api.post.dto.response.PostDetailResponse;
+import com.cocos.cocos.api.post.dto.response.PostImagesResponse;
 import com.cocos.cocos.api.post.service.PostService;
 import com.cocos.cocos.db.animal.repository.AnimalRepository;
 import com.cocos.cocos.db.breed.entity.Breed;
@@ -22,7 +27,12 @@ import com.cocos.cocos.db.post.entity.Post;
 import com.cocos.cocos.db.post.entity.PostCategory;
 import com.cocos.cocos.db.post.entity.PostImage;
 import com.cocos.cocos.db.post.entity.PostTag;
-import com.cocos.cocos.db.post.repository.*;
+
+import com.cocos.cocos.db.post.repository.PostCategoryRepository;
+import com.cocos.cocos.db.post.repository.PostImageRepository;
+import com.cocos.cocos.db.post.repository.PostLikeRepository;
+import com.cocos.cocos.db.post.repository.PostRepository;
+import com.cocos.cocos.db.post.repository.PostTagRepository;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.pet.Gender;
 import com.cocos.cocos.enums.tag.TagType;
@@ -41,6 +51,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -49,7 +60,7 @@ import static org.mockito.Mockito.times;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("게시글 서비스 테스트")
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-public class PostServiceTest {
+class PostServiceTest {
 
     @InjectMocks
     PostService postService;
@@ -160,35 +171,43 @@ public class PostServiceTest {
                 .build();
         final List<String> tags = new ArrayList<>(List.of(disease.getName()));
 
-        BDDMockito.given(postRepository.findById(any())).willReturn(Optional.ofNullable(post));
-        BDDMockito.given(memberRepository.findById(any())).willReturn(Optional.ofNullable(member));
-        BDDMockito.given(petRepository.findByMemberId(any())).willReturn(pet);
-        BDDMockito.given(breedRepository.findById(any())).willReturn(Optional.ofNullable(breed));
-        BDDMockito.given(postImageRepository.findAllByPostId(any())).willReturn(postImages);
-        BDDMockito.given(postCategoryRepository.findById(any())).willReturn(Optional.ofNullable(postCategory));
-        BDDMockito.given(postLikeRepository.countByPostId(any())).willReturn(likeCounts);
-        BDDMockito.given(postLikeRepository.existsByMemberIdAndPostId(any(), any())).willReturn(true);
-        BDDMockito.given(commentRepository.countByPostId(any())).willReturn(commentCounts);
-        BDDMockito.given(commentRepository.findAllByPostId(any())).willReturn(comments);
-        BDDMockito.given(subCommentRepository.countByCommentId(any())).willReturn(subCommentCounts);
-        BDDMockito.given(postTagRepository.findAllByPostId(any())).willReturn(postTags);
-        BDDMockito.given(diseaseRepository.findById(any())).willReturn(Optional.ofNullable(disease));
-        BDDMockito.given(appDataS3Client.getPresignedUrl(member.getImage())).willReturn(member.getImage());
-        BDDMockito.given(appDataS3Client.getPresignedUrl(postImage1.getImage())).willReturn(postImage1.getImage());
-        BDDMockito.given(appDataS3Client.getPresignedUrl(postImage2.getImage())).willReturn(postImage2.getImage());
+        BDDMockito.given(postRepository.findById(postId)).willReturn(Optional.of(post));
+        BDDMockito.given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
+        BDDMockito.given(petRepository.findByMemberId(memberId)).willReturn(pet);
+
+        BDDMockito.given(breedRepository.findById(pet.getBreedId())).willReturn(Optional.ofNullable(breed));
+
+        BDDMockito.given(postImageRepository.findAllByPostId(postId)).willReturn(postImages);
+
+        BDDMockito.given(memberDataS3Client.getPresignedUrl(Objects.requireNonNull(member).getImage())).willReturn(Objects.requireNonNull(member).getImage());
+        BDDMockito.given(memberDataS3Client.getPresignedUrl(postImage1.getImage())).willReturn(postImage1.getImage());
+        BDDMockito.given(memberDataS3Client.getPresignedUrl(postImage2.getImage())).willReturn(postImage2.getImage());
+
+        BDDMockito.given(postCategoryRepository.findById(post.getCategoryId())).willReturn(Optional.of(postCategory));
+
+        BDDMockito.given(postLikeRepository.countByPostId(postId)).willReturn(likeCounts);
+        BDDMockito.given(postLikeRepository.existsByMemberIdAndPostId(memberId, postId)).willReturn(true);
+
+        BDDMockito.given(commentRepository.countByPostId(postId)).willReturn(commentCounts);
+        BDDMockito.given(commentRepository.findAllByPostId(postId)).willReturn(comments);
+        BDDMockito.given(subCommentRepository.countByCommentId(comment.getId())).willReturn(subCommentCounts);
+
+        BDDMockito.given(postTagRepository.findAllByPostId(postId)).willReturn(postTags);
+        BDDMockito.given(diseaseRepository.findById(postTag.getTagId())).willReturn(Optional.of(disease));
 
         final PostDetailResponse expected = PostDetailResponse.builder()
                 .nickname(member.getNickname())
                 .profileImage(member.getImage())
-                .breed(breed.getName())
+                .breed(Objects.requireNonNull(breed).getName())
                 .petAge(pet.getAge())
                 .likeCounts(likeCounts)
                 .totalCommentCounts(commentCounts + subCommentCounts)
-                .title(post.getTitle())
+                .title(Objects.requireNonNull(post).getTitle())
                 .content(post.getContent())
                 .images(images)
-                .category(postCategory.getName())
+                .category(Objects.requireNonNull(postCategory).getName())
                 .isLiked(true)
+                .isWriter(true)
                 .tags(tags)
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
@@ -206,6 +225,9 @@ public class PostServiceTest {
         // given
         final Long postId = 1L;
         final Long memberId = 1L;
+
+        final Post post = Post.builder().memberId(memberId).build();
+
         final Comment comment = Comment.builder()
                 .memberId(memberId)
                 .postId(postId)
@@ -213,6 +235,7 @@ public class PostServiceTest {
                 .build();
         final List<Comment> comments = new ArrayList<>(List.of(comment));
 
+        BDDMockito.given(postRepository.findById(any())).willReturn(Optional.of(post));
         BDDMockito.given(commentRepository.findAllByPostId(any())).willReturn(comments);
 
         // when
@@ -409,7 +432,7 @@ public class PostServiceTest {
         final PostImagesResponse actual = postService.addPost(memberId, categoryId, title, content, images, null, null, null);
 
         //then
-        Assertions.assertThat(actual.images().size()).isEqualTo(2);
+        Assertions.assertThat(actual.images()).hasSize(2);
     }
 
     @Test
@@ -448,8 +471,6 @@ public class PostServiceTest {
                 .petId(1L)
                 .symptomId(3L)
                 .build();
-        final List<PetSymptom> petSymptoms = new ArrayList<>(List.of(petSymptom1, petSymptom2));
-
 
         final PostTag postTag1 = PostTag.builder()
                 .tagId(1L)
@@ -493,6 +514,7 @@ public class PostServiceTest {
         BDDMockito.given(petDiseaseRepository.findAllByPetId(any())).willReturn(petDiseases);
         BDDMockito.given(postTagRepository.findAllByTagIdAndTagType(any(), any())).willReturn(postTags);
         BDDMockito.given(postRepository.findTopPostsByPostIds(any(), any())).willReturn(posts);
+        BDDMockito.given(postRepository.findTop5ByLikeCountDesc()).willReturn(posts);
 
         final PopularPostsResponse expected = PopularPostsResponse.of(
                 posts.stream()
