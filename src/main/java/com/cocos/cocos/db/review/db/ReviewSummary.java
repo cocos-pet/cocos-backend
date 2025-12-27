@@ -9,7 +9,12 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "review_summary")
+@Table(
+        name = "review_summary",
+        indexes = {
+                @Index(name = "idx_review_summary_option_id_review_id", columnList = "review_summary_option_id, review_id")
+        }
+)
 public class ReviewSummary extends BaseTime {
 
     @Id
