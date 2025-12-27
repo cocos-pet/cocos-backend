@@ -1,11 +1,25 @@
 package com.cocos.cocos.review;
 
-import com.cocos.cocos.api.review.dto.response.*;
+import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
+import com.cocos.cocos.api.review.dto.response.ReviewImageDeleteListResponse;
+import com.cocos.cocos.api.review.dto.response.ReviewSummaryListResponse;
+import com.cocos.cocos.api.review.dto.response.ReviewSummaryOptionListResponse;
+import com.cocos.cocos.api.review.dto.response.ReviewSummaryOptionResponse;
+import com.cocos.cocos.api.review.dto.response.ReviewSummaryResponse;
 import com.cocos.cocos.api.review.service.ReviewService;
 import com.cocos.cocos.db.hospital.entity.Hospital;
 import com.cocos.cocos.db.hospital.repository.HospitalRepository;
-import com.cocos.cocos.db.review.db.*;
-import com.cocos.cocos.db.review.repository.*;
+
+import com.cocos.cocos.db.review.db.Review;
+import com.cocos.cocos.db.review.db.ReviewImage;
+import com.cocos.cocos.db.review.db.ReviewSummary;
+import com.cocos.cocos.db.review.db.ReviewSummaryOption;
+import com.cocos.cocos.db.review.db.ReviewSymptom;
+import com.cocos.cocos.db.review.repository.ReviewImageRepository;
+import com.cocos.cocos.db.review.repository.ReviewRepository;
+import com.cocos.cocos.db.review.repository.ReviewSummaryOptionRepository;
+import com.cocos.cocos.db.review.repository.ReviewSummaryRepository;
+import com.cocos.cocos.db.review.repository.ReviewSymptomRepository;
 import com.cocos.cocos.enums.pet.Gender;
 import com.cocos.cocos.external.MemberDataS3Client;
 import org.assertj.core.api.Assertions;
@@ -31,7 +45,7 @@ import static org.mockito.Mockito.times;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("리뷰 테스트")
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-public class ReviewServiceTest {
+class ReviewServiceTest {
 
     @InjectMocks
     ReviewService reviewService;
@@ -91,12 +105,18 @@ public class ReviewServiceTest {
                 .diseaseId(diseaseId)
                 .build();
 
+        final Hospital hospital = Hospital.builder()
+                        .build();
+
+        ReflectionTestUtils.setField(hospital, "id", hospitalId);
         ReflectionTestUtils.setField(review, "id", 123L);
 
         BDDMockito.given(memberDataS3Client.putPresignedUrl(any())).willReturn(presignedUrl);
         BDDMockito.given(reviewRepository.save(any(Review.class)))
                 .willReturn(review);
 
+        BDDMockito.given(hospitalRepository.findById(hospitalId))
+                .willReturn(Optional.of(hospital));
 
         final ReviewAddResponse expected = ReviewAddResponse.of(
                 presignedUrls
