@@ -8,7 +8,7 @@ import com.cocos.cocos.db.body.repository.BodyRepository;
 import com.cocos.cocos.db.disease.entity.Disease;
 import com.cocos.cocos.db.disease.repository.DiseaseRepository;
 import com.cocos.cocos.enums.pet.PetProblem;
-import com.cocos.cocos.external.AppDataS3Client;
+import com.cocos.cocos.external.CloudfrontClient;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -40,7 +40,7 @@ public class BodyServiceTest {
     private DiseaseRepository diseaseRepository;
 
     @Mock
-    private AppDataS3Client appDataS3Client;
+    private CloudfrontClient cloudfrontClient;
 
     @Test
     @DisplayName("신체 부위 리스트를 조회할 수 있다.")
@@ -72,7 +72,7 @@ public class BodyServiceTest {
 
         BDDMockito.given(diseaseRepository.findAll()).willReturn(diseases);
         BDDMockito.given(bodyRepository.findAllById(any())).willReturn(bodies);
-        BDDMockito.given(appDataS3Client.getPresignedUrl(any())).willReturn("image");
+        BDDMockito.given(cloudfrontClient.getAppCloudfrontUrl(any())).willReturn("image");
 
         //when
         final BodiesResponse actual = bodyService.getBodies(PetProblem.DISEASE);

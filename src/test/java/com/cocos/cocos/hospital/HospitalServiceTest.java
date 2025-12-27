@@ -13,6 +13,7 @@ import com.cocos.cocos.db.hospital.repository.HospitalTagMappingRepository;
 import com.cocos.cocos.db.hospital.repository.HospitalTagRepository;
 import com.cocos.cocos.db.hospital.repository.HospitalVisitPurposeRepository;
 import com.cocos.cocos.external.AppDataS3Client;
+import com.cocos.cocos.external.CloudfrontClient;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -52,7 +53,7 @@ public class HospitalServiceTest {
     private HospitalVisitPurposeRepository hospitalVisitPurposeRepository;
 
     @Mock
-    private AppDataS3Client appDataS3Client;
+    private CloudfrontClient cloudfrontClient;
 
     @Test
     @DisplayName("도로명 주소가 있는 병원 상세 정보를 조회할 수 있다.")
@@ -72,6 +73,8 @@ public class HospitalServiceTest {
                 .longitude(128.0)
                 .reviewCount(0)
                 .districtId(1L)
+                .keywords("")
+                .homepageUrl("")
                 .build();
 
         final HospitalTag hospitalTag1 = HospitalTag.builder()
@@ -93,7 +96,7 @@ public class HospitalServiceTest {
         BDDMockito.given(hospitalRepository.findById(any())).willReturn(Optional.ofNullable(hospital));
         BDDMockito.given(hospitalTagMappingRepository.findAllByHospitalId(any())).willReturn(hospitalTagMappings);
         BDDMockito.given(hospitalTagRepository.findAllByIdIn(any())).willReturn(hospitalTags);
-        BDDMockito.given(appDataS3Client.getPresignedUrl(any())).willReturn(hospital.getImage());
+        BDDMockito.given(cloudfrontClient.getAppCloudfrontUrl(any())).willReturn(hospital.getImage());
 
         final HospitalDetailResponse expected = HospitalDetailResponse.of(
                 "병원 이름",
@@ -103,7 +106,9 @@ public class HospitalServiceTest {
                 "병원 도로명주소",
                 "병원 이미지",
                 "",
-                ""
+                "",
+                35.0,
+                128.0
         );
 
         //when
@@ -131,6 +136,8 @@ public class HospitalServiceTest {
                 .longitude(128.0)
                 .reviewCount(0)
                 .districtId(1L)
+                .keywords("")
+                .homepageUrl("")
                 .build();
 
         final HospitalTag hospitalTag1 = HospitalTag.builder()
@@ -152,7 +159,7 @@ public class HospitalServiceTest {
         BDDMockito.given(hospitalRepository.findById(any())).willReturn(Optional.ofNullable(hospital));
         BDDMockito.given(hospitalTagMappingRepository.findAllByHospitalId(any())).willReturn(hospitalTagMappings);
         BDDMockito.given(hospitalTagRepository.findAllByIdIn(any())).willReturn(hospitalTags);
-        BDDMockito.given(appDataS3Client.getPresignedUrl(any())).willReturn(hospital.getImage());
+        BDDMockito.given(cloudfrontClient.getAppCloudfrontUrl(any())).willReturn(hospital.getImage());
 
         final HospitalDetailResponse expected = HospitalDetailResponse.of(
                 "병원 이름",
@@ -162,7 +169,9 @@ public class HospitalServiceTest {
                 "병원 주소",
                 "병원 이미지",
                 "",
-                ""
+                "",
+                35.0,
+                128.0
         );
 
         //when
