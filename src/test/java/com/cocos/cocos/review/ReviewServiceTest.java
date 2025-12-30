@@ -16,20 +16,28 @@ import com.cocos.cocos.db.district.repository.DistrictRepository;
 import com.cocos.cocos.db.hospital.entity.Hospital;
 import com.cocos.cocos.db.hospital.entity.VisitPurpose;
 import com.cocos.cocos.db.hospital.repository.HospitalRepository;
-import com.cocos.cocos.db.member.entity.Member;
-import com.cocos.cocos.db.pet.entity.Pet;
+
 import com.cocos.cocos.db.review.db.Review;
 import com.cocos.cocos.db.review.db.ReviewImage;
 import com.cocos.cocos.db.review.db.ReviewSummary;
 import com.cocos.cocos.db.review.db.ReviewSummaryOption;
 import com.cocos.cocos.db.review.db.ReviewSymptom;
-
 import com.cocos.cocos.db.review.repository.ReviewImageRepository;
 import com.cocos.cocos.db.review.repository.ReviewRepository;
 import com.cocos.cocos.db.review.repository.ReviewSummaryOptionRepository;
 import com.cocos.cocos.db.review.repository.ReviewSummaryRepository;
 import com.cocos.cocos.db.review.repository.ReviewSymptomRepository;
+import com.cocos.cocos.db.member.entity.Member;
+import com.cocos.cocos.db.pet.entity.Pet;
+import com.cocos.cocos.db.animal.repository.AnimalRepository;
+import com.cocos.cocos.db.breed.repository.BreedRepository;
+import com.cocos.cocos.db.disease.repository.DiseaseRepository;
+import com.cocos.cocos.db.hospital.repository.HospitalVisitPurposeRepository;
+import com.cocos.cocos.db.member.repository.MemberRepository;
+import com.cocos.cocos.db.pet.repository.PetRepository;
+import com.cocos.cocos.enums.location.LocationType;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
+
 import com.cocos.cocos.enums.pet.Gender;
 import com.cocos.cocos.external.MemberDataS3Client;
 import org.assertj.core.api.Assertions;
@@ -42,13 +50,7 @@ import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import com.cocos.cocos.db.animal.repository.AnimalRepository;
-import com.cocos.cocos.db.breed.repository.BreedRepository;
-import com.cocos.cocos.db.disease.repository.DiseaseRepository;
-import com.cocos.cocos.db.hospital.repository.HospitalVisitPurposeRepository;
-import com.cocos.cocos.db.member.repository.MemberRepository;
-import com.cocos.cocos.db.pet.repository.PetRepository;
-import com.cocos.cocos.enums.location.LocationType;
+
 
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -150,13 +152,16 @@ class ReviewServiceTest {
                 .diseaseId(diseaseId)
                 .build();
 
+        final Hospital hospital = Hospital.builder()
+                        .build();
+
+        ReflectionTestUtils.setField(hospital, "id", hospitalId);
         ReflectionTestUtils.setField(review, "id", 123L);
 
         BDDMockito.given(memberDataS3Client.putPresignedUrl(any())).willReturn(presignedUrl);
         BDDMockito.given(reviewRepository.save(any(Review.class)))
                 .willReturn(review);
         BDDMockito.given(hospitalRepository.findById(hospitalId)).willReturn(Optional.of(Hospital.builder().build()));
-
 
         final ReviewAddResponse expected = ReviewAddResponse.of(
                 presignedUrls

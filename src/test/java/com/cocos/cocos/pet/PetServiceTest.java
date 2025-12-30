@@ -2,6 +2,7 @@ package com.cocos.cocos.pet;
 
 import com.cocos.cocos.api.pet.dto.request.PetCreateRequest;
 import com.cocos.cocos.api.pet.service.PetService;
+import com.cocos.cocos.db.disease.repository.DiseaseRepository;
 import com.cocos.cocos.db.pet.entity.Pet;
 import com.cocos.cocos.db.pet.repository.PetDiseaseRepository;
 import com.cocos.cocos.db.pet.repository.PetRepository;
@@ -24,7 +25,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("애완동물 서비스 테스트")
+@DisplayName("반려동물 서비스 테스트")
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class PetServiceTest {
 
@@ -40,8 +41,11 @@ class PetServiceTest {
     @Mock
     PetDiseaseRepository petDiseaseRepository;
 
+    @Mock
+    DiseaseRepository diseaseRepository;
+
     @Test
-    @DisplayName("애완동물을 추가할 수 있다.")
+    @DisplayName("반려동물을 추가할 수 있다.")
     void addPet() {
         // given
         final Long memberId = 1L;
@@ -63,6 +67,7 @@ class PetServiceTest {
                 .breedId(breedId)
                 .build();
 
+        BDDMockito.given(diseaseRepository.countByIdIn(petCreateRequest.diseaseIds())).willReturn((long) petCreateRequest.diseaseIds().size());
         BDDMockito.given(petRepository.save(any(Pet.class))).willReturn(pet);
 
         // when
