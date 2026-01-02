@@ -1,6 +1,7 @@
 package com.cocos.cocos.post;
 
 import com.cocos.cocos.config.JpaAuditingConfig;
+import com.cocos.cocos.config.QuerydslConfig;
 import com.cocos.cocos.db.post.entity.Post;
 import com.cocos.cocos.db.post.repository.PostRepository;
 
@@ -19,7 +20,7 @@ import org.springframework.context.annotation.Import;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DisplayName("게시글 레포지토리 테스트")
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-@Import(JpaAuditingConfig.class)
+@Import({JpaAuditingConfig.class, QuerydslConfig.class})
 class PostRepositoryTest {
 
     @Autowired
