@@ -1,5 +1,7 @@
 package com.cocos.cocos.breed;
 
+import com.cocos.cocos.config.JpaAuditingConfig;
+import com.cocos.cocos.config.QuerydslConfig;
 import com.cocos.cocos.db.breed.entity.Breed;
 import com.cocos.cocos.db.breed.repository.BreedRepository;
 import org.assertj.core.api.Assertions;
@@ -12,14 +14,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DisplayName("품종 레포지토리 테스트")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+@Import({JpaAuditingConfig.class, QuerydslConfig.class })
 class BreedRepositoryTest {
 
     @Autowired
