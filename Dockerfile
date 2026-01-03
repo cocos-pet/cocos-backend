@@ -11,6 +11,9 @@ RUN gradle build -x test --no-daemon
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
+ARG SPRING_PROFILES_ACTIVE=dev
+ENV SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE
+
 ENV TZ=Asia/Seoul
 COPY --from=build /app/build/libs/*.jar app.jar
 
