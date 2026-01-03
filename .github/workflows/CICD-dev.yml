@@ -22,17 +22,17 @@ jobs:
       - name: docker login
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          username: ${{ secrets.DOCKERHUB_USERNAME_DEV }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD_DEV }}
 
       - name: docker image build
         run: |
           docker build \
             --build-arg SPRING_PROFILES_ACTIVE=dev \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/cocos-dev .
+            -t ${{ secrets.DOCKERHUB_USERNAME_DEV }}/cocos .
 
       - name: Docker Hub push
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/cocos-dev
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME_DEV }}/cocos
 
       - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@master
