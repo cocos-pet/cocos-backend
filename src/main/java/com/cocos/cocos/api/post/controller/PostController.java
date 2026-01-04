@@ -44,6 +44,11 @@ public class PostController implements PostControllerSwagger {
         return SuccessResponse.success(SuccessMessage.OK, postService.getCategories());
     }
 
+    @GetMapping("/categories/writable")
+    public ResponseEntity<BaseResponse<PostCategoriesResponse>> getWritablePostCategories() {
+        return SuccessResponse.success(SuccessMessage.OK, postService.getWritablePostCategories(PrincipalHandler.getMemberIdFromPrincipal()));
+    }
+
     @PostMapping
     public ResponseEntity<BaseResponse<PostImagesResponse>> addPost(
             @RequestBody @Valid final PostRequest postRequest
