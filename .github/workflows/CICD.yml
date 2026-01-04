@@ -39,10 +39,11 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: docker image build
-        run: docker build \
-          --no-cache \
-          --build-arg SPRING_PROFILES_ACTIVE=prod \
-          -t ${{ secrets.DOCKERHUB_USERNAME }}/cocos .
+        run: |
+          docker build \
+            --no-cache \
+            --build-arg SPRING_PROFILES_ACTIVE=prod \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/cocos .
 
       - name: Docker Hub push
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/cocos
