@@ -9,6 +9,7 @@ import com.cocos.cocos.validation.member.MemberNicknameConstraint;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,7 +30,7 @@ public interface MemberControllerSwagger {
     @ApiResponse(
             responseCode = "200",
             description = "로그인에 성공했습니다.")
-    public ResponseEntity<BaseResponse<LoginResponse>> login(final LoginRequest loginRequest);
+    public ResponseEntity<BaseResponse<LoginResponse>> login(@Valid final LoginRequest loginRequest);
 
     @Operation(summary = "로그아웃 API", description = "로그아웃 API 입니다.")
     @ApiResponse(
