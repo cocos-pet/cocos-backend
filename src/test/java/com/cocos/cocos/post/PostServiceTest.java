@@ -534,7 +534,7 @@ class PostServiceTest {
     @DisplayName("어드민 권한을 가진 사용자의 경우 admin-only 카테고리를 포함한 4개의 카테고리를 조회할 수 있다.")
     void getWritablePostCategories_admin_includesAdminOnlyCategory() {
         // given
-        Long memberId = 1L;
+        final Long memberId = 1L;
         Member admin = Member.builder()
                 .isAdmin(true)
                 .build();
@@ -564,7 +564,7 @@ class PostServiceTest {
                 .isAdminOnly(true)
                 .build();
 
-        List<PostCategory> categories = List.of(
+        final List<PostCategory> categories = List.of(
                 postCategory1, postCategory2, postCategory3, postCategory4
         );
 
@@ -576,7 +576,7 @@ class PostServiceTest {
                 .willReturn("presigned-url");
 
         // when
-        PostCategoriesResponse response =
+        final PostCategoriesResponse response =
                 postService.getWritablePostCategories(memberId);
 
         // then
@@ -590,7 +590,7 @@ class PostServiceTest {
     @DisplayName("어드민 권한을 가지지 않은 사용자의 경우 admin-only 카테고리를 제외한 3개의 카테고리를 조회할 수 있다.")
     void getWritablePostCategories_nonAdmin_excludesAdminOnlyCategory() {
         // given
-        Long memberId = 2L;
+        final Long memberId = 2L;
         Member user = Member.builder()
                 .isAdmin(false)
                 .build();
@@ -614,7 +614,7 @@ class PostServiceTest {
                 .isAdminOnly(false)
                 .build();
 
-        List<PostCategory> categories = List.of(
+        final List<PostCategory> categories = List.of(
                 postCategory1, postCategory2, postCategory3
         );
 
@@ -626,7 +626,7 @@ class PostServiceTest {
                 .willReturn("presigned-url");
 
         // when
-        PostCategoriesResponse response =
+        final PostCategoriesResponse response =
                 postService.getWritablePostCategories(memberId);
 
         // then
