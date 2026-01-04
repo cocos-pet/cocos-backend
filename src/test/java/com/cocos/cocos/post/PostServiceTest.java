@@ -48,6 +48,7 @@ import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -528,4 +529,111 @@ class PostServiceTest {
         //then
         Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
     }
+
+    @Test
+    @DisplayName("어드민 권한을 가진 사용자의 경우 admin-only 카테고리를 포함한 4개의 카테고리를 조회할 수 있다.")
+    void getWritablePostCategories_admin_includesAdminOnlyCategory() {
+        // given
+        Long memberId = 1L;
+        Member admin = Member.builder()
+                .isAdmin(true)
+                .build();
+        ReflectionTestUtils.setField(admin, "id", memberId);
+
+        final PostCategory postCategory1 = PostCategory.builder()
+                .name("증상·질병")
+                .image("")
+                .isAdminOnly(false)
+                .build();
+
+        final PostCategory postCategory2 = PostCategory.builder()
+                .name("병원고민")
+                .image("")
+                .isAdminOnly(false)
+                .build();
+
+        final PostCategory postCategory3 = PostCategory.builder()
+                .name("일상·치유")
+                .image("")
+                .isAdminOnly(false)
+                .build();
+
+        final PostCategory postCategory4 = PostCategory.builder()
+                .name("코코스매거진")
+                .image("")
+                .isAdminOnly(true)
+                .build();
+
+        List<PostCategory> categories = List.of(
+                postCategory1, postCategory2, postCategory3, postCategory4
+        );
+
+        BDDMockito.given(memberRepository.findById(memberId))
+                .willReturn(Optional.of(admin));
+        BDDMockito.given(postCategoryRepository.findAll())
+                .willReturn(categories);
+        BDDMockito.given(appDataS3Client.getPresignedUrl(any()))
+                .willReturn("presigned-url");
+
+        // when
+        PostCategoriesResponse response =
+                postService.getWritablePostCategories(memberId);
+
+        // then
+        Assertions.assertThat(response.categories())
+                .hasSize(4)
+                .extracting(PostCategoryResponse::name)
+                .contains("코코스매거진");
+    }
+
+    @Test
+    @DisplayName("어드민 권한을 가지지 않은 사용자의 경우 admin-only 카테고리를 제외한 3개의 카테고리를 조회할 수 있다.")
+    void getWritablePostCategories_nonAdmin_excludesAdminOnlyCategory() {
+        // given
+        Long memberId = 2L;
+        Member user = Member.builder()
+                .isAdmin(false)
+                .build();
+        ReflectionTestUtils.setField(user, "id", memberId);
+
+        final PostCategory postCategory1 = PostCategory.builder()
+                .name("증상·질병")
+                .image("")
+                .isAdminOnly(false)
+                .build();
+
+        final PostCategory postCategory2 = PostCategory.builder()
+                .name("병원고민")
+                .image("")
+                .isAdminOnly(false)
+                .build();
+
+        final PostCategory postCategory3 = PostCategory.builder()
+                .name("일상·치유")
+                .image("")
+                .isAdminOnly(false)
+                .build();
+
+        List<PostCategory> categories = List.of(
+                postCategory1, postCategory2, postCategory3
+        );
+
+        BDDMockito.given(memberRepository.findById(memberId))
+                .willReturn(Optional.of(user));
+        BDDMockito.given(postCategoryRepository.findAllByIsAdminOnlyFalse())
+                .willReturn(categories);
+        BDDMockito.given(appDataS3Client.getPresignedUrl(any()))
+                .willReturn("presigned-url");
+
+        // when
+        PostCategoriesResponse response =
+                postService.getWritablePostCategories(memberId);
+
+        // then
+        Assertions.assertThat(response.categories())
+                .hasSize(3)
+                .extracting(PostCategoryResponse::name)
+                .doesNotContain("코코스매거진");
+    }
+
 }
