@@ -11,6 +11,7 @@ import com.cocos.cocos.util.PrincipalHandler;
 import com.cocos.cocos.util.validation.EntityExistsValidator;
 import com.cocos.cocos.validation.hospital.HospitalIdConstraint;
 import com.cocos.cocos.validation.member.MemberNicknameConstraint;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -61,9 +62,9 @@ public class MemberController implements MemberControllerSwagger {
 
     @PostMapping("/login")
     public ResponseEntity<BaseResponse<LoginResponse>> login(
-            @RequestBody final LoginRequest loginRequest
+            @Valid @RequestBody final LoginRequest loginRequest
     ) {
-        return SuccessResponse.success(SuccessMessage.OK, memberService.login(loginRequest.code()));
+        return SuccessResponse.success(SuccessMessage.OK, memberService.login(loginRequest.code(), loginRequest.redirectUri()));
     }
 
     @PostMapping("/logout")

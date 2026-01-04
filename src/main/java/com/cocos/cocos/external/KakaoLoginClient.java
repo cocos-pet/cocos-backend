@@ -18,14 +18,12 @@ public class KakaoLoginClient {
 
     @Value("${kakao.client-id}")
     private String kakaoClientId;
-    @Value("${kakao.redirect-url}")
-    private String kakaoRedirectUrl;
     @Value("${kakao.admin-key}")
     private String kakaoAdminKey;
 
     private static final String ADMIN_KEY_TYPE = "KakaoAK ";
 
-    public String login(final String code) {
+    public String login(final String code, final String kakaoRedirectUri) {
 
         final RestClient restClient = RestClient.create();
         final URI uri = UriComponentsBuilder
@@ -35,7 +33,7 @@ public class KakaoLoginClient {
                 .queryParam("redirect_uri", "{redirect_uri}")
                 .queryParam("grant_type", "{grant_type}")
                 .encode()
-                .buildAndExpand(code, kakaoClientId, kakaoRedirectUrl, "authorization_code")
+                .buildAndExpand(code, kakaoClientId, kakaoRedirectUri, "authorization_code")
                 .toUri();
 
         final KakaoAccessTokenResponse kakaoAccessTokenResponse = restClient.post()

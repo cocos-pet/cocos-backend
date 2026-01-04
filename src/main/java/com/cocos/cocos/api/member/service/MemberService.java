@@ -81,9 +81,9 @@ public class MemberService {
     }
 
     @Transactional
-    public LoginResponse login(final String code) {
+    public LoginResponse login(final String code, final String redirectUri) {
         //ToDo: 코드 역할에 따라 간격 띄우는 것 필요
-        final String sub = kakaoLoginClient.login(code);
+        final String sub = kakaoLoginClient.login(code, redirectUri);
         Member member = null;
         boolean isCompletedSignUp;
         if (memberRepository.existsBySub(sub)) {
