@@ -57,7 +57,8 @@ public class SecurityConfig {
         BLACK_LIST_GET_METHOD_URL_IN_WHITE_LIST = new String[]{
                 apiPrefix + "/posts/members",
                 apiPrefix + "/comments/members",
-                apiPrefix + "/hospitals/reviews/members"
+                apiPrefix + "/hospitals/reviews/members",
+                apiPrefix + "/posts/categories/writable"
         };
 
         BLACK_LIST_POST_METHOD_URL_IN_WHITE_LIST = new String[]{
