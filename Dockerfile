@@ -1,9 +1,11 @@
 FROM gradle:8.9-jdk21-alpine AS build
 WORKDIR /app
 
-COPY gradle gradle
-COPY gradlew build.gradle settings.gradle ./
-RUN gradle dependencies --no-daemon
+ENV GRADLE_USER_HOME=/gradle-cache
+
+COPY gradlew gradlew
+COPY gradle/wrapper gradle/wrapper
+COPY build.gradle settings.gradle ./
 
 COPY . .
 RUN gradle build -x test --no-daemon
