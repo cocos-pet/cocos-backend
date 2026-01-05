@@ -38,15 +38,19 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: docker image build
-        run: |
-          docker build \
-            --no-cache \
-            --build-arg SPRING_PROFILES_ACTIVE=prod \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/cocos .
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Docker Hub push
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/cocos
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/cocos
+          build-args: |
+            SPRING_PROFILES_ACTIVE=prod
+          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/cocos:buildcache-prod
+          cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/cocos:buildcache-prod,mode=max
 
       - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@master
