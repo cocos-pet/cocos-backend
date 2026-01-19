@@ -1,9 +1,11 @@
 package com.cocos.cocos.api.notification.service;
 
 import com.cocos.cocos.api.notification.dto.response.UnreadNotificationResponse;
+import com.cocos.cocos.common.exception.CocosException;
 import com.cocos.cocos.db.member.repository.MemberRepository;
 import com.cocos.cocos.db.notification.entity.Notification;
 import com.cocos.cocos.db.notification.repository.NotificationRepository;
+import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.event.MagazinePublishedEvent;
 import com.cocos.cocos.event.PostCommentEvent;
 import com.cocos.cocos.event.PostLikeMilestoneEvent;
@@ -50,11 +52,21 @@ public class NotificationService {
     }
 
     @Transactional(readOnly = true)
-    public UnreadNotificationResponse hasUnreadNotification(Long notifierId) {
+    public UnreadNotificationResponse hasUnreadNotification(final Long notifierId) {
         boolean hasUnread =
                 notificationRepository.existsByNotifierIdAndIsReadFalse(notifierId);
 
         return new UnreadNotificationResponse(hasUnread);
+    }
+
+    public void readNotification(final Long memberId, final Long notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_NOTIFICATION));
+        notification.validateOwner(memberId);
+
+        if (!notification.isRead()) {
+            notification.markRead();
+        }
     }
 
     private boolean isAlreadyNotified(final Long postId, final int likeCount) {
