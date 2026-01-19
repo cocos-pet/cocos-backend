@@ -6,7 +6,9 @@ import com.cocos.cocos.db.post.entity.PostLike;
 import com.cocos.cocos.db.post.repository.PostLikeRepository;
 import com.cocos.cocos.db.post.repository.PostRepository;
 import com.cocos.cocos.enums.message.FailMessage;
+import com.cocos.cocos.event.PostLikedEvent;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,8 +18,10 @@ public class PostLikeService {
 
     private final PostLikeRepository postLikeRepository;
     private final PostRepository postRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public int addPostLike(final Long memberId, final Long postId) {
+    @Transactional
+    public void addPostLike(final Long memberId, final Long postId) {
         postLikeRepository.save(
                 PostLike.builder()
                         .memberId(memberId)
@@ -29,7 +33,7 @@ public class PostLikeService {
         );
 
         post.addLike();
-        return post.getLikeCount();
+        eventPublisher.publishEvent(new PostLikedEvent(postId, memberId, post.getLikeCount()));
     }
 
     @Transactional

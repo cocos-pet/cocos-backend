@@ -1,6 +1,5 @@
 package com.cocos.cocos.api.post.controller;
 
-import com.cocos.cocos.api.post.facade.PostLikeFacade;
 import com.cocos.cocos.api.post.service.PostLikeService;
 import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.common.response.SuccessResponse;
@@ -24,14 +23,13 @@ public class PostLikeController implements PostLikeControllerSwagger {
 
     private final PostLikeService postLikeService;
     private final EntityExistsValidator entityExistsValidator;
-    private final PostLikeFacade postLikeFacade;
 
     @PostMapping("/{postId}")
     public ResponseEntity<BaseResponse<Void>> addPostLike(
             @PathVariable(name = "postId") @PostIdConstraint final Long postId
     ) {
         entityExistsValidator.validatePetByMemberId(PrincipalHandler.getMemberIdFromPrincipal());
-        postLikeFacade.addPostLikeAndNotification(PrincipalHandler.getMemberIdFromPrincipal(), postId);
+        postLikeService.addPostLike(PrincipalHandler.getMemberIdFromPrincipal(), postId);
         return SuccessResponse.success(SuccessMessage.OK, null);
     }
 
