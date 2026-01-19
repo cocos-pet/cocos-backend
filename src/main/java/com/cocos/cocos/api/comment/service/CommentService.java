@@ -54,10 +54,19 @@ public class CommentService {
         );
 
         final Post post = postRepository.findById(postId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_POST));
+        final Member actor = memberRepository.findById(memberId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
 
         if (!comment.isSelfComment(post.getMemberId())) {
             eventPublisher.publishEvent(
-                    new PostCommentEvent(comment.getId())
+                    new PostCommentEvent(
+                            post.getId(),
+                            post.getMemberId(),
+                            post.getTitle(),
+                            comment.getId(),
+                            comment.getContent(),
+                            actor.getId(),
+                            actor.getNickname()
+                    )
             );
         }
     }

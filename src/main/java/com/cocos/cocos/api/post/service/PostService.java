@@ -263,7 +263,12 @@ public class PostService {
         }
 
         if (post.isMagazine()) {
-            eventPublisher.publishEvent(new MagazinePublishedEvent(post.getId()));
+            eventPublisher.publishEvent(new MagazinePublishedEvent(
+                    post.getId(),
+                    post.getMemberId(),
+                    post.getTitle(),
+                    post.getContent()
+            ));
         }
 
         return PostImagesResponse.of(null);

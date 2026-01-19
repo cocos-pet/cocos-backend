@@ -17,8 +17,6 @@ public class PostCommentNotificationListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handle(PostCommentEvent event) {
-        notificationService.createForComment(
-                event.commentId()
-        );
+        notificationService.createForComment(event);
     }
 }

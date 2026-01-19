@@ -5,6 +5,10 @@ import com.cocos.cocos.db.comment.entity.Comment;
 import com.cocos.cocos.db.member.entity.Member;
 import com.cocos.cocos.db.post.entity.Post;
 import com.cocos.cocos.enums.notification.NotificationType;
+import com.cocos.cocos.event.MagazinePublishedEvent;
+import com.cocos.cocos.event.PostCommentEvent;
+import com.cocos.cocos.event.PostLikeMilestoneEvent;
+import com.cocos.cocos.event.PostSubCommentEvent;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -82,76 +86,60 @@ public class Notification extends BaseTime {
         this.milestone = milestone;
     }
 
-    public static Notification postLikeMilestone(
-            Post post,
-            Member actor,
-            int likeCount
-    ) {
+    public static Notification postLikeMilestone(PostLikeMilestoneEvent event) {
         return Notification.builder()
-                .notifierId(post.getMemberId())
-                .actorId(actor.getId())
-                .actorNickname(actor.getNickname())
+                .notifierId(event.postOwnerId())
+                .actorId(event.actorId())
+                .actorNickname(event.actorNickname())
                 .notificationType(NotificationType.POST_LIKE_MILESTONE)
-                .notificationTargetId(post.getId())
-                .postId(post.getId())
-                .title(post.getTitle())
-                .milestone(likeCount)
+                .notificationTargetId(event.postId())
+                .postId(event.postId())
+                .title(event.postTitle())
+                .milestone(event.likeCount())
                 .build();
     }
 
     public static Notification magazinePublished(
             Long notifierId,
-            Post post
+            MagazinePublishedEvent event
     ) {
         return Notification.builder()
                 .notifierId(notifierId)
-                .actorId(post.getMemberId())
+                .actorId(event.postOwnerId())
                 .notificationType(NotificationType.MAGAZINE_PUBLISHED)
-                .notificationTargetId(post.getId())
-                .postId(post.getId())
-                .title(post.getTitle())
-                .content(post.getContent())
+                .notificationTargetId(event.postId())
+                .postId(event.postId())
+                .title(event.postTitle())
+                .content(event.postContent())
                 .build();
     }
 
-    public static Notification comment(
-            Post post,
-            Comment comment,
-            Member actor
-    ) {
+    public static Notification comment(PostCommentEvent event) {
         return Notification.builder()
-                .notifierId(post.getMemberId())
-                .actorId(actor.getId())
-                .actorNickname(actor.getNickname())
+                .notifierId(event.postOwnerId())
+                .actorId(event.actorId())
+                .actorNickname(event.actorNickname())
                 .notificationType(NotificationType.COMMENT)
-                .notificationTargetId(comment.getId())
-                .postId(post.getId())
-                .title(post.getTitle())
-                .content(comment.getContent())
+                .notificationTargetId(event.commentId())
+                .postId(event.postId())
+                .title(event.postTitle())
+                .content(event.commentContent())
                 .build();
     }
 
-    public static Notification subComment(
-            Long postId,
-            String postTitle,
-            Long notifierId,
-            Long actorId,
-            String actorNickname,
-            Long subCommentId,
-            String content
-    ) {
+
+    public static Notification subComment(PostSubCommentEvent event) {
         return Notification.builder()
-                .notifierId(notifierId)
-                .actorId(actorId)
-                .actorNickname(actorNickname)
+                .notifierId(event.parentCommentOwnerId())
+                .actorId(event.actorId())
+                .actorNickname(event.actorNickname())
                 .notificationType(NotificationType.SUB_COMMENT)
-                .notificationTargetId(subCommentId)
-                .postId(postId)
-                .title(postTitle)
-                .content(content)
+                .notificationTargetId(event.subCommentId())
+                .postId(event.postId())
+                .title(event.postTitle())
+                .content(event.content())
                 .build();
     }
-
 
     public void markRead() {
         this.isRead = true;

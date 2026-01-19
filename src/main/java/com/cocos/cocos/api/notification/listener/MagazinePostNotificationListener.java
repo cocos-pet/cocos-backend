@@ -17,6 +17,6 @@ public class MagazinePostNotificationListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handle(MagazinePublishedEvent event) {
-        notificationService.createForMagazine(event.postId());
+        notificationService.createForMagazine(event);
     }
 }
