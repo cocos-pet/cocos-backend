@@ -24,24 +24,18 @@ import java.util.Objects;
 @Transactional
 public class NotificationService {
 
-
     private final NotificationRepository notificationRepository;
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
 
     @Transactional
-    public void createForComment(final Comment comment) {
-
+    public void createForComment(final Long commentId) {
+        final Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_COMMENT));
         final Post post = postRepository.findById(comment.getPostId()).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_POST));
         final Member actor = memberRepository.findById(comment.getMemberId()).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
 
-        boolean isSelfComment = Objects.equals(post.getMemberId(), actor.getId());
-        if (isSelfComment) {
-            return;
-        }
-
-        final Notification notification = Notification.builder().notifierId(post.getMemberId()).actorId(actor.getId()).actorNickname(actor.getNickname()).notificationType(NotificationType.COMMENT).notificationTargetId(comment.getId()).postId(post.getId()).title(post.getTitle()).content(comment.getContent()).build();
+        final Notification notification = Notification.comment(post, comment, actor);
 
         notificationRepository.save(notification);
 
@@ -70,7 +64,7 @@ public class NotificationService {
                 .map(memberId -> Notification.magazinePublished(memberId, post))
                 .toList();
 
-       notificationRepository.saveAll(notifications);
+        notificationRepository.saveAll(notifications);
     }
 
     public void createForPostLike(final Long postId, final Long actorId, final int likeCount) {
@@ -81,8 +75,7 @@ public class NotificationService {
             return;
         }
 
-        final Notification notification = Notification.postLikeMilestone(
-                post.getId(), post.getMemberId(), post.getTitle(), actor.getId(), actor.getNickname(), likeCount);
+        final Notification notification = Notification.postLikeMilestone(post, actor, likeCount);
 
         notificationRepository.save(notification);
     }
