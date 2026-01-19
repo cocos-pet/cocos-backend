@@ -12,6 +12,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Set;
+
 @Service
 @RequiredArgsConstructor
 public class PostLikeService {
@@ -19,6 +21,8 @@ public class PostLikeService {
     private final PostLikeRepository postLikeRepository;
     private final PostRepository postRepository;
     private final ApplicationEventPublisher eventPublisher;
+
+    private static final Set<Integer> LIKE_MILESTONES = Set.of(10, 20, 30);
 
     @Transactional
     public void addPostLike(final Long memberId, final Long postId) {
@@ -33,7 +37,17 @@ public class PostLikeService {
         );
 
         post.addLike();
-        eventPublisher.publishEvent(new PostLikedEvent(postId, memberId, post.getLikeCount()));
+        final int likeCount = post.getLikeCount();
+
+        if (isLikeMilestone(likeCount)) {
+            eventPublisher.publishEvent(
+                    new PostLikedEvent(postId, memberId, likeCount)
+            );
+        }
+    }
+
+    private boolean isLikeMilestone(int likeCount) {
+        return LIKE_MILESTONES.contains(likeCount);
     }
 
     @Transactional
