@@ -6,25 +6,29 @@ import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.common.response.SuccessResponse;
 import com.cocos.cocos.enums.message.SuccessMessage;
 import com.cocos.cocos.util.PrincipalHandler;
+import com.cocos.cocos.validation.notification.NotificationIdConstraint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("${api.prefix}/notifications")
 @RequiredArgsConstructor
-public class NotificationController implements NotificationControllerSwagger{
+public class NotificationController implements NotificationControllerSwagger {
     private final NotificationService notificationService;
 
     @GetMapping("/unread")
     public ResponseEntity<BaseResponse<UnreadNotificationResponse>> hasUnread() {
-        return SuccessResponse.success(
-                SuccessMessage.OK,
-                notificationService.hasUnreadNotification(
-                        PrincipalHandler.getMemberIdFromPrincipal()
-                )
-        );
+        return SuccessResponse.success(SuccessMessage.CREATED, notificationService.hasUnreadNotification(PrincipalHandler.getMemberIdFromPrincipal()));
+    }
+
+    @PatchMapping("/{notificationId}/read")
+    public ResponseEntity<BaseResponse<Void>> read(@PathVariable(name = "notificationId") @NotificationIdConstraint final Long notificationId) {
+        notificationService.readNotification(PrincipalHandler.getMemberIdFromPrincipal(), notificationId);
+        return SuccessResponse.success(SuccessMessage.OK, null);
     }
 }
