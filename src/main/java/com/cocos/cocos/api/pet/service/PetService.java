@@ -119,6 +119,7 @@ public class PetService {
 
         if (petUpdateRequest.diseaseIds() != null) {
             petDiseaseRepository.deleteAllByPetId(petId);
+            petDiseaseRepository.flush();
             if (!petUpdateRequest.diseaseIds().isEmpty()) {
                 validatePetDiseases(petUpdateRequest.diseaseIds());
                 savePetDiseases(petUpdateRequest.diseaseIds(), pet.getId());
@@ -127,6 +128,7 @@ public class PetService {
 
         if (petUpdateRequest.symptomIds() != null) {
             petSymptomRepository.deleteAllByPetId(petId);
+            petSymptomRepository.flush();
             if (!petUpdateRequest.symptomIds().isEmpty()) {
                 validatePetSymptoms(petUpdateRequest.symptomIds());
                 savePetSymptoms(petUpdateRequest.symptomIds(), pet.getId());
