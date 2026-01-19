@@ -18,13 +18,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class NotificationService {
-    private static final Set<Integer> LIKE_MILESTONES = Set.of(10, 20, 30);
+
 
     private final NotificationRepository notificationRepository;
     private final MemberRepository memberRepository;
@@ -63,22 +62,20 @@ public class NotificationService {
         notificationRepository.save(notification);
     }
 
-    public void createForMagazine(final Post post) {
-        final List<Long> memberIds = memberRepository.findAll().stream().map(Member::getId).toList();
+    public void createForMagazine(final Long postId) {
+        final Post post = postRepository.findById(postId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_POST));
+        final List<Long> memberIds = memberRepository.findAllIds();
 
-        for (Long memberId : memberIds) {
-            final Notification notification = Notification.builder().notifierId(memberId).actorId(post.getMemberId()).notificationType(NotificationType.MAGAZINE_PUBLISHED).notificationTargetId(post.getId()).postId(post.getId()).title(post.getTitle()).content(post.getContent()).build();
-            notificationRepository.save(notification);
-        }
+        List<Notification> notifications = memberIds.stream()
+                .map(memberId -> Notification.magazinePublished(memberId, post))
+                .toList();
+
+       notificationRepository.saveAll(notifications);
     }
 
     public void createForPostLike(final Long postId, final Long actorId, final int likeCount) {
         final Post post = postRepository.findById(postId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_POST));
         final Member actor = memberRepository.findById(actorId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
-
-        if (!isLikeMilestone(likeCount)) {
-            return;
-        }
 
         if (isAlreadyNotified(postId, likeCount)) {
             return;
@@ -92,9 +89,5 @@ public class NotificationService {
 
     private boolean isAlreadyNotified(final Long postId, final int likeCount) {
         return notificationRepository.existsByPostIdAndMilestone(postId, likeCount);
-    }
-
-    private static boolean isLikeMilestone(int likeCount) {
-        return LIKE_MILESTONES.contains(likeCount);
     }
 }
