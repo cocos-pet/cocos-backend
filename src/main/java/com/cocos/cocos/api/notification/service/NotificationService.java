@@ -2,7 +2,6 @@ package com.cocos.cocos.api.notification.service;
 
 import com.cocos.cocos.common.exception.CocosException;
 import com.cocos.cocos.db.comment.entity.Comment;
-import com.cocos.cocos.db.comment.entity.SubComment;
 import com.cocos.cocos.db.comment.repository.CommentRepository;
 import com.cocos.cocos.db.member.entity.Member;
 import com.cocos.cocos.db.member.repository.MemberRepository;
@@ -11,13 +10,12 @@ import com.cocos.cocos.db.notification.repository.NotificationRepository;
 import com.cocos.cocos.db.post.entity.Post;
 import com.cocos.cocos.db.post.repository.PostRepository;
 import com.cocos.cocos.enums.message.FailMessage;
-import com.cocos.cocos.enums.notification.NotificationType;
+import com.cocos.cocos.event.PostSubCommentEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -41,17 +39,17 @@ public class NotificationService {
 
     }
 
-    public void createForSubComment(final SubComment subComment) {
-        final Comment comment = commentRepository.findById(subComment.getCommentId()).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_COMMENT));
-        final Post post = postRepository.findById(comment.getPostId()).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_POST));
-        final Member actor = memberRepository.findById(subComment.getMemberId()).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
-
-        boolean isSelfSubComment = Objects.equals(comment.getMemberId(), actor.getId());
-        if (isSelfSubComment) {
-            return;
-        }
-
-        final Notification notification = Notification.builder().notifierId(comment.getMemberId()).actorId(actor.getId()).actorNickname(actor.getNickname()).notificationType(NotificationType.SUB_COMMENT).postId(post.getId()).title(post.getTitle()).content(subComment.getContent()).build();
+    public void createForSubComment(PostSubCommentEvent event) {
+        Notification notification =
+                Notification.subComment(
+                        event.postId(),
+                        event.postTitle(),
+                        event.parentCommentOwnerId(),
+                        event.actorId(),
+                        event.actorNickname(),
+                        event.subCommentId(),
+                        event.content()
+                );
 
         notificationRepository.save(notification);
     }
