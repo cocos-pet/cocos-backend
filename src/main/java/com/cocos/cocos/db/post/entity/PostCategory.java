@@ -22,9 +22,13 @@ public class PostCategory {
     @Column(name = "image", nullable = false)
     private String image;
 
+    @Column(name = "is_admin_only", nullable = false)
+    private boolean isAdminOnly;
+
     @Builder
-    public PostCategory(String name, String image) {
+    public PostCategory(String name, String image, boolean isAdminOnly) {
         this.name = name;
         this.image = image;
+        this.isAdminOnly = isAdminOnly;
     }
 }

@@ -39,6 +39,12 @@ public interface PostControllerSwagger {
             description = "게시글 카테고리 리스트 조회 성공")
     public ResponseEntity<BaseResponse<PostCategoriesResponse>> getPostCategories();
 
+    @Operation(summary = "게시글 작성 가능 카테고리 리스트 API", description = "게시글 작성 가능 카테고리 리스트를 조회하는 API입니다.")
+    @ApiResponse(
+            responseCode = "200",
+            description = "게시글 작성 가능 카테고리 리스트 조회 성공")
+    public ResponseEntity<BaseResponse<PostCategoriesResponse>> getWritablePostCategories();
+
     @Operation(summary = "게시글 추가 API", description = "게시글을 추가하는 API입니다.")
     @ApiResponse(
             responseCode = "200",

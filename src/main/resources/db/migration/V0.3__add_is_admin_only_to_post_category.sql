@@ -1,0 +1,2 @@
+ALTER TABLE post_category
+ADD COLUMN is_admin_only BOOLEAN NOT NULL DEFAULT FALSE;

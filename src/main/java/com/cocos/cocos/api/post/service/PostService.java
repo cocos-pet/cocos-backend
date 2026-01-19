@@ -182,6 +182,25 @@ public class PostService {
                 .toList());
     }
 
+    @Transactional(readOnly = true)
+    public PostCategoriesResponse getWritablePostCategories(final Long memberId) {
+        final Member member = memberRepository.findById(memberId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
+
+        final List<PostCategory> postCategories = getWritableCategories(member.isAdmin());
+
+        return PostCategoriesResponse.of(postCategories.stream()
+                .map(postCategory -> PostCategoryResponse.of(postCategory.getId(), postCategory.getName(), appDataS3Client.getPresignedUrl(postCategory.getImage())))
+                .toList());
+    }
+
+    private List<PostCategory> getWritableCategories(final boolean isAdmin) {
+        if (isAdmin) {
+            return postCategoryRepository.findAll();
+        } else {
+            return postCategoryRepository.findAllByIsAdminOnlyFalse();
+        }
+    }
+
     @Transactional
     public PostImagesResponse addPost(final Long memberId, final Long categoryId, final String title,
                                       final String content, final List<String> images, final Long animalId,
