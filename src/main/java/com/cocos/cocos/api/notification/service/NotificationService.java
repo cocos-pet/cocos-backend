@@ -1,5 +1,6 @@
 package com.cocos.cocos.api.notification.service;
 
+import com.cocos.cocos.api.notification.dto.response.UnreadNotificationResponse;
 import com.cocos.cocos.db.member.repository.MemberRepository;
 import com.cocos.cocos.db.notification.entity.Notification;
 import com.cocos.cocos.db.notification.repository.NotificationRepository;
@@ -46,6 +47,14 @@ public class NotificationService {
 
         final Notification notification = Notification.postLikeMilestone(postLikeMilestoneEvent);
         notificationRepository.save(notification);
+    }
+
+    @Transactional(readOnly = true)
+    public UnreadNotificationResponse hasUnreadNotification(Long notifierId) {
+        boolean hasUnread =
+                notificationRepository.existsByNotifierIdAndIsReadFalse(notifierId);
+
+        return new UnreadNotificationResponse(hasUnread);
     }
 
     private boolean isAlreadyNotified(final Long postId, final int likeCount) {

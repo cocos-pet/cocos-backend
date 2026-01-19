@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
     boolean existsByPostIdAndMilestone(final Long postId, final int milestone);
+
+    boolean existsByNotifierIdAndIsReadFalse(final Long notifierId);
 }
