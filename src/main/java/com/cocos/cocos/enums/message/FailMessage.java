@@ -41,6 +41,7 @@ public enum FailMessage {
     BAD_REQUEST_INVALID_CITY_ID(HttpStatus.BAD_REQUEST, 40027, "유효하지 않은 도시 아이디입니다. "),
     BAD_REQUEST_INVALID_DISTRICT_ID(HttpStatus.BAD_REQUEST, 40028, "유효하지 않은 지역 아이디입니다. "),
     BAD_REQUEST_VALIDATION_ERROR(HttpStatus.BAD_REQUEST, 40029, "요청에 유효하지 않은 데이터가 있습니다. "),
+    BAD_REQUEST_INVALID_NOTIFICATION_ID(HttpStatus.BAD_REQUEST, 40030, "유효하지 않은 알림 아이디입니다. "),
     /**
      * 401
      */
@@ -58,7 +59,7 @@ public enum FailMessage {
     FORBIDDEN_COMMENT_DELETE(HttpStatus.FORBIDDEN, 40301, "댓글을 삭제할 권한이 없습니다. "),
     FORBIDDEN_PET_UPDATE(HttpStatus.FORBIDDEN, 40302, "반려동물 정보를 수정할 권리가 없습니다. "),
     FORBIDDEN_POST_DELETE(HttpStatus.FORBIDDEN, 40303, "게시글을 삭제할 권리가 없습니다. "),
-
+    FORBIDDEN_NOTIFICATION_ACCESS_DENIED(HttpStatus.FORBIDDEN,40304,"본인의 알림만 읽을 수 있습니다."),
     /**
      * 404
      */
@@ -87,6 +88,7 @@ public enum FailMessage {
     NOT_FOUND_REVIEW(HttpStatus.NOT_FOUND, 40422, "리뷰를 찾을 수 없습니다."),
     NOT_FOUND_SUMMARY_OPTION(HttpStatus.NOT_FOUND, 40423, "리뷰 요약 옵션을 찾을 수 없습니다."),
     NOT_FOUND_VISIT_PURPOSE(HttpStatus.NOT_FOUND, 40424, "방문 목적을 찾을 수 없습니다."),
+    NOT_FOUND_NOTIFICATION(HttpStatus.NOT_FOUND, 40425, "알림을 찾을 수 없습니다."),
 
     /**
      * 405
