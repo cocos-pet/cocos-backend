@@ -1,6 +1,7 @@
 package com.cocos.cocos.db.notification.entity;
 
 import com.cocos.cocos.db.BaseTime;
+import com.cocos.cocos.db.post.entity.Post;
 import com.cocos.cocos.enums.notification.NotificationType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -59,7 +60,7 @@ public class Notification extends BaseTime {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "content",  columnDefinition = "text")
+    @Column(name = "content", columnDefinition = "text")
     private String content;
 
     @Column(name = "is_read", nullable = false)
@@ -96,6 +97,21 @@ public class Notification extends BaseTime {
                 .postId(postId)
                 .title(postTitle)
                 .milestone(likeCount)
+                .build();
+    }
+
+    public static Notification magazinePublished(
+            Long notifierId,
+            Post post
+    ) {
+        return Notification.builder()
+                .notifierId(notifierId)
+                .actorId(post.getMemberId())
+                .notificationType(NotificationType.MAGAZINE_PUBLISHED)
+                .notificationTargetId(post.getId())
+                .postId(post.getId())
+                .title(post.getTitle())
+                .content(post.getContent())
                 .build();
     }
 
