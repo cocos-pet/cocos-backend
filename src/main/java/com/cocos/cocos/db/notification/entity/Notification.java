@@ -131,6 +131,28 @@ public class Notification extends BaseTime {
                 .build();
     }
 
+    public static Notification subComment(
+            Long postId,
+            String postTitle,
+            Long notifierId,
+            Long actorId,
+            String actorNickname,
+            Long subCommentId,
+            String content
+    ) {
+        return Notification.builder()
+                .notifierId(notifierId)
+                .actorId(actorId)
+                .actorNickname(actorNickname)
+                .notificationType(NotificationType.SUB_COMMENT)
+                .notificationTargetId(subCommentId)
+                .postId(postId)
+                .title(postTitle)
+                .content(content)
+                .build();
+    }
+
+
     public void markRead() {
         this.isRead = true;
     }
