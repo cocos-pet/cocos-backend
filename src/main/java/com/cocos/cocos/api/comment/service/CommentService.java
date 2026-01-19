@@ -15,8 +15,10 @@ import com.cocos.cocos.db.pet.repository.PetRepository;
 import com.cocos.cocos.db.post.entity.Post;
 import com.cocos.cocos.db.post.repository.PostRepository;
 import com.cocos.cocos.enums.message.FailMessage;
+import com.cocos.cocos.event.PostCommentEvent;
 import com.cocos.cocos.external.MemberDataS3Client;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,7 @@ public class CommentService {
     private final BreedRepository breedRepository;
     private final PostRepository postRepository;
     private final MemberDataS3Client memberDataS3Client;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void addPostComment(final Long postId, final String content, final Long memberId) {
@@ -41,13 +44,21 @@ public class CommentService {
             throw new CocosException(FailMessage.UNAUTHORIZED);
         }
 
-        commentRepository.save(
+        final Comment comment = commentRepository.save(
                 Comment.builder()
                         .content(content)
                         .memberId(memberId)
                         .postId(postId)
                         .build()
         );
+
+        final Post post = postRepository.findById(postId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_POST));
+
+        if (!comment.isSelfComment(post.getMemberId())) {
+            eventPublisher.publishEvent(
+                    new PostCommentEvent(comment.getId())
+            );
+        }
     }
 
     @Transactional
