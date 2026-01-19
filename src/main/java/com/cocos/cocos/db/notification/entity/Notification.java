@@ -23,7 +23,8 @@ import lombok.NoArgsConstructor;
         name = "notification",
         indexes = {
                 @Index(name = "idx_notification_user_created", columnList = "notifier_id, created_at DESC"),
-                @Index(name = "idx_notification_user_read", columnList = "notifier_id, is_read")
+                @Index(name = "idx_notification_user_read", columnList = "notifier_id, is_read"),
+                @Index(name = "idx_notification_user_type_created", columnList = "notifier_id, notification_type, created_at DESC")
         }
 )
 public class Notification extends BaseTime {
