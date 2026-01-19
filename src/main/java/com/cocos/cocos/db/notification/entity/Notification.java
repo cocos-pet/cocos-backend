@@ -1,6 +1,8 @@
 package com.cocos.cocos.db.notification.entity;
 
 import com.cocos.cocos.db.BaseTime;
+import com.cocos.cocos.db.comment.entity.Comment;
+import com.cocos.cocos.db.member.entity.Member;
 import com.cocos.cocos.db.post.entity.Post;
 import com.cocos.cocos.enums.notification.NotificationType;
 import jakarta.persistence.Column;
@@ -81,21 +83,18 @@ public class Notification extends BaseTime {
     }
 
     public static Notification postLikeMilestone(
-            Long postId,
-            Long postOwnerId,
-            String postTitle,
-            Long actorId,
-            String actorNickname,
+            Post post,
+            Member actor,
             int likeCount
     ) {
         return Notification.builder()
-                .notifierId(postOwnerId)
-                .actorId(actorId)
-                .actorNickname(actorNickname)
+                .notifierId(post.getMemberId())
+                .actorId(actor.getId())
+                .actorNickname(actor.getNickname())
                 .notificationType(NotificationType.POST_LIKE_MILESTONE)
-                .notificationTargetId(postId)
-                .postId(postId)
-                .title(postTitle)
+                .notificationTargetId(post.getId())
+                .postId(post.getId())
+                .title(post.getTitle())
                 .milestone(likeCount)
                 .build();
     }
@@ -112,6 +111,23 @@ public class Notification extends BaseTime {
                 .postId(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
+                .build();
+    }
+
+    public static Notification comment(
+            Post post,
+            Comment comment,
+            Member actor
+    ) {
+        return Notification.builder()
+                .notifierId(post.getMemberId())
+                .actorId(actor.getId())
+                .actorNickname(actor.getNickname())
+                .notificationType(NotificationType.COMMENT)
+                .notificationTargetId(comment.getId())
+                .postId(post.getId())
+                .title(post.getTitle())
+                .content(comment.getContent())
                 .build();
     }
 
