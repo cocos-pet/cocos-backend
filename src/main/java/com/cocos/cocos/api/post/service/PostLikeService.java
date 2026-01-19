@@ -17,11 +17,7 @@ public class PostLikeService {
     private final PostLikeRepository postLikeRepository;
     private final PostRepository postRepository;
 
-    @Transactional
-    public void addPostLike(final Long memberId, final Long postId) {
-        if (postLikeRepository.existsByMemberIdAndPostId(memberId, postId)) {
-            throw new CocosException(FailMessage.CONFLICT_POSTLIKE);
-        }
+    public int addPostLike(final Long memberId, final Long postId) {
         postLikeRepository.save(
                 PostLike.builder()
                         .memberId(memberId)
@@ -31,7 +27,9 @@ public class PostLikeService {
         final Post post = postRepository.findById(postId).orElseThrow(
                 () -> new CocosException(FailMessage.NOT_FOUND_POST)
         );
+
         post.addLike();
+        return post.getLikeCount();
     }
 
     @Transactional
