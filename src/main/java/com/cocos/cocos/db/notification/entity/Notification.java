@@ -1,9 +1,8 @@
 package com.cocos.cocos.db.notification.entity;
 
+import com.cocos.cocos.common.exception.CocosException;
 import com.cocos.cocos.db.BaseTime;
-import com.cocos.cocos.db.comment.entity.Comment;
-import com.cocos.cocos.db.member.entity.Member;
-import com.cocos.cocos.db.post.entity.Post;
+import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.enums.notification.NotificationType;
 import com.cocos.cocos.event.MagazinePublishedEvent;
 import com.cocos.cocos.event.PostCommentEvent;
@@ -143,5 +142,11 @@ public class Notification extends BaseTime {
 
     public void markRead() {
         this.isRead = true;
+    }
+
+    public void validateOwner(Long memberId) {
+        if (!this.notifierId.equals(memberId)) {
+            throw new CocosException(FailMessage.FORBIDDEN_NOTIFICATION_ACCESS_DENIED);
+        }
     }
 }
