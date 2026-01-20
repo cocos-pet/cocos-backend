@@ -375,6 +375,7 @@ class CommentServiceTest {
                 .memberId(memberId)
                 .title("게시글")
                 .build();
+        ReflectionTestUtils.setField(post, "id", postId);
 
         given(memberRepository.findByNickname(any()))
                 .willReturn(Optional.of(member));
