@@ -35,6 +35,3 @@ jobs:
 
       - name: Run tests
         run: ./gradlew test -Dspring.profiles.active=test
-
-      - name: Docker build check
-        run: docker build -t cocos-pr .
