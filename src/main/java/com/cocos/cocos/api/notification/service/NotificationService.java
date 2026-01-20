@@ -10,6 +10,7 @@ import com.cocos.cocos.db.notification.repository.NotificationRepository;
 import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.enums.notification.NotificationCategory;
 import com.cocos.cocos.enums.notification.NotificationIcon;
+import com.cocos.cocos.enums.notification.NotificationType;
 import com.cocos.cocos.event.MagazinePublishedEvent;
 import com.cocos.cocos.event.PostCommentEvent;
 import com.cocos.cocos.event.PostLikeMilestoneEvent;
@@ -21,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -99,6 +102,8 @@ public class NotificationService {
             return NotificationListResponse.of(null, null, List.of());
         }
 
+        Map<NotificationType, String> iconUrlMap = createIconUrlMap(notifications);
+
         final List<NotificationResponse> responseList = notifications.stream()
                 .map(notification -> new NotificationResponse(
                         notification.getId(),
@@ -115,7 +120,7 @@ public class NotificationService {
 
                         notification.getMilestone(),
 
-                        appDataS3Client.getPresignedUrl(NotificationIcon.imageKeyOf(notification.getNotificationType()))
+                        iconUrlMap.get(notification.getNotificationType())
                 )).toList();
 
         final Notification last = notifications.getLast();
@@ -125,6 +130,16 @@ public class NotificationService {
                 last.getId(),
                 responseList
         );
+    }
+
+    private Map<NotificationType, String> createIconUrlMap(List<Notification> notifications) {
+        return notifications.stream()
+                .map(Notification::getNotificationType)
+                .distinct()
+                .collect(Collectors.toMap(
+                        type -> type,
+                        type -> appDataS3Client.getPresignedUrl(NotificationIcon.imageKeyOf(type))
+                ));
     }
 
     private boolean isAlreadyNotified(final Long postId, final int likeCount) {
