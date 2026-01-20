@@ -22,12 +22,14 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -36,7 +38,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -61,9 +62,6 @@ class NotificationServiceTest {
     @Test
     void 좋아요_마일스톤이_중복이_아니면_NOTIFICATION이_저장된다() {
         // given
-        given(notificationRepository.existsByPostIdAndMilestone(1L, 10))
-                .willReturn(false);
-
         PostLikeMilestoneEvent event = new PostLikeMilestoneEvent(
                 1L, 10L, "제목", 20L, "닉네임", 10
         );
@@ -85,20 +83,17 @@ class NotificationServiceTest {
     }
 
     @Test
-    void 좋아요_마일스톤_중복이면_알림이_생성되지_않는다() {
+    void 좋아요_마일스톤_중복이면_DataIntegrityViolationException을_무시한다() {
         // given
-        given(notificationRepository.existsByPostIdAndMilestone(1L, 10))
-                .willReturn(true);
-
         PostLikeMilestoneEvent event = new PostLikeMilestoneEvent(
                 1L, 10L, "제목", 20L, "닉네임", 10
         );
 
-        // when
-        notificationService.createForPostLike(event);
+        given(notificationRepository.save(any(Notification.class)))
+                .willThrow(new DataIntegrityViolationException("중복 저장 시도"));
 
-        // then
-        verify(notificationRepository, never()).save(any());
+        // when & then
+        assertDoesNotThrow(() -> notificationService.createForPostLike(event));
     }
 
     @Test
