@@ -17,6 +17,7 @@ import com.cocos.cocos.event.PostLikeMilestoneEvent;
 import com.cocos.cocos.event.PostSubCommentEvent;
 import com.cocos.cocos.external.AppDataS3Client;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,12 +56,12 @@ public class NotificationService {
     }
 
     public void createForPostLike(final PostLikeMilestoneEvent postLikeMilestoneEvent) {
-        if (isAlreadyNotified(postLikeMilestoneEvent.postId(), postLikeMilestoneEvent.likeCount())) {
-            return;
+        try {
+            final Notification notification = Notification.postLikeMilestone(postLikeMilestoneEvent);
+            notificationRepository.save(notification);
+        } catch (DataIntegrityViolationException ignored) {
+            // duplicate notification already exists
         }
-
-        final Notification notification = Notification.postLikeMilestone(postLikeMilestoneEvent);
-        notificationRepository.save(notification);
     }
 
     @Transactional(readOnly = true)
@@ -140,9 +141,5 @@ public class NotificationService {
                         type -> type,
                         type -> appDataS3Client.getPresignedUrl(NotificationIcon.imageKeyOf(type))
                 ));
-    }
-
-    private boolean isAlreadyNotified(final Long postId, final int likeCount) {
-        return notificationRepository.existsByPostIdAndMilestone(postId, likeCount);
     }
 }
