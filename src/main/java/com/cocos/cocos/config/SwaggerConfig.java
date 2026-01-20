@@ -9,18 +9,18 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
+@Profile({"local", "dev"})
+@Configuration
 @OpenAPIDefinition(
         servers = {
-                @Server(url = "https://www.cocos.r-e.kr", description = "개발 서버"),
-                @Server(url = "http://localhost:8080", description = "로컬 서버")
-        })
-@Configuration
+                @Server(url = "${swagger.server-url}")
+        }
+)
 public class SwaggerConfig {
-    //ToDo: final 키워드 필요
-    private static final String SWAGGER_DESCRIPTION = """
-            Cocos API Docs
-            """;
+
+    private static final String SECURITY_SCHEME_NAME = "Bearer Authentication";
 
     @Bean
     public OpenAPI openAPI() {
@@ -32,23 +32,17 @@ public class SwaggerConfig {
                 .scheme("bearer")
                 .bearerFormat("JWT");
 
-
-        SecurityRequirement securityRequirement = new SecurityRequirement()
-                .addList("Bearer Token");
-
         return new OpenAPI()
                 .components(new Components()
-                        .addSecuritySchemes("Bearer Token", apiKey))
-                .addSecurityItem(securityRequirement)
+                        .addSecuritySchemes(SECURITY_SCHEME_NAME, apiKey))
+                .addSecurityItem(new SecurityRequirement().addList(SECURITY_SCHEME_NAME))
                 .info(apiInfo());
     }
 
     private Info apiInfo() {
         return new Info()
-                .title("COCOS API Swagger")
-                .description(SWAGGER_DESCRIPTION)
-                .version("v.0.0.0");
+                .title("COCOS API")
+                .description("Cocos API Documentation")
+                .version("v0.0.0");
     }
-
-
 }
