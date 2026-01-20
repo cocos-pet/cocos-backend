@@ -12,7 +12,6 @@ import com.cocos.cocos.event.MagazinePublishedEvent;
 import com.cocos.cocos.event.PostCommentEvent;
 import com.cocos.cocos.event.PostLikeMilestoneEvent;
 import com.cocos.cocos.event.PostSubCommentEvent;
-import com.cocos.cocos.external.AppDataS3Client;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -34,13 +33,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("알림 서비스 테스트")
@@ -55,9 +51,6 @@ class NotificationServiceTest {
 
     @Mock
     private MemberRepository memberRepository;
-
-    @Mock
-    private AppDataS3Client appDataS3Client;
 
     @Test
     void 좋아요_마일스톤이_중복이_아니면_NOTIFICATION이_저장된다() {
@@ -247,9 +240,6 @@ class NotificationServiceTest {
                 anyInt()
         )).willReturn(List.of(notification1, notification2));
 
-        given(appDataS3Client.getPresignedUrl(anyString()))
-                .willReturn("https://presigned-url");
-
         // when
         NotificationListResponse response =
                 notificationService.getNotifications(memberId, category, null, null);
@@ -262,15 +252,11 @@ class NotificationServiceTest {
         assertThat(first.type()).isEqualTo(NotificationType.COMMENT);
         assertThat(first.isRead()).isFalse();
         assertThat(first.content()).isEqualTo("댓글 내용");
-        assertThat(first.iconImageUrl()).isEqualTo("https://presigned-url");
 
         assertThat(response.cursorCreatedAt())
                 .isEqualTo(notification2.getCreatedAt());
         assertThat(response.cursorId())
                 .isEqualTo(notification2.getId());
-
-        verify(appDataS3Client, times(2))
-                .getPresignedUrl(anyString());
     }
 
 
@@ -298,8 +284,6 @@ class NotificationServiceTest {
         assertThat(response.notifications()).isEmpty();
         assertThat(response.cursorCreatedAt()).isNull();
         assertThat(response.cursorId()).isNull();
-
-        verifyNoInteractions(appDataS3Client);
     }
 
 }

@@ -36,8 +36,5 @@ public record NotificationResponse(
         String actorNickname,
 
         @Schema(description = "좋아요 마일스톤 수치 (POST_LIKE_MILESTONE 타입에서만 사용, 그 외 null)", example = "10", nullable = true)
-        Integer milestone,
-
-        @Schema(description = "알림 아이콘", nullable = true)
-        String iconImageUrl
+        Integer milestone
 ) {}
