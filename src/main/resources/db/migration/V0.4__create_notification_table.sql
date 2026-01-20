@@ -12,7 +12,8 @@ CREATE TABLE notification (
     is_read BOOLEAN NOT NULL DEFAULT FALSE,
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    CONSTRAINT uq_post_milestone UNIQUE (post_id, milestone)
 );
 
 -- 내 알림 최신순 조회
