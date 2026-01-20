@@ -2,6 +2,7 @@ package com.cocos.cocos.api.notification.dto.response;
 
 import java.time.LocalDateTime;
 
+import com.cocos.cocos.enums.notification.NotificationType;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "알림 응답 DTO")
@@ -11,7 +12,7 @@ public record NotificationResponse(
         Long id,
 
         @Schema(description = "알림 타입", example = "COMMENT", allowableValues = {"COMMENT", "SUB_COMMENT", "POST_LIKE_MILESTONE", "MAGAZINE_PUBLISHED"})
-        String type,
+        NotificationType type,
 
         @Schema(description = "알림 읽음 여부", example = "false")
         boolean isRead,
