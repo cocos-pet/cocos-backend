@@ -244,8 +244,11 @@ public class PostService {
                             .build()
             ));
         }
+
+        PostImagesResponse imagesResponse = PostImagesResponse.of(null);
+
         if (images != null) {
-            return PostImagesResponse.of(
+            imagesResponse = PostImagesResponse.of(
                     images.stream()
                             .map(image -> {
                                 //ToDo: "post"를 상수화 해도 될 듯, 파일 포맷에 이미지 이름 추가 안 해도 됫 듯
@@ -271,7 +274,7 @@ public class PostService {
             ));
         }
 
-        return PostImagesResponse.of(null);
+        return imagesResponse;
     }
 
     @Transactional(readOnly = true)
