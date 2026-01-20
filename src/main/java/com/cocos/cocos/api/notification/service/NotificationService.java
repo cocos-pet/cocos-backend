@@ -78,7 +78,6 @@ public class NotificationService {
         }
     }
 
-
     @Transactional(readOnly = true)
     public NotificationListResponse getNotifications(
             final Long memberId,
