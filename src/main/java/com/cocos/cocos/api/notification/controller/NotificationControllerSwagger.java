@@ -22,7 +22,7 @@ public interface NotificationControllerSwagger {
 
     @Operation(summary = "읽지 않은 알림 존재 여부 조회 API", description = "읽지 않은 알림이 존재하는지 조회하는 API 입니다.")
     @ApiResponse(
-            responseCode = "201",
+            responseCode = "200",
             description = "읽지 않은 알림 존재 여부 조회에 성공했습니다. "
     )
     public ResponseEntity<BaseResponse<UnreadNotificationResponse>> hasUnread();

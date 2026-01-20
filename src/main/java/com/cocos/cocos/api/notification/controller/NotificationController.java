@@ -29,7 +29,7 @@ public class NotificationController implements NotificationControllerSwagger {
 
     @GetMapping("/unread")
     public ResponseEntity<BaseResponse<UnreadNotificationResponse>> hasUnread() {
-        return SuccessResponse.success(SuccessMessage.CREATED, notificationService.hasUnreadNotification(PrincipalHandler.getMemberIdFromPrincipal()));
+        return SuccessResponse.success(SuccessMessage.OK, notificationService.hasUnreadNotification(PrincipalHandler.getMemberIdFromPrincipal()));
     }
 
     @PatchMapping("/{notificationId}/read")
