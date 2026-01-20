@@ -15,8 +15,11 @@ import com.cocos.cocos.db.pet.repository.PetRepository;
 import com.cocos.cocos.db.post.entity.Post;
 import com.cocos.cocos.db.post.repository.PostRepository;
 import com.cocos.cocos.enums.message.FailMessage;
+import com.cocos.cocos.event.PostCommentEvent;
+import com.cocos.cocos.event.PostSubCommentEvent;
 import com.cocos.cocos.external.MemberDataS3Client;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +37,7 @@ public class CommentService {
     private final BreedRepository breedRepository;
     private final PostRepository postRepository;
     private final MemberDataS3Client memberDataS3Client;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void addPostComment(final Long postId, final String content, final Long memberId) {
@@ -41,13 +45,30 @@ public class CommentService {
             throw new CocosException(FailMessage.UNAUTHORIZED);
         }
 
-        commentRepository.save(
+        final Comment comment = commentRepository.save(
                 Comment.builder()
                         .content(content)
                         .memberId(memberId)
                         .postId(postId)
                         .build()
         );
+
+        final Post post = postRepository.findById(postId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_POST));
+        final Member actor = memberRepository.findById(memberId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
+
+        if (!comment.isSelfComment(post.getMemberId())) {
+            eventPublisher.publishEvent(
+                    new PostCommentEvent(
+                            post.getId(),
+                            post.getMemberId(),
+                            post.getTitle(),
+                            comment.getId(),
+                            comment.getContent(),
+                            actor.getId(),
+                            actor.getNickname()
+                    )
+            );
+        }
     }
 
     @Transactional
@@ -74,7 +95,7 @@ public class CommentService {
         }
 
         final Member mentionedMember = memberRepository.findByNickname(nickname).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
-        subCommentRepository.save(
+        final SubComment subComment = subCommentRepository.save(
                 SubComment.builder()
                         .commentId(commentId)
                         .mentionedMemberId(mentionedMember.getId())
@@ -82,6 +103,32 @@ public class CommentService {
                         .memberId(memberId)
                         .build()
         );
+
+        final Comment parentComment = commentRepository.findById(subComment.getCommentId()).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_COMMENT));
+        final Post post = postRepository.findById(parentComment.getPostId()).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_POST));
+        final Member actor = memberRepository.findById(subComment.getMemberId()).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
+
+        if (shouldSkipNotification(subComment, parentComment.getMemberId(), post.getMemberId())) {
+            return;
+        }
+
+        eventPublisher.publishEvent(
+                new PostSubCommentEvent(
+                        post.getId(),
+                        post.getMemberId(),
+                        parentComment.getId(),
+                        parentComment.getMemberId(),
+                        subComment.getId(),
+                        actor.getId(),
+                        actor.getNickname(),
+                        subComment.getContent(),
+                        post.getTitle()
+                )
+        );
+    }
+
+    private static boolean shouldSkipNotification(SubComment subComment, Long parentCommentMemberId, Long postMemberId) {
+        return subComment.isSelfSubComment(parentCommentMemberId) || subComment.isSelfComment(postMemberId);
     }
 
     @Transactional

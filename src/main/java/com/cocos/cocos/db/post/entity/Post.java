@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "post")
 public class Post extends BaseTime {
 
+    private static final Long MAGAZINE_CATEGORY_ID = 4L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -42,6 +44,10 @@ public class Post extends BaseTime {
 
     public void addLike() {
         this.likeCount++;
+    }
+
+    public boolean isMagazine() {
+        return MAGAZINE_CATEGORY_ID.equals(categoryId);
     }
 
     public void deleteLike() {

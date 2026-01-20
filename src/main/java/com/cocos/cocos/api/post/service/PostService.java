@@ -29,11 +29,13 @@ import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.enums.post.PostSortCriteria;
 import com.cocos.cocos.enums.tag.TagType;
+import com.cocos.cocos.event.MagazinePublishedEvent;
 import com.cocos.cocos.external.AppDataS3Client;
 import com.cocos.cocos.external.MemberDataS3Client;
 import com.cocos.cocos.util.PostSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -68,6 +70,7 @@ public class PostService {
     private final PetSymptomRepository petSymptomRepository;
     private final AppDataS3Client appDataS3Client;
     private final MemberDataS3Client memberDataS3Client;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
     public PostDetailResponse getPostDetail(final Long postId, final Long memberId) {
@@ -241,8 +244,11 @@ public class PostService {
                             .build()
             ));
         }
+
+        PostImagesResponse imagesResponse = PostImagesResponse.of(null);
+
         if (images != null) {
-            return PostImagesResponse.of(
+            imagesResponse = PostImagesResponse.of(
                     images.stream()
                             .map(image -> {
                                 //ToDo: "post"를 상수화 해도 될 듯, 파일 포맷에 이미지 이름 추가 안 해도 됫 듯
@@ -258,7 +264,17 @@ public class PostService {
                             .toList()
             );
         }
-        return PostImagesResponse.of(null);
+
+        if (post.isMagazine()) {
+            eventPublisher.publishEvent(new MagazinePublishedEvent(
+                    post.getId(),
+                    post.getMemberId(),
+                    post.getTitle(),
+                    post.getContent()
+            ));
+        }
+
+        return imagesResponse;
     }
 
     @Transactional(readOnly = true)

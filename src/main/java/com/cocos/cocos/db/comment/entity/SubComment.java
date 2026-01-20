@@ -36,4 +36,12 @@ public class SubComment extends BaseTime {
         this.commentId = commentId;
         this.mentionedMemberId = mentionedMemberId;
     }
+
+    public boolean isSelfSubComment(final Long parentCommentMemberId) {
+        return memberId.equals(parentCommentMemberId);
+    }
+
+    public boolean isSelfComment(final Long postMemberId) {
+        return memberId.equals(postMemberId);
+    }
 }
