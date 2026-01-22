@@ -29,21 +29,23 @@ public class PostLikeService {
 
     @Transactional
     public void addPostLike(final Long memberId, final Long postId) {
+
         postLikeRepository.save(
                 PostLike.builder()
                         .memberId(memberId)
                         .postId(postId)
                         .build()
         );
-        final Post post = postRepository.findById(postId).orElseThrow(
-                () -> new CocosException(FailMessage.NOT_FOUND_POST)
-        );
 
-        post.addLike();
-        final int likeCount = post.getLikeCount();
-        final Member member = memberRepository.findById(memberId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
+        postRepository.increaseLikeCount(postId);
+
+        final int likeCount = postRepository.findLikeCount(postId);
+
 
         if (isLikeMilestone(likeCount)) {
+            final Post post = postRepository.findById(postId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_POST));
+            final Member member = memberRepository.findById(memberId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
+
             eventPublisher.publishEvent(
                     new PostLikeMilestoneEvent(postId, post.getMemberId(), post.getTitle(), memberId, member.getNickname(), likeCount)
             );

@@ -27,6 +27,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -57,19 +58,22 @@ class PostLikeServiceTest {
         Long postId = 1L;
         Long postOwnerId = 10L;
         Long memberId = 20L;
+        int likeCount = 10;
 
         Post post = Post.builder()
                 .memberId(postOwnerId)
                 .title("게시글 제목")
                 .build();
         ReflectionTestUtils.setField(post, "id", postId);
-        ReflectionTestUtils.setField(post, "likeCount", 9);
 
         Member member = Member.builder()
                 .nickname("닉네임")
                 .build();
         ReflectionTestUtils.setField(member, "id", memberId);
 
+        willDoNothing().given(postRepository).increaseLikeCount(postId);
+        given(postRepository.findLikeCount(postId))
+                .willReturn(likeCount);
         given(postRepository.findById(postId))
                 .willReturn(Optional.of(post));
         given(memberRepository.findById(memberId))
@@ -88,7 +92,7 @@ class PostLikeServiceTest {
         assertThat(event.postId()).isEqualTo(postId);
         assertThat(event.postOwnerId()).isEqualTo(postOwnerId);
         assertThat(event.actorId()).isEqualTo(memberId);
-        assertThat(event.likeCount()).isEqualTo(10);
+        assertThat(event.likeCount()).isEqualTo(likeCount);
     }
 
     @Test
@@ -96,23 +100,11 @@ class PostLikeServiceTest {
         // given
         Long postId = 1L;
         Long memberId = 20L;
+        int likeCount = 3;
 
-        Post post = Post.builder()
-                .memberId(10L)
-                .title("게시글 제목")
-                .build();
-        ReflectionTestUtils.setField(post, "id", postId);
-        ReflectionTestUtils.setField(post, "likeCount", 3);
-
-        Member member = Member.builder()
-                .nickname("닉네임")
-                .build();
-        ReflectionTestUtils.setField(member, "id", memberId);
-
-        given(postRepository.findById(postId))
-                .willReturn(Optional.of(post));
-        given(memberRepository.findById(memberId))
-                .willReturn(Optional.of(member));
+        willDoNothing().given(postRepository).increaseLikeCount(postId);
+        given(postRepository.findLikeCount(postId))
+                .willReturn(likeCount);
 
         // when
         postLikeService.addPostLike(memberId, postId);

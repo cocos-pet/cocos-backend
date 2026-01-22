@@ -4,6 +4,7 @@ import com.cocos.cocos.db.post.entity.Post;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -22,4 +23,19 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
     List<Post> findAllByMemberId(final Long memberId);
 
     void deleteAllByMemberId(final Long memberId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+                update Post p
+                set p.likeCount = p.likeCount + 1
+                where p.id = :postId
+            """)
+    void increaseLikeCount(@Param("postId") final Long postId);
+
+    @Query("""
+                select p.likeCount
+                from Post p
+                where p.id = :postId
+            """)
+    int findLikeCount(@Param("postId") final Long postId);
 }
