@@ -13,7 +13,6 @@ import com.cocos.cocos.event.MagazinePublishedEvent;
 import com.cocos.cocos.event.PostCommentEvent;
 import com.cocos.cocos.event.PostLikeMilestoneEvent;
 import com.cocos.cocos.event.PostSubCommentEvent;
-import com.cocos.cocos.external.AppDataS3Client;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,6 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final MemberRepository memberRepository;
-    private final AppDataS3Client appDataS3Client;
 
     private static final int DEFAULT_PAGE_SIZE = 20;
 
