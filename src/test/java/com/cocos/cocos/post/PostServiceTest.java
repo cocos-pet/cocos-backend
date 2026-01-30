@@ -36,7 +36,6 @@ import com.cocos.cocos.db.post.repository.PostTagRepository;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.pet.Gender;
 import com.cocos.cocos.enums.tag.TagType;
-import com.cocos.cocos.external.s3.MemberDataS3Client;
 import com.cocos.cocos.external.s3.S3BucketType;
 import com.cocos.cocos.external.s3.S3PresignClient;
 import org.assertj.core.api.Assertions;
@@ -100,8 +99,6 @@ class PostServiceTest {
     private PetSymptomRepository petSymptomRepository;
     @Mock
     private S3PresignClient s3PresignClient;
-    @Mock
-    private MemberDataS3Client memberDataS3Client;
 
     @Test
     @DisplayName("게시글 세부사항을 조회할 수 있다.")
@@ -182,9 +179,9 @@ class PostServiceTest {
 
         BDDMockito.given(postImageRepository.findAllByPostId(postId)).willReturn(postImages);
 
-        BDDMockito.given(memberDataS3Client.getPresignedUrl(Objects.requireNonNull(member).getImage())).willReturn(Objects.requireNonNull(member).getImage());
-        BDDMockito.given(memberDataS3Client.getPresignedUrl(postImage1.getImage())).willReturn(postImage1.getImage());
-        BDDMockito.given(memberDataS3Client.getPresignedUrl(postImage2.getImage())).willReturn(postImage2.getImage());
+        BDDMockito.given(s3PresignClient.get(S3BucketType.MEMBER_DATA, Objects.requireNonNull(member).getImage())).willReturn(Objects.requireNonNull(member).getImage());
+        BDDMockito.given(s3PresignClient.get(S3BucketType.MEMBER_DATA, postImage1.getImage())).willReturn(postImage1.getImage());
+        BDDMockito.given(s3PresignClient.get(S3BucketType.MEMBER_DATA, postImage2.getImage())).willReturn(postImage2.getImage());
 
         BDDMockito.given(postCategoryRepository.findById(post.getCategoryId())).willReturn(Optional.of(postCategory));
 
