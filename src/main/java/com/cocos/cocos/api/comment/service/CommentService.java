@@ -17,7 +17,8 @@ import com.cocos.cocos.db.post.repository.PostRepository;
 import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.event.PostCommentEvent;
 import com.cocos.cocos.event.PostSubCommentEvent;
-import com.cocos.cocos.external.MemberDataS3Client;
+import com.cocos.cocos.external.s3.S3BucketType;
+import com.cocos.cocos.external.s3.S3PresignClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -36,8 +37,8 @@ public class CommentService {
     private final PetRepository petRepository;
     private final BreedRepository breedRepository;
     private final PostRepository postRepository;
-    private final MemberDataS3Client memberDataS3Client;
     private final ApplicationEventPublisher eventPublisher;
+    private final S3PresignClient s3PresignClient;
 
     @Transactional
     public void addPostComment(final Long postId, final String content, final Long memberId) {
@@ -241,7 +242,7 @@ public class CommentService {
         return CommentAndSubCommentsResponse.of(
                 comment.getId(),
                 commentMember.getNickname(),
-                memberDataS3Client.getPresignedUrl(commentMember.getImage()),
+                s3PresignClient.get(S3BucketType.MEMBER_DATA, commentMember.getImage()),
                 commentBreed.getName(),
                 commentPet.getAge(),
                 comment.getContent(),
@@ -267,7 +268,7 @@ public class CommentService {
         return SubCommentResponse.of(
                 subComment.getId(),
                 subCommentMember.getNickname(),
-                memberDataS3Client.getPresignedUrl(subCommentMember.getImage()),
+                s3PresignClient.get(S3BucketType.MEMBER_DATA, subCommentMember.getImage()),
                 subCommentBreed.getName(),
                 subCommentPet.getAge(),
                 subComment.getContent(),
