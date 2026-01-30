@@ -8,7 +8,8 @@ import com.cocos.cocos.db.body.repository.BodyRepository;
 import com.cocos.cocos.db.disease.entity.Disease;
 import com.cocos.cocos.db.disease.repository.DiseaseRepository;
 import com.cocos.cocos.enums.pet.PetProblem;
-import com.cocos.cocos.external.AppDataS3Client;
+import com.cocos.cocos.external.s3.S3BucketType;
+import com.cocos.cocos.external.s3.S3PresignClient;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -24,11 +25,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("신체 부위 서비스 테스트")
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-public class BodyServiceTest {
+class BodyServiceTest {
 
     @InjectMocks
     private BodyService bodyService;
@@ -40,7 +42,7 @@ public class BodyServiceTest {
     private DiseaseRepository diseaseRepository;
 
     @Mock
-    private AppDataS3Client appDataS3Client;
+    private S3PresignClient s3PresignClient;
 
     @Test
     @DisplayName("신체 부위 리스트를 조회할 수 있다.")
@@ -72,7 +74,12 @@ public class BodyServiceTest {
 
         BDDMockito.given(diseaseRepository.findAll()).willReturn(diseases);
         BDDMockito.given(bodyRepository.findAllById(any())).willReturn(bodies);
-        BDDMockito.given(appDataS3Client.getPresignedUrl(any())).willReturn("image");
+        BDDMockito.given(
+                s3PresignClient.get(
+                        eq(S3BucketType.APP_DATA),
+                        any()
+                )
+        ).willReturn("image");
 
         //when
         final BodiesResponse actual = bodyService.getBodies(PetProblem.DISEASE);

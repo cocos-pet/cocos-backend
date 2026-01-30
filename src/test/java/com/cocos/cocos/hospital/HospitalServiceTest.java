@@ -12,7 +12,8 @@ import com.cocos.cocos.db.hospital.repository.HospitalRepository;
 import com.cocos.cocos.db.hospital.repository.HospitalTagMappingRepository;
 import com.cocos.cocos.db.hospital.repository.HospitalTagRepository;
 import com.cocos.cocos.db.hospital.repository.HospitalVisitPurposeRepository;
-import com.cocos.cocos.external.AppDataS3Client;
+import com.cocos.cocos.external.s3.S3BucketType;
+import com.cocos.cocos.external.s3.S3PresignClient;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("병원 서비스 테스트")
@@ -52,7 +54,7 @@ class HospitalServiceTest {
     private HospitalVisitPurposeRepository hospitalVisitPurposeRepository;
 
     @Mock
-    private AppDataS3Client appDataS3Client;
+    private S3PresignClient s3PresignClient;
 
     @Test
     @DisplayName("도로명 주소가 있는 병원 상세 정보를 조회할 수 있다.")
@@ -91,7 +93,12 @@ class HospitalServiceTest {
         BDDMockito.given(hospitalRepository.findById(any())).willReturn(Optional.ofNullable(hospital));
         BDDMockito.given(hospitalTagMappingRepository.findAllByHospitalId(any())).willReturn(hospitalTagMappings);
         BDDMockito.given(hospitalTagRepository.findAllByIdIn(any())).willReturn(hospitalTags);
-        BDDMockito.given(appDataS3Client.getPresignedUrl(any())).willReturn(hospital.getImage());
+        BDDMockito.given(
+                s3PresignClient.get(
+                        eq(S3BucketType.APP_DATA),
+                        any(String.class)
+                )
+        ).willAnswer(invocation -> invocation.getArgument(1));
 
         final HospitalDetailResponse expected = HospitalDetailResponse.of(
                 "병원 이름",
@@ -150,7 +157,7 @@ class HospitalServiceTest {
         BDDMockito.given(hospitalRepository.findById(any())).willReturn(Optional.ofNullable(hospital));
         BDDMockito.given(hospitalTagMappingRepository.findAllByHospitalId(any())).willReturn(hospitalTagMappings);
         BDDMockito.given(hospitalTagRepository.findAllByIdIn(any())).willReturn(hospitalTags);
-        BDDMockito.given(appDataS3Client.getPresignedUrl(any())).willReturn(hospital.getImage());
+        BDDMockito.given(s3PresignClient.get(eq(S3BucketType.APP_DATA), any())).willReturn(hospital.getImage());
 
         final HospitalDetailResponse expected = HospitalDetailResponse.of(
                 "병원 이름",
