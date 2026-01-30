@@ -14,7 +14,8 @@ import com.cocos.cocos.db.hospital.repository.HospitalVisitPurposeRepository;
 import com.cocos.cocos.enums.hospital.HospitalSortCriteria;
 import com.cocos.cocos.enums.location.LocationType;
 import com.cocos.cocos.enums.message.FailMessage;
-import com.cocos.cocos.external.AppDataS3Client;
+import com.cocos.cocos.external.s3.S3BucketType;
+import com.cocos.cocos.external.s3.S3PresignClient;
 import com.cocos.cocos.util.SortConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -34,7 +35,7 @@ public class HospitalService {
     private final HospitalTagRepository hospitalTagRepository;
     private final HospitalTagMappingRepository hospitalTagMappingRepository;
     private final HospitalVisitPurposeRepository hospitalVisitPurposeRepository;
-    private final AppDataS3Client appDataS3Client;
+    private final S3PresignClient s3PresignClient;
 
     @Transactional(readOnly = true)
     public HospitalListResponse getHospitals(
@@ -146,7 +147,7 @@ public class HospitalService {
                 hospitalTags,
                 hospital.getIntroduction(),
                 hospital.getDisplayAddress(),
-                appDataS3Client.getPresignedUrl(hospital.getImage()),
+                s3PresignClient.get(S3BucketType.APP_DATA, hospital.getImage()),
                 hospital.getKeywords(),
                 hospital.getHomepageUrl(),
                 hospital.getLatitude(),

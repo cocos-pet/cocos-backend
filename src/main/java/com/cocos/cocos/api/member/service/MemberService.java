@@ -36,9 +36,10 @@ import com.cocos.cocos.db.search.repository.SearchRepository;
 import com.cocos.cocos.enums.location.LocationType;
 import com.cocos.cocos.enums.member.Platform;
 import com.cocos.cocos.enums.message.FailMessage;
-import com.cocos.cocos.external.AppDataS3Client;
 import com.cocos.cocos.external.KakaoLoginClient;
-import com.cocos.cocos.external.MemberDataS3Client;
+import com.cocos.cocos.external.s3.MemberDataS3Client;
+import com.cocos.cocos.external.s3.S3BucketType;
+import com.cocos.cocos.external.s3.S3PresignClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,7 +73,7 @@ public class MemberService {
     private final ReviewImageRepository reviewImageRepository;
     private final ReviewSummaryRepository reviewSummaryRepository;
     private final ReviewSymptomRepository reviewSymptomRepository;
-    private final AppDataS3Client appDataS3Client;
+    private final S3PresignClient s3PresignClient;
 
     @Transactional(readOnly = true)
     public MemberProfileResponse getMemberProfile(final String nickname, final Long memberId) {
@@ -197,7 +198,7 @@ public class MemberService {
                 hospital.getId(),
                 hospital.getName(),
                 hospital.getDisplayAddress(),
-                appDataS3Client.getPresignedUrl(hospital.getImage())
+                s3PresignClient.get(S3BucketType.APP_DATA, hospital.getImage())
         );
     }
 

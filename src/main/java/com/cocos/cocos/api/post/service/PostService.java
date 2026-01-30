@@ -30,8 +30,9 @@ import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.enums.post.PostSortCriteria;
 import com.cocos.cocos.enums.tag.TagType;
 import com.cocos.cocos.event.MagazinePublishedEvent;
-import com.cocos.cocos.external.AppDataS3Client;
-import com.cocos.cocos.external.MemberDataS3Client;
+import com.cocos.cocos.external.s3.MemberDataS3Client;
+import com.cocos.cocos.external.s3.S3BucketType;
+import com.cocos.cocos.external.s3.S3PresignClient;
 import com.cocos.cocos.util.PostSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,7 +69,7 @@ public class PostService {
     private final SymptomRepository symptomRepository;
     private final PetDiseaseRepository petDiseaseRepository;
     private final PetSymptomRepository petSymptomRepository;
-    private final AppDataS3Client appDataS3Client;
+    private final S3PresignClient s3PresignClient;
     private final MemberDataS3Client memberDataS3Client;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -181,7 +182,7 @@ public class PostService {
     public PostCategoriesResponse getCategories() {
         final List<PostCategory> postCategories = postCategoryRepository.findAll();
         return PostCategoriesResponse.of(postCategories.stream()
-                .map(postCategory -> PostCategoryResponse.of(postCategory.getId(), postCategory.getName(), appDataS3Client.getPresignedUrl(postCategory.getImage())))
+                .map(postCategory -> PostCategoryResponse.of(postCategory.getId(), postCategory.getName(), s3PresignClient.get(S3BucketType.APP_DATA, postCategory.getImage())))
                 .toList());
     }
 
@@ -192,7 +193,7 @@ public class PostService {
         final List<PostCategory> postCategories = getWritableCategories(member.isAdmin());
 
         return PostCategoriesResponse.of(postCategories.stream()
-                .map(postCategory -> PostCategoryResponse.of(postCategory.getId(), postCategory.getName(), appDataS3Client.getPresignedUrl(postCategory.getImage())))
+                .map(postCategory -> PostCategoryResponse.of(postCategory.getId(), postCategory.getName(), s3PresignClient.get(S3BucketType.APP_DATA, postCategory.getImage())))
                 .toList());
     }
 
