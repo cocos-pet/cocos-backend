@@ -35,6 +35,10 @@ public class TestAuthController implements TestAuthControllerSwagger {
             throw new CocosException(FailMessage.UNAUTHORIZED);
         }
 
+        if (request.memberIds() == null || request.memberIds().isEmpty()) {
+            return ResponseEntity.ok(List.of());
+        }
+
         final List<TokenResponse> tokens = request.memberIds().stream()
                 .map(jwtProvider::reissueToken
                 )
