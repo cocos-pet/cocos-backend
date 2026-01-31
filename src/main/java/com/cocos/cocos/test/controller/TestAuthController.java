@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.MessageDigest;
 import java.util.List;
 
 @RestController
@@ -33,7 +34,7 @@ public class TestAuthController implements TestAuthControllerSwagger {
             return ResponseEntity.ok(List.of());
         }
 
-        if (!testAuthSecret.equals(secretKey)) {
+        if (!MessageDigest.isEqual(testAuthSecret.getBytes(), secretKey.getBytes())) {
             throw new CocosException(FailMessage.UNAUTHORIZED);
         }
 
