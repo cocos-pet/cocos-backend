@@ -78,6 +78,13 @@ dependencies {
     implementation 'io.micrometer:micrometer-registry-prometheus'
 }
 
+tasks.withType(JavaCompile).configureEach {
+    if (project.hasProperty('prod')) {
+        exclude("**/TestAuthController*.java")
+    }
+}
+
+
 tasks.named('test') {
     useJUnitPlatform()
 }
