@@ -25,19 +25,19 @@ api:
   prefix: /api/test
 
 test:
-  auth-secret:
+  auth-secret: as
 
 aws:
-  access-key:
-  secret-key:
+  access-key: ak
+  secret-key: sk
   region: ap-northeast-2
-  app-data-s3-bucket-name:
-  member-data-s3-bucket-name:
+  app-data-s3-bucket-name: bucket
+  member-data-s3-bucket-name: bucket
 
 kakao:
-  client-id:
-  redirect-url:
-  admin-key:
+  client-id: client-id
+  redirect-url: redirect-url
+  admin-key: admin-key
 
 jwt:
-  secret:
+  secret: jwt-secret
