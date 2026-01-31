@@ -26,5 +26,5 @@ public interface TestAuthControllerSwagger {
     ResponseEntity<List<TokenResponse>> fakeLogin(
             @Parameter(in = ParameterIn.HEADER, name = "X-Test-Auth-Secret", description = "테스트 인증 시크릿 키", required = true)
             @RequestHeader("X-Test-Auth-Secret") final String secretKey,
-            @RequestBody final FakeLoginRequest memberIds);
+            @RequestBody final FakeLoginRequest request);
 }
