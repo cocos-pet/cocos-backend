@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.List;
 
@@ -30,11 +31,7 @@ public class TestAuthController implements TestAuthControllerSwagger {
             @RequestHeader("X-Test-Auth-Secret") final String secretKey,
             @RequestBody final FakeLoginRequest request) {
 
-        if (request.memberIds() == null || request.memberIds().isEmpty()) {
-            return ResponseEntity.ok(List.of());
-        }
-
-        if (!MessageDigest.isEqual(testAuthSecret.getBytes(), secretKey.getBytes())) {
+        if (!MessageDigest.isEqual(testAuthSecret.getBytes(StandardCharsets.UTF_8), secretKey.getBytes(StandardCharsets.UTF_8))) {
             throw new CocosException(FailMessage.UNAUTHORIZED);
         }
 
