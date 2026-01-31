@@ -28,7 +28,11 @@ public class TestAuthController implements TestAuthControllerSwagger {
     public ResponseEntity<List<TokenResponse>> fakeLogin(
             @RequestHeader("X-Test-Auth-Secret") final String secretKey,
             @RequestBody final FakeLoginRequest request) {
-        
+
+        if (request.memberIds() == null || request.memberIds().isEmpty()) {
+            return ResponseEntity.ok(List.of());
+        }
+
         if (!testAuthSecret.equals(secretKey)) {
             throw new CocosException(FailMessage.UNAUTHORIZED);
         }
