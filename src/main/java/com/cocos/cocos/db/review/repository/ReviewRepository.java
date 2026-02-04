@@ -1,6 +1,6 @@
 package com.cocos.cocos.db.review.repository;
 
-import com.cocos.cocos.db.review.db.Review;
+import com.cocos.cocos.db.review.entity.Review;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

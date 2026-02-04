@@ -17,11 +17,11 @@ import com.cocos.cocos.db.hospital.entity.Hospital;
 import com.cocos.cocos.db.hospital.entity.VisitPurpose;
 import com.cocos.cocos.db.hospital.repository.HospitalRepository;
 
-import com.cocos.cocos.db.review.db.Review;
-import com.cocos.cocos.db.review.db.ReviewImage;
-import com.cocos.cocos.db.review.db.ReviewSummary;
-import com.cocos.cocos.db.review.db.ReviewSummaryOption;
-import com.cocos.cocos.db.review.db.ReviewSymptom;
+import com.cocos.cocos.db.review.entity.Review;
+import com.cocos.cocos.db.review.entity.ReviewImage;
+import com.cocos.cocos.db.review.entity.ReviewSummary;
+import com.cocos.cocos.db.review.entity.ReviewSummaryOption;
+import com.cocos.cocos.db.review.entity.ReviewSymptom;
 import com.cocos.cocos.db.review.repository.ReviewImageRepository;
 import com.cocos.cocos.db.review.repository.ReviewRepository;
 import com.cocos.cocos.db.review.repository.ReviewSummaryOptionRepository;
