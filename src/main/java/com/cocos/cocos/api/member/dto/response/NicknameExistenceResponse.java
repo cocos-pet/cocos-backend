@@ -1,7 +1,9 @@
 package com.cocos.cocos.api.member.dto.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 public record NicknameExistenceResponse(
-        //ToDo: 스키마 필요
+        @Schema(description = "닉네임 존재 여부 조회", example = "true")
         boolean isExistNickname
 ) {
     public static NicknameExistenceResponse of(final boolean isExistNickname) {
