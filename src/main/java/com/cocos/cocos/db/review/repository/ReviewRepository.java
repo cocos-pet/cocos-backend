@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewRepositoryCustom {
@@ -18,4 +19,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewRep
     List<Review> findAllByMemberIdAndIdLessThan(final Long memberId, final Long cursorId, final Pageable pageable);
 
     List<Review> findAllByMemberId(final Long memberId, final Pageable pageable);
+
+    Optional<Review> findTopByMemberIdAndDiseaseIdIsNotNullOrderByCreatedAtDesc(final Long memberId);
 }

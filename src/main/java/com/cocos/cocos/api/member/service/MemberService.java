@@ -3,11 +3,15 @@ package com.cocos.cocos.api.member.service;
 import com.cocos.cocos.api.member.dto.response.*;
 import com.cocos.cocos.auth.JwtProvider;
 import com.cocos.cocos.common.exception.CocosException;
+import com.cocos.cocos.db.body.entity.Body;
+import com.cocos.cocos.db.body.repository.BodyRepository;
 import com.cocos.cocos.db.city.entity.City;
 import com.cocos.cocos.db.city.repository.CityRepository;
 import com.cocos.cocos.db.comment.entity.Comment;
 import com.cocos.cocos.db.comment.repository.CommentRepository;
 import com.cocos.cocos.db.comment.repository.SubCommentRepository;
+import com.cocos.cocos.db.disease.entity.Disease;
+import com.cocos.cocos.db.disease.repository.DiseaseRepository;
 import com.cocos.cocos.db.district.entity.District;
 import com.cocos.cocos.db.district.repository.DistrictRepository;
 import com.cocos.cocos.db.hospital.entity.Hospital;
@@ -27,7 +31,7 @@ import com.cocos.cocos.db.post.repository.PostImageRepository;
 import com.cocos.cocos.db.post.repository.PostLikeRepository;
 import com.cocos.cocos.db.post.repository.PostRepository;
 import com.cocos.cocos.db.post.repository.PostTagRepository;
-import com.cocos.cocos.db.review.db.Review;
+import com.cocos.cocos.db.review.entity.Review;
 import com.cocos.cocos.db.review.repository.ReviewImageRepository;
 import com.cocos.cocos.db.review.repository.ReviewRepository;
 import com.cocos.cocos.db.review.repository.ReviewSummaryRepository;
@@ -43,6 +47,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.util.List;
 
 @Service
@@ -73,6 +78,9 @@ public class MemberService {
     private final ReviewSummaryRepository reviewSummaryRepository;
     private final ReviewSymptomRepository reviewSymptomRepository;
     private final AppDataS3Client appDataS3Client;
+    private final BodyRepository bodyRepository;
+    private final DiseaseRepository diseaseRepository;
+    private final Clock clock;
 
     @Transactional(readOnly = true)
     public MemberProfileResponse getMemberProfile(final String nickname, final Long memberId) {
@@ -260,6 +268,28 @@ public class MemberService {
         memberTokenRepository.deleteByMemberId(memberId);
         kakaoLoginClient.unlink(Long.parseLong(member.getSub()));
         memberRepository.deleteById(memberId);
+    }
+
+    @Transactional(readOnly = true)
+    public MemberRecentReviewResponse getRecentReview(final String nickname, final Long memberId) {
+        final Member member = findMember(nickname, memberId);
+
+        return reviewRepository
+                .findTopByMemberIdAndDiseaseIdIsNotNullOrderByCreatedAtDesc(member.getId())
+                .map(review -> {
+                    Disease disease = diseaseRepository.findById(review.getDiseaseId())
+                            .orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_DISEASE));
+
+                    Body body = bodyRepository.findById(disease.getBodyId())
+                            .orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_BODY));
+
+                    return MemberRecentReviewResponse.from(
+                            body.getName(),
+                            review.getCreatedAt(),
+                            clock
+                    );
+                })
+                .orElse(null);
     }
 
     private void deleteAboutPet(final Long memberId) {
