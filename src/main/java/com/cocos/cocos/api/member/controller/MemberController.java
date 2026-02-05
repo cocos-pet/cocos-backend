@@ -117,6 +117,6 @@ public class MemberController implements MemberControllerSwagger {
     public ResponseEntity<BaseResponse<MemberRecentReviewResponse>> getRecentMemberReview(
             @RequestParam(name = "nickname", required = false)  @MemberNicknameConstraint final String nickname
     ) {
-        return SuccessResponse.success(SuccessMessage.OK, memberService.getRecentReview(nickname, PrincipalHandler.getMemberIdFromPrincipal()));
+        return SuccessResponse.success(SuccessMessage.OK, memberService.getRecentVisitedReview(nickname, PrincipalHandler.getMemberIdFromPrincipal()));
     }
 }
