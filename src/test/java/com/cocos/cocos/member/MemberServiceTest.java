@@ -125,7 +125,7 @@ class MemberServiceTest {
 
         final Long memberId = 1L;
         final String bodyName = "Eye";
-        final String visitedAt = FIXED_NOW.minusDays(15).format(VISITED_AT_FORMATTER);
+        final LocalDateTime visitedAt = FIXED_NOW.minusDays(15);
 
         givenRecentReview(memberId, bodyName, visitedAt);
 
@@ -145,7 +145,7 @@ class MemberServiceTest {
 
         final Long memberId = 1L;
         final String bodyName = "Leg";
-        final String visitedAt = FIXED_NOW.minusMonths(2).format(VISITED_AT_FORMATTER);
+        final LocalDateTime visitedAt = FIXED_NOW.minusMonths(2);
 
         givenRecentReview(memberId, bodyName, visitedAt);
 
@@ -160,7 +160,7 @@ class MemberServiceTest {
     private void givenRecentReview(
             Long memberId,
             String bodyName,
-            String visitedAt
+            LocalDateTime visitedAt
     ) {
         final Member member = Member.builder().build();
         ReflectionTestUtils.setField(member, "id", memberId);
