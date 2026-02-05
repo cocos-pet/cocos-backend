@@ -1,6 +1,14 @@
 package com.cocos.cocos.api.member.service;
 
-import com.cocos.cocos.api.member.dto.response.*;
+import com.cocos.cocos.api.member.dto.response.LoginResponse;
+import com.cocos.cocos.api.member.dto.response.MemberHospitalResponse;
+import com.cocos.cocos.api.member.dto.response.MemberLocationResponse;
+import com.cocos.cocos.api.member.dto.response.MemberProfileResponse;
+import com.cocos.cocos.api.member.dto.response.MemberRecentReviewResponse;
+import com.cocos.cocos.api.member.dto.response.MemberReviewTermsAgreeResponse;
+import com.cocos.cocos.api.member.dto.response.NicknameExistenceResponse;
+import com.cocos.cocos.api.member.dto.response.ReissueTokenResponse;
+import com.cocos.cocos.api.member.dto.response.TokenResponse;
 import com.cocos.cocos.auth.JwtProvider;
 import com.cocos.cocos.common.exception.CocosException;
 import com.cocos.cocos.db.body.entity.Body;
@@ -48,7 +56,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -285,11 +292,10 @@ public class MemberService {
 
                     final Body body = bodyRepository.findById(disease.getBodyId())
                             .orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_BODY));
-                    final LocalDateTime visitedAt = LocalDateTime.parse(review.getVisitedAt(), VISITED_AT_FORMATTER);
 
                     return MemberRecentReviewResponse.from(
                             body.getName(),
-                            visitedAt,
+                            review.getVisitedAt(),
                             clock
                     );
                 })
