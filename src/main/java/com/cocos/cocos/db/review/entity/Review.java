@@ -2,10 +2,19 @@ package com.cocos.cocos.db.review.entity;
 
 import com.cocos.cocos.db.BaseTime;
 import com.cocos.cocos.enums.pet.Gender;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -19,7 +28,7 @@ public class Review extends BaseTime {
     private Long id;
 
     @Column(name = "visited_at", nullable = false)
-    private String visitedAt;
+    private LocalDateTime visitedAt;
 
     @Column(name = "gender", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -47,7 +56,7 @@ public class Review extends BaseTime {
     private Long diseaseId;
 
     @Builder
-    public Review(final String visitedAt, final Gender gender, final Double weight, final Long purposeId, final String content, final Long hospitalId, final Long memberId, final Long breedId, final Long diseaseId) {
+    public Review(final LocalDateTime visitedAt, final Gender gender, final Double weight, final Long purposeId, final String content, final Long hospitalId, final Long memberId, final Long breedId, final Long diseaseId) {
         this.visitedAt = visitedAt;
         this.gender = gender;
         this.weight = weight;
