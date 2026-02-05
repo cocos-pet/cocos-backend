@@ -23,7 +23,8 @@ import com.cocos.cocos.db.pet.repository.PetSymptomRepository;
 import com.cocos.cocos.db.symptom.entity.Symptom;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.message.FailMessage;
-import com.cocos.cocos.external.MemberDataS3Client;
+import com.cocos.cocos.external.s3.S3BucketType;
+import com.cocos.cocos.external.s3.S3PresignClient;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,7 +42,7 @@ public class PetService {
     private final DiseaseRepository diseaseRepository;
     private final SymptomRepository symptomRepository;
     private final MemberRepository memberRepository;
-    private final MemberDataS3Client memberDataS3Client;
+    private final S3PresignClient s3PresignClient;
 
     //ToDo: yml에 추가하는 방향 고민 중
     private static final String PET_BASE_IMAGE_URL = "member/basePetImage.png";
@@ -178,7 +179,7 @@ public class PetService {
 
         return PetResponse.of(
                 pet.getId(),
-                memberDataS3Client.getPresignedUrl(pet.getImage()),
+                s3PresignClient.get(S3BucketType.MEMBER_DATA, pet.getImage()),
                 pet.getName(),
                 pet.getAge(),
                 pet.getGender(),

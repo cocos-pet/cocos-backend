@@ -30,8 +30,8 @@ import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.enums.post.PostSortCriteria;
 import com.cocos.cocos.enums.tag.TagType;
 import com.cocos.cocos.event.MagazinePublishedEvent;
-import com.cocos.cocos.external.AppDataS3Client;
-import com.cocos.cocos.external.MemberDataS3Client;
+import com.cocos.cocos.external.s3.S3BucketType;
+import com.cocos.cocos.external.s3.S3PresignClient;
 import com.cocos.cocos.util.PostSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,8 +68,7 @@ public class PostService {
     private final SymptomRepository symptomRepository;
     private final PetDiseaseRepository petDiseaseRepository;
     private final PetSymptomRepository petSymptomRepository;
-    private final AppDataS3Client appDataS3Client;
-    private final MemberDataS3Client memberDataS3Client;
+    private final S3PresignClient s3PresignClient;
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
@@ -85,7 +84,7 @@ public class PostService {
                 () -> new CocosException(FailMessage.NOT_FOUND_BREED)
         );
         final List<String> images = postImageRepository.findAllByPostId(postId).stream()
-                .map(postImage -> memberDataS3Client.getPresignedUrl(postImage.getImage()))
+                .map(postImage -> s3PresignClient.get(S3BucketType.MEMBER_DATA, postImage.getImage()))
                 .toList();
         final PostCategory postCategory = postCategoryRepository.findById(post.getCategoryId()).orElseThrow(
                 () -> new CocosException(FailMessage.NOT_FOUND_CATEGORY)
@@ -125,7 +124,7 @@ public class PostService {
 
         return PostDetailResponse.builder()
                 .nickname(member.getNickname())
-                .profileImage(memberDataS3Client.getPresignedUrl(member.getImage()))
+                .profileImage(s3PresignClient.get(S3BucketType.MEMBER_DATA, member.getImage()))
                 .breed(breed.getName())
                 .petAge(pet.getAge())
                 .likeCounts(likeCounts)
@@ -181,7 +180,7 @@ public class PostService {
     public PostCategoriesResponse getCategories() {
         final List<PostCategory> postCategories = postCategoryRepository.findAll();
         return PostCategoriesResponse.of(postCategories.stream()
-                .map(postCategory -> PostCategoryResponse.of(postCategory.getId(), postCategory.getName(), appDataS3Client.getPresignedUrl(postCategory.getImage())))
+                .map(postCategory -> PostCategoryResponse.of(postCategory.getId(), postCategory.getName(), s3PresignClient.get(S3BucketType.APP_DATA, postCategory.getImage())))
                 .toList());
     }
 
@@ -192,7 +191,7 @@ public class PostService {
         final List<PostCategory> postCategories = getWritableCategories(member.isAdmin());
 
         return PostCategoriesResponse.of(postCategories.stream()
-                .map(postCategory -> PostCategoryResponse.of(postCategory.getId(), postCategory.getName(), appDataS3Client.getPresignedUrl(postCategory.getImage())))
+                .map(postCategory -> PostCategoryResponse.of(postCategory.getId(), postCategory.getName(), s3PresignClient.get(S3BucketType.APP_DATA, postCategory.getImage())))
                 .toList());
     }
 
@@ -259,7 +258,7 @@ public class PostService {
                                                 .image(fileName)
                                                 .build()
                                 );
-                                return memberDataS3Client.putPresignedUrl(fileName);
+                                return s3PresignClient.put(S3BucketType.MEMBER_DATA, fileName);
                             })
                             .toList()
             );
@@ -444,7 +443,7 @@ public class PostService {
 
     private String getFirstImage(final List<PostImage> postImages) {
         if (!postImages.isEmpty()) {
-            return memberDataS3Client.getPresignedUrl(postImages.getFirst().getImage());
+            return s3PresignClient.get(S3BucketType.MEMBER_DATA, postImages.getFirst().getImage());
         }
         return null;
     }

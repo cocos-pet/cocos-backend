@@ -41,7 +41,8 @@ import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.location.LocationType;
 import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.enums.pet.Gender;
-import com.cocos.cocos.external.MemberDataS3Client;
+import com.cocos.cocos.external.s3.S3BucketType;
+import com.cocos.cocos.external.s3.S3PresignClient;
 import com.cocos.cocos.util.SortConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -71,7 +72,6 @@ public class ReviewService {
     private final ReviewSymptomRepository reviewSymptomRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final ReviewSummaryOptionRepository reviewSummaryOptionRepository;
-    private final MemberDataS3Client memberDataS3Client;
     private final HospitalRepository hospitalRepository;
     private final BreedRepository breedRepository;
     private final AnimalRepository animalRepository;
@@ -80,6 +80,7 @@ public class ReviewService {
     private final MemberRepository memberRepository;
     private final PetRepository petRepository;
     private final HospitalVisitPurposeRepository hospitalVisitPurposeRepository;
+    private final S3PresignClient s3PresignClient;
 
     private static final DateTimeFormatter RESPONSE_DATE_FORMATTER =
             DateTimeFormatter.ofPattern("yyyy.MM.dd");
@@ -135,7 +136,7 @@ public class ReviewService {
                                         .build()
                         );
 
-                        return memberDataS3Client.putPresignedUrl(fileName);
+                        return s3PresignClient.put(S3BucketType.MEMBER_DATA, fileName);
                     })
                     .toList()
             );
@@ -450,7 +451,7 @@ public class ReviewService {
         return reviewImages.stream()
                 .collect(Collectors.groupingBy(
                         ReviewImage::getReviewId,
-                        Collectors.mapping(img -> memberDataS3Client.getPresignedUrl(img.getImage()), Collectors.toList())
+                        Collectors.mapping(img -> s3PresignClient.get(S3BucketType.MEMBER_DATA, img.getImage()), Collectors.toList())
                 ));
     }
 
@@ -559,7 +560,7 @@ public class ReviewService {
         }
 
         final List<String> reviewImages = reviewImageRepository.findAllByReviewId(reviewId).stream()
-                .map(reviewImage -> memberDataS3Client.deletePresignedUrl(reviewImage.getImage()))
+                .map(reviewImage -> s3PresignClient.delete(S3BucketType.MEMBER_DATA, reviewImage.getImage()))
                 .toList();
 
         reviewSummaryRepository.deleteAllByReviewId(reviewId);

@@ -42,7 +42,8 @@ public enum FailMessage {
     BAD_REQUEST_INVALID_DISTRICT_ID(HttpStatus.BAD_REQUEST, 40028, "유효하지 않은 지역 아이디입니다. "),
     BAD_REQUEST_VALIDATION_ERROR(HttpStatus.BAD_REQUEST, 40029, "요청에 유효하지 않은 데이터가 있습니다. "),
     BAD_REQUEST_INVALID_NOTIFICATION_ID(HttpStatus.BAD_REQUEST, 40030, "유효하지 않은 알림 아이디입니다. "),
-    BAD_REQUEST_INVALID_VISITED_AT_FORMAT(HttpStatus.BAD_REQUEST, 40031, "유효하지 않은 방문 날짜 포맷입니다. "),
+    BAD_REQUEST_INVALID_S3_OBJECT_KEY(HttpStatus.BAD_REQUEST, 40031, "유효하지 않은 S3 Object key 입니다. "),
+    BAD_REQUEST_INVALID_VISITED_AT_FORMAT(HttpStatus.BAD_REQUEST, 40032, "유효하지 않은 방문 날짜 포맷입니다. "),
     /**
      * 401
      */

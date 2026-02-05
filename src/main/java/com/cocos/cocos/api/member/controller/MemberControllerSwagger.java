@@ -2,7 +2,6 @@ package com.cocos.cocos.api.member.controller;
 
 import com.cocos.cocos.api.member.dto.request.LoginRequest;
 import com.cocos.cocos.api.member.dto.request.ProfileUpdateRequest;
-
 import com.cocos.cocos.api.member.dto.response.LoginResponse;
 import com.cocos.cocos.api.member.dto.response.MemberHospitalResponse;
 import com.cocos.cocos.api.member.dto.response.MemberLocationResponse;
@@ -11,7 +10,6 @@ import com.cocos.cocos.api.member.dto.response.MemberRecentReviewResponse;
 import com.cocos.cocos.api.member.dto.response.MemberReviewTermsAgreeResponse;
 import com.cocos.cocos.api.member.dto.response.NicknameExistenceResponse;
 import com.cocos.cocos.api.member.dto.response.ReissueTokenResponse;
-
 import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.validation.hospital.HospitalIdConstraint;
 import com.cocos.cocos.validation.member.MemberNicknameConstraint;

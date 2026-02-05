@@ -38,7 +38,8 @@ import com.cocos.cocos.db.review.repository.ReviewSymptomRepository;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.location.LocationType;
 import com.cocos.cocos.enums.pet.Gender;
-import com.cocos.cocos.external.MemberDataS3Client;
+import com.cocos.cocos.external.s3.S3BucketType;
+import com.cocos.cocos.external.s3.S3PresignClient;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -58,6 +59,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
@@ -84,9 +86,6 @@ class ReviewServiceTest {
     ReviewSummaryOptionRepository reviewSummaryOptionRepository;
 
     @Mock
-    MemberDataS3Client memberDataS3Client;
-
-    @Mock
     HospitalRepository hospitalRepository;
 
     @Mock
@@ -110,10 +109,11 @@ class ReviewServiceTest {
     @Mock
     HospitalVisitPurposeRepository hospitalVisitPurposeRepository;
 
-
-
     @Mock
     SymptomRepository symptomRepository;
+
+    @Mock
+    S3PresignClient s3PresignClient;
 
     @Test
     @DisplayName("리뷰를 작성할 수 있다.")
@@ -155,7 +155,7 @@ class ReviewServiceTest {
         ReflectionTestUtils.setField(hospital, "id", hospitalId);
         ReflectionTestUtils.setField(review, "id", 123L);
 
-        BDDMockito.given(memberDataS3Client.putPresignedUrl(any())).willReturn(presignedUrl);
+        BDDMockito.given(s3PresignClient.put(eq(S3BucketType.MEMBER_DATA), any())).willReturn(presignedUrl);
         BDDMockito.given(reviewRepository.save(any(Review.class)))
                 .willReturn(review);
         BDDMockito.given(hospitalRepository.findById(hospitalId)).willReturn(Optional.of(Hospital.builder().build()));
@@ -334,9 +334,9 @@ class ReviewServiceTest {
 
         BDDMockito.given(reviewRepository.findById(reviewId)).willReturn(Optional.of(review));
         BDDMockito.given(reviewImageRepository.findAllByReviewId(reviewId)).willReturn(reviewImages);
-        BDDMockito.given(memberDataS3Client.deletePresignedUrl(reviewImage1.getImage())).willReturn("presignedUrl1");
-        BDDMockito.given(memberDataS3Client.deletePresignedUrl(reviewImage2.getImage())).willReturn("presignedUrl2");
-        BDDMockito.given(memberDataS3Client.deletePresignedUrl(reviewImage3.getImage())).willReturn("presignedUrl3");
+        BDDMockito.given(s3PresignClient.delete(S3BucketType.MEMBER_DATA, reviewImage1.getImage())).willReturn("presignedUrl1");
+        BDDMockito.given(s3PresignClient.delete(S3BucketType.MEMBER_DATA, reviewImage2.getImage())).willReturn("presignedUrl2");
+        BDDMockito.given(s3PresignClient.delete(S3BucketType.MEMBER_DATA, reviewImage3.getImage())).willReturn("presignedUrl3");
         BDDMockito.given(hospitalRepository.findById(review.getHospitalId())).willReturn(Optional.of(hospital));
 
         final ReviewImageDeleteListResponse expected = ReviewImageDeleteListResponse.of(

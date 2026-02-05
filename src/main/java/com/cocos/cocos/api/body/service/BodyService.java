@@ -9,7 +9,9 @@ import com.cocos.cocos.db.disease.repository.DiseaseRepository;
 import com.cocos.cocos.db.symptom.entity.Symptom;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.pet.PetProblem;
-import com.cocos.cocos.external.AppDataS3Client;
+
+import com.cocos.cocos.external.s3.S3BucketType;
+import com.cocos.cocos.external.s3.S3PresignClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +25,7 @@ public class BodyService {
     private final BodyRepository bodyRepository;
     private final DiseaseRepository diseaseRepository;
     private final SymptomRepository symptomRepository;
-    private final AppDataS3Client appDataS3Client;
+    private final S3PresignClient s3PresignClient;
 
     @Transactional(readOnly = true)
     public BodiesResponse getBodies(final PetProblem petProblem) {
@@ -31,7 +33,7 @@ public class BodyService {
         final List<Body> bodies = bodyRepository.findAllById(bodyIds);
         return BodiesResponse.of(
                 bodies.stream()
-                        .map(body -> BodyResponse.of(body.getId(), body.getName(), appDataS3Client.getPresignedUrl(body.getImage())))
+                        .map(body -> BodyResponse.of(body.getId(), body.getName(), s3PresignClient.get(S3BucketType.APP_DATA, body.getImage())))
                         .toList()
         );
     }

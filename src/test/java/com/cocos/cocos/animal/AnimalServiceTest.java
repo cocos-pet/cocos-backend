@@ -5,7 +5,8 @@ import com.cocos.cocos.api.animal.dto.response.AnimalsResponse;
 import com.cocos.cocos.api.animal.service.AnimalService;
 import com.cocos.cocos.db.animal.entity.Animal;
 import com.cocos.cocos.db.animal.repository.AnimalRepository;
-import com.cocos.cocos.external.AppDataS3Client;
+import com.cocos.cocos.external.s3.S3BucketType;
+import com.cocos.cocos.external.s3.S3PresignClient;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -21,11 +22,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("동물 서비스 테스트")
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-public class AnimalServiceTest {
+class AnimalServiceTest {
 
     @InjectMocks
     private AnimalService animalService;
@@ -34,7 +36,7 @@ public class AnimalServiceTest {
     private AnimalRepository animalRepository;
 
     @Mock
-    private AppDataS3Client appDataS3Client;
+    private S3PresignClient s3PresignClient;
 
     @Test
     @DisplayName("동물 리스트를 조회할 수 있다.")
@@ -42,11 +44,11 @@ public class AnimalServiceTest {
         //given
         final Animal animal1 = Animal.builder()
                 .name("이름1")
-                .image("image1")
+                .image("image")
                 .build();
         final Animal animal2 = Animal.builder()
                 .name("이름2")
-                .image("image2")
+                .image("image")
                 .build();
         final List<Animal> animals = new ArrayList<Animal>(List.of(animal1, animal2));
         final AnimalsResponse expected = AnimalsResponse.of(
@@ -55,7 +57,12 @@ public class AnimalServiceTest {
                         .toList()
         );
         BDDMockito.given(animalRepository.findAll()).willReturn(animals);
-        BDDMockito.given(appDataS3Client.getPresignedUrl(any())).willReturn("image");
+        BDDMockito.given(
+                s3PresignClient.get(
+                        eq(S3BucketType.APP_DATA),
+                        any(String.class)
+                )
+        ).willAnswer(invocation -> invocation.getArgument(1));
 
         //when
         final AnimalsResponse actual = animalService.getAnimals();
