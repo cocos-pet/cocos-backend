@@ -25,6 +25,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,6 +55,7 @@ class MemberServiceTest {
 
     private static final LocalDateTime FIXED_NOW =
             LocalDateTime.of(2025, 10, 26, 10, 0);
+    public static final DateTimeFormatter VISITED_AT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private void setupClock() {
         Clock fixedClock = Clock.fixed(
@@ -105,7 +107,7 @@ class MemberServiceTest {
                 .willReturn(Optional.empty());
 
         assertThatThrownBy(() ->
-                memberService.getRecentReview(null, memberId)
+                memberService.getRecentVisitedReview(null, memberId)
         ).isInstanceOf(CocosException.class)
                 .hasFieldOrPropertyWithValue(
                         "failMessage",
@@ -113,7 +115,7 @@ class MemberServiceTest {
                 );
 
         verify(reviewRepository, never())
-                .findTopByMemberIdAndDiseaseIdIsNotNullOrderByCreatedAtDesc(anyLong());
+                .findTopByMemberIdAndDiseaseIdIsNotNullOrderByVisitedAtDesc(anyLong());
     }
 
     @Test
@@ -123,12 +125,12 @@ class MemberServiceTest {
 
         final Long memberId = 1L;
         final String bodyName = "Eye";
-        final LocalDateTime createdAt = FIXED_NOW.minusDays(15);
+        final String visitedAt = FIXED_NOW.minusDays(15).format(VISITED_AT_FORMATTER);
 
-        givenRecentReview(memberId, bodyName, createdAt);
+        givenRecentReview(memberId, bodyName, visitedAt);
 
         final MemberRecentReviewResponse response =
-                memberService.getRecentReview(null, memberId);
+                memberService.getRecentVisitedReview(null, memberId);
 
         assertThat(response.diseaseBody()).isEqualTo(bodyName);
         assertThat(response.timeSinceVisit().value()).isEqualTo(15);
@@ -143,12 +145,12 @@ class MemberServiceTest {
 
         final Long memberId = 1L;
         final String bodyName = "Leg";
-        final LocalDateTime createdAt = FIXED_NOW.minusDays(60);
+        final String visitedAt = FIXED_NOW.minusDays(60).format(VISITED_AT_FORMATTER);
 
-        givenRecentReview(memberId, bodyName, createdAt);
+        givenRecentReview(memberId, bodyName, visitedAt);
 
         final MemberRecentReviewResponse response =
-                memberService.getRecentReview(null, memberId);
+                memberService.getRecentVisitedReview(null, memberId);
 
         assertThat(response.timeSinceVisit().value()).isEqualTo(2);
         assertThat(response.timeSinceVisit().unit())
@@ -158,7 +160,7 @@ class MemberServiceTest {
     private void givenRecentReview(
             Long memberId,
             String bodyName,
-            LocalDateTime createdAt
+            String visitedAt
     ) {
         final Member member = Member.builder().build();
         ReflectionTestUtils.setField(member, "id", memberId);
@@ -167,7 +169,7 @@ class MemberServiceTest {
                 .memberId(memberId)
                 .diseaseId(10L)
                 .build();
-        ReflectionTestUtils.setField(review, "createdAt", createdAt);
+        ReflectionTestUtils.setField(review, "visitedAt", visitedAt);
 
         final Disease disease = Disease.builder().bodyId(20L).build();
         final Body body = Body.builder().name(bodyName).build();
@@ -175,7 +177,7 @@ class MemberServiceTest {
         given(memberRepository.findById(memberId))
                 .willReturn(Optional.of(member));
         given(reviewRepository
-                .findTopByMemberIdAndDiseaseIdIsNotNullOrderByCreatedAtDesc(memberId))
+                .findTopByMemberIdAndDiseaseIdIsNotNullOrderByVisitedAtDesc(memberId))
                 .willReturn(Optional.of(review));
         given(diseaseRepository.findById(10L))
                 .willReturn(Optional.of(disease));
