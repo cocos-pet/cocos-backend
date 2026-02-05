@@ -20,5 +20,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewRep
 
     List<Review> findAllByMemberId(final Long memberId, final Pageable pageable);
 
-    Optional<Review> findTopByMemberIdAndDiseaseIdIsNotNullOrderByCreatedAtDesc(final Long memberId);
+    Optional<Review> findTopByMemberIdAndDiseaseIdIsNotNullOrderByVisitedAtDesc(final Long memberId);
 }
