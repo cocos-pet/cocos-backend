@@ -1,8 +1,15 @@
 package com.cocos.cocos.api.review.service;
 
 import com.cocos.cocos.api.review.dto.query.ReviewSearchCondition;
+import com.cocos.cocos.api.review.dto.response.HospitalReviewListResponse;
+import com.cocos.cocos.api.review.dto.response.HospitalReviewResponse;
+import com.cocos.cocos.api.review.dto.response.MemberHospitalReviewListResponse;
+import com.cocos.cocos.api.review.dto.response.MemberHospitalReviewResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
+import com.cocos.cocos.api.review.dto.response.ReviewImageDeleteListResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewSummaryListResponse;
+import com.cocos.cocos.api.review.dto.response.ReviewSummaryOptionListResponse;
+import com.cocos.cocos.api.review.dto.response.ReviewSummaryOptionResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewSummaryResponse;
 import com.cocos.cocos.common.exception.CocosException;
 import com.cocos.cocos.db.animal.entity.Animal;
@@ -16,7 +23,6 @@ import com.cocos.cocos.db.hospital.entity.VisitPurpose;
 import com.cocos.cocos.db.hospital.repository.HospitalRepository;
 import com.cocos.cocos.db.hospital.repository.HospitalVisitPurposeRepository;
 import com.cocos.cocos.db.member.entity.Member;
-import com.cocos.cocos.api.review.dto.response.*;
 import com.cocos.cocos.db.member.repository.MemberRepository;
 import com.cocos.cocos.db.pet.entity.Pet;
 import com.cocos.cocos.db.pet.repository.PetRepository;
@@ -25,11 +31,15 @@ import com.cocos.cocos.db.review.entity.ReviewImage;
 import com.cocos.cocos.db.review.entity.ReviewSummary;
 import com.cocos.cocos.db.review.entity.ReviewSummaryOption;
 import com.cocos.cocos.db.review.entity.ReviewSymptom;
-import com.cocos.cocos.db.review.repository.*;
-import com.cocos.cocos.enums.message.FailMessage;
+import com.cocos.cocos.db.review.repository.ReviewImageRepository;
+import com.cocos.cocos.db.review.repository.ReviewRepository;
+import com.cocos.cocos.db.review.repository.ReviewSummaryOptionRepository;
+import com.cocos.cocos.db.review.repository.ReviewSummaryRepository;
+import com.cocos.cocos.db.review.repository.ReviewSymptomRepository;
 import com.cocos.cocos.db.symptom.entity.Symptom;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.location.LocationType;
+import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.enums.pet.Gender;
 import com.cocos.cocos.external.MemberDataS3Client;
 import com.cocos.cocos.util.SortConstants;
@@ -40,7 +50,15 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -63,14 +81,15 @@ public class ReviewService {
     private final PetRepository petRepository;
     private final HospitalVisitPurposeRepository hospitalVisitPurposeRepository;
 
-
+    private static final DateTimeFormatter RESPONSE_DATE_FORMATTER =
+            DateTimeFormatter.ofPattern("yyyy.MM.dd");
     private static final String REVIEW_IMAGE_S3_PREFIX = "reviewImage";
     private static final boolean IS_GOOD_REVIEW = true;
     private static final int DEFAULT_PAGE_SIZE = 4;
 
     @Transactional
     public ReviewAddResponse addReview(final Long memberId, final Long hospitalId, final Long breedId, final Gender gender,
-                                       final Double weight, final String visitedAt, final String content,
+                                       final Double weight, final LocalDateTime visitedAt, final String content,
                                        final Long purposeId, final Long diseaseId, final List<Long> symptomIds,
                                        final List<Long> goodReviewIds, final List<Long> badReviewIds, final List<String> images) {
         final Review review = reviewRepository.save(Review.builder()
@@ -196,11 +215,13 @@ public class ReviewService {
                             visitPurposeMap.get(review.getPurposeId())
                     ).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_VISIT_PURPOSE));
 
+                    final String visitedAt = review.getVisitedAt().format(RESPONSE_DATE_FORMATTER);
+
                     return MemberHospitalReviewResponse.of(
                             review.getId(),
                             hospital.getId(),
                             hospital.getName(),
-                            review.getVisitedAt(),
+                            visitedAt,
                             hospital.getDisplayAddress(),
                             review.getContent(),
                             summaryOptionList,
@@ -284,6 +305,8 @@ public class ReviewService {
                             visitPurposeMap.get(review.getPurposeId())
                     ).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_VISIT_PURPOSE));
 
+                    final String visitedAt = review.getVisitedAt().format(RESPONSE_DATE_FORMATTER);
+
                     return HospitalReviewResponse.of(
                             review.getId(),
                             member.getId(),
@@ -292,7 +315,7 @@ public class ReviewService {
                             pet.getAge(),
                             hospital.getId(),
                             hospital.getName(),
-                            review.getVisitedAt(),
+                            visitedAt,
                             hospital.getDisplayAddress(),
                             review.getContent(),
                             summaryOptionList,
