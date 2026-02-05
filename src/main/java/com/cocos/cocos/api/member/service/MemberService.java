@@ -1,13 +1,25 @@
 package com.cocos.cocos.api.member.service;
 
-import com.cocos.cocos.api.member.dto.response.*;
+import com.cocos.cocos.api.member.dto.response.LoginResponse;
+import com.cocos.cocos.api.member.dto.response.MemberHospitalResponse;
+import com.cocos.cocos.api.member.dto.response.MemberLocationResponse;
+import com.cocos.cocos.api.member.dto.response.MemberProfileResponse;
+import com.cocos.cocos.api.member.dto.response.MemberRecentReviewResponse;
+import com.cocos.cocos.api.member.dto.response.MemberReviewTermsAgreeResponse;
+import com.cocos.cocos.api.member.dto.response.NicknameExistenceResponse;
+import com.cocos.cocos.api.member.dto.response.ReissueTokenResponse;
+import com.cocos.cocos.api.member.dto.response.TokenResponse;
 import com.cocos.cocos.auth.JwtProvider;
 import com.cocos.cocos.common.exception.CocosException;
+import com.cocos.cocos.db.body.entity.Body;
+import com.cocos.cocos.db.body.repository.BodyRepository;
 import com.cocos.cocos.db.city.entity.City;
 import com.cocos.cocos.db.city.repository.CityRepository;
 import com.cocos.cocos.db.comment.entity.Comment;
 import com.cocos.cocos.db.comment.repository.CommentRepository;
 import com.cocos.cocos.db.comment.repository.SubCommentRepository;
+import com.cocos.cocos.db.disease.entity.Disease;
+import com.cocos.cocos.db.disease.repository.DiseaseRepository;
 import com.cocos.cocos.db.district.entity.District;
 import com.cocos.cocos.db.district.repository.DistrictRepository;
 import com.cocos.cocos.db.hospital.entity.Hospital;
@@ -27,7 +39,7 @@ import com.cocos.cocos.db.post.repository.PostImageRepository;
 import com.cocos.cocos.db.post.repository.PostLikeRepository;
 import com.cocos.cocos.db.post.repository.PostRepository;
 import com.cocos.cocos.db.post.repository.PostTagRepository;
-import com.cocos.cocos.db.review.db.Review;
+import com.cocos.cocos.db.review.entity.Review;
 import com.cocos.cocos.db.review.repository.ReviewImageRepository;
 import com.cocos.cocos.db.review.repository.ReviewRepository;
 import com.cocos.cocos.db.review.repository.ReviewSummaryRepository;
@@ -43,12 +55,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
 
+    private static final DateTimeFormatter VISITED_AT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final MemberRepository memberRepository;
     private final KakaoLoginClient kakaoLoginClient;
     private final JwtProvider jwtProvider;
@@ -72,6 +87,9 @@ public class MemberService {
     private final ReviewSummaryRepository reviewSummaryRepository;
     private final ReviewSymptomRepository reviewSymptomRepository;
     private final S3PresignClient s3PresignClient;
+    private final BodyRepository bodyRepository;
+    private final DiseaseRepository diseaseRepository;
+    private final Clock clock;
 
     @Transactional(readOnly = true)
     public MemberProfileResponse getMemberProfile(final String nickname, final Long memberId) {
@@ -259,6 +277,28 @@ public class MemberService {
         memberTokenRepository.deleteByMemberId(memberId);
         kakaoLoginClient.unlink(Long.parseLong(member.getSub()));
         memberRepository.deleteById(memberId);
+    }
+
+    @Transactional(readOnly = true)
+    public MemberRecentReviewResponse getRecentVisitedReview(final String nickname, final Long memberId) {
+        final Member member = findMember(nickname, memberId);
+
+        return reviewRepository
+                .findTopByMemberIdAndDiseaseIdIsNotNullOrderByVisitedAtDesc(member.getId())
+                .map(review -> {
+                    final Disease disease = diseaseRepository.findById(review.getDiseaseId())
+                            .orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_DISEASE));
+
+                    final Body body = bodyRepository.findById(disease.getBodyId())
+                            .orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_BODY));
+
+                    return MemberRecentReviewResponse.from(
+                            body.getName(),
+                            review.getVisitedAt(),
+                            clock
+                    );
+                })
+                .orElse(null);
     }
 
     private void deleteAboutPet(final Long memberId) {

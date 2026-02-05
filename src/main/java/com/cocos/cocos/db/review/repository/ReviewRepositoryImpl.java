@@ -1,7 +1,7 @@
 package com.cocos.cocos.db.review.repository;
 
 import com.cocos.cocos.api.review.dto.query.ReviewSearchCondition;
-import com.cocos.cocos.db.review.db.Review;
+import com.cocos.cocos.db.review.entity.Review;
 import com.cocos.cocos.enums.location.LocationType;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -12,9 +12,9 @@ import java.util.List;
 
 import static com.cocos.cocos.db.district.entity.QDistrict.district;
 import static com.cocos.cocos.db.hospital.entity.QHospital.hospital;
-import static com.cocos.cocos.db.review.db.QReview.review;
-import static com.cocos.cocos.db.review.db.QReviewSummary.reviewSummary;
-import static com.cocos.cocos.db.review.db.QReviewSymptom.reviewSymptom;
+import static com.cocos.cocos.db.review.entity.QReview.review;
+import static com.cocos.cocos.db.review.entity.QReviewSummary.reviewSummary;
+import static com.cocos.cocos.db.review.entity.QReviewSymptom.reviewSymptom;
 import static com.cocos.cocos.db.symptom.entity.QSymptom.symptom;
 
 @Repository
