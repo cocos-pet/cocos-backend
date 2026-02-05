@@ -48,12 +48,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
 
+    private static final DateTimeFormatter VISITED_AT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final MemberRepository memberRepository;
     private final MemberDataS3Client memberDataS3Client;
     private final KakaoLoginClient kakaoLoginClient;
@@ -271,21 +274,22 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public MemberRecentReviewResponse getRecentReview(final String nickname, final Long memberId) {
+    public MemberRecentReviewResponse getRecentVisitedReview(final String nickname, final Long memberId) {
         final Member member = findMember(nickname, memberId);
 
         return reviewRepository
-                .findTopByMemberIdAndDiseaseIdIsNotNullOrderByCreatedAtDesc(member.getId())
+                .findTopByMemberIdAndDiseaseIdIsNotNullOrderByVisitedAtDesc(member.getId())
                 .map(review -> {
-                    Disease disease = diseaseRepository.findById(review.getDiseaseId())
+                    final Disease disease = diseaseRepository.findById(review.getDiseaseId())
                             .orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_DISEASE));
 
-                    Body body = bodyRepository.findById(disease.getBodyId())
+                    final Body body = bodyRepository.findById(disease.getBodyId())
                             .orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_BODY));
+                    final LocalDateTime visitedAt = LocalDateTime.parse(review.getVisitedAt(), VISITED_AT_FORMATTER);
 
                     return MemberRecentReviewResponse.from(
                             body.getName(),
-                            review.getCreatedAt(),
+                            visitedAt,
                             clock
                     );
                 })
