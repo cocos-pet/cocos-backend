@@ -145,7 +145,7 @@ class MemberServiceTest {
 
         final Long memberId = 1L;
         final String bodyName = "Leg";
-        final String visitedAt = FIXED_NOW.minusDays(60).format(VISITED_AT_FORMATTER);
+        final String visitedAt = FIXED_NOW.minusMonths(2).format(VISITED_AT_FORMATTER);
 
         givenRecentReview(memberId, bodyName, visitedAt);
 
