@@ -1,5 +1,6 @@
 package com.cocos.cocos.api.review.dto.request;
 
+import com.cocos.cocos.common.datetime.DateParser;
 import com.cocos.cocos.enums.pet.Gender;
 import com.cocos.cocos.validation.breed.BreedIdConstraint;
 import com.cocos.cocos.validation.disease.DiseaseIdConstraint;
@@ -9,6 +10,7 @@ import com.cocos.cocos.validation.review.GoodReviewIdsConstraint;
 import com.cocos.cocos.validation.symptom.SymptomIdsConstraint;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record ReviewAddRequest(
@@ -41,4 +43,7 @@ public record ReviewAddRequest(
         @Schema(description = "리뷰 이미지 리스트", nullable = true, example = "[image1, image2...]")
         List<String> images
 ) {
+        public LocalDateTime parsedVisitedAt() {
+                return DateParser.parseToLocalDateTime(visitedAt);
+        }
 }
