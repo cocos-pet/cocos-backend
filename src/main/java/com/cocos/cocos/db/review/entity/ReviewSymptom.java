@@ -1,4 +1,4 @@
-package com.cocos.cocos.db.review.db;
+package com.cocos.cocos.db.review.entity;
 
 import com.cocos.cocos.db.BaseTime;
 import jakarta.persistence.*;
@@ -9,23 +9,28 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "review_image")
-public class ReviewImage extends BaseTime {
+@Table(
+        name = "review_symptom",
+        indexes = {
+                @Index(name = "idx_symptom_id_review_id", columnList = "symptom_id, review_id")
+        }
+)
+public class ReviewSymptom extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "image", nullable = false)
-    private String image;
-
     @Column(name = "review_id", nullable = false)
     private Long reviewId;
 
+    @Column(name = "symptom_id", nullable = false)
+    private Long symptomId;
+
     @Builder
-    public ReviewImage(final String image, final Long reviewId) {
-        this.image = image;
+    public ReviewSymptom(final Long reviewId, final Long symptomId) {
         this.reviewId = reviewId;
+        this.symptomId = symptomId;
     }
 }

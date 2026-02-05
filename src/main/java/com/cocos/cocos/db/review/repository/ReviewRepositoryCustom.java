@@ -1,7 +1,7 @@
 package com.cocos.cocos.db.review.repository;
 
 import com.cocos.cocos.api.review.dto.query.ReviewSearchCondition;
-import com.cocos.cocos.db.review.db.Review;
+import com.cocos.cocos.db.review.entity.Review;
 
 import java.util.List;
 

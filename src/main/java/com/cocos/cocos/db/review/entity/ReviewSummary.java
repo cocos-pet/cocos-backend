@@ -1,4 +1,4 @@
-package com.cocos.cocos.db.review.db;
+package com.cocos.cocos.db.review.entity;
 
 import com.cocos.cocos.db.BaseTime;
 import jakarta.persistence.*;

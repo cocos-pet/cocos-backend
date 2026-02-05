@@ -1,13 +1,13 @@
 package com.cocos.cocos.api.review.controller;
 
 import com.cocos.cocos.api.review.dto.request.ReviewAddRequest;
+import com.cocos.cocos.api.review.dto.request.ReviewListRequest;
+import com.cocos.cocos.api.review.dto.response.HospitalReviewListResponse;
 import com.cocos.cocos.api.review.dto.response.MemberHospitalReviewListResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewImageDeleteListResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewSummaryListResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewSummaryOptionListResponse;
-import com.cocos.cocos.api.review.dto.request.ReviewListRequest;
-import com.cocos.cocos.api.review.dto.response.*;
 import com.cocos.cocos.api.review.service.ReviewService;
 import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.common.response.SuccessResponse;
@@ -23,7 +23,14 @@ import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("${api.prefix}")
@@ -42,7 +49,7 @@ public class ReviewController implements ReviewControllerSwagger {
         entityExistsValidator.validatePetByMemberId(PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.CREATED, reviewService.addReview(
                 PrincipalHandler.getMemberIdFromPrincipal(), hospitalId, reviewAddRequest.breedId(), reviewAddRequest.gender(),
-                reviewAddRequest.weight(), reviewAddRequest.visitedAt(), reviewAddRequest.content(),
+                reviewAddRequest.weight(), reviewAddRequest.parsedVisitedAt(), reviewAddRequest.content(),
                 reviewAddRequest.purposeId(), reviewAddRequest.diseaseId(), reviewAddRequest.symptomIds(),
                 reviewAddRequest.goodReviewIds(), reviewAddRequest.badReviewIds(), reviewAddRequest.images()
         ));

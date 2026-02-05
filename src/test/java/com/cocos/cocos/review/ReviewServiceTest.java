@@ -2,6 +2,7 @@ package com.cocos.cocos.review;
 
 import com.cocos.cocos.api.review.dto.query.ReviewSearchCondition;
 import com.cocos.cocos.api.review.dto.response.HospitalReviewListResponse;
+import com.cocos.cocos.api.review.dto.response.HospitalReviewResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewAddResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewImageDeleteListResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewSummaryListResponse;
@@ -10,34 +11,32 @@ import com.cocos.cocos.api.review.dto.response.ReviewSummaryOptionResponse;
 import com.cocos.cocos.api.review.dto.response.ReviewSummaryResponse;
 import com.cocos.cocos.api.review.service.ReviewService;
 import com.cocos.cocos.db.animal.entity.Animal;
+import com.cocos.cocos.db.animal.repository.AnimalRepository;
 import com.cocos.cocos.db.breed.entity.Breed;
+import com.cocos.cocos.db.breed.repository.BreedRepository;
 import com.cocos.cocos.db.disease.entity.Disease;
+import com.cocos.cocos.db.disease.repository.DiseaseRepository;
 import com.cocos.cocos.db.district.repository.DistrictRepository;
 import com.cocos.cocos.db.hospital.entity.Hospital;
 import com.cocos.cocos.db.hospital.entity.VisitPurpose;
 import com.cocos.cocos.db.hospital.repository.HospitalRepository;
-
-import com.cocos.cocos.db.review.db.Review;
-import com.cocos.cocos.db.review.db.ReviewImage;
-import com.cocos.cocos.db.review.db.ReviewSummary;
-import com.cocos.cocos.db.review.db.ReviewSummaryOption;
-import com.cocos.cocos.db.review.db.ReviewSymptom;
+import com.cocos.cocos.db.hospital.repository.HospitalVisitPurposeRepository;
+import com.cocos.cocos.db.member.entity.Member;
+import com.cocos.cocos.db.member.repository.MemberRepository;
+import com.cocos.cocos.db.pet.entity.Pet;
+import com.cocos.cocos.db.pet.repository.PetRepository;
+import com.cocos.cocos.db.review.entity.Review;
+import com.cocos.cocos.db.review.entity.ReviewImage;
+import com.cocos.cocos.db.review.entity.ReviewSummary;
+import com.cocos.cocos.db.review.entity.ReviewSummaryOption;
+import com.cocos.cocos.db.review.entity.ReviewSymptom;
 import com.cocos.cocos.db.review.repository.ReviewImageRepository;
 import com.cocos.cocos.db.review.repository.ReviewRepository;
 import com.cocos.cocos.db.review.repository.ReviewSummaryOptionRepository;
 import com.cocos.cocos.db.review.repository.ReviewSummaryRepository;
 import com.cocos.cocos.db.review.repository.ReviewSymptomRepository;
-import com.cocos.cocos.db.member.entity.Member;
-import com.cocos.cocos.db.pet.entity.Pet;
-import com.cocos.cocos.db.animal.repository.AnimalRepository;
-import com.cocos.cocos.db.breed.repository.BreedRepository;
-import com.cocos.cocos.db.disease.repository.DiseaseRepository;
-import com.cocos.cocos.db.hospital.repository.HospitalVisitPurposeRepository;
-import com.cocos.cocos.db.member.repository.MemberRepository;
-import com.cocos.cocos.db.pet.repository.PetRepository;
-import com.cocos.cocos.enums.location.LocationType;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
-
+import com.cocos.cocos.enums.location.LocationType;
 import com.cocos.cocos.enums.pet.Gender;
 import com.cocos.cocos.external.MemberDataS3Client;
 import org.assertj.core.api.Assertions;
@@ -50,12 +49,10 @@ import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-
-
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import com.cocos.cocos.api.review.dto.response.HospitalReviewResponse;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -127,7 +124,7 @@ class ReviewServiceTest {
         final Long breedId = 1L;
         final Gender gender = Gender.F;
         final double weight = 7.0;
-        final String visitedAt = "2025.04.22";
+        final LocalDateTime visitedAt = LocalDateTime.parse("2025-07-12T15:20:19");
         final String content = "내용";
         final Long purposeId = 2L;
         final Long diseaseId = 3L;
@@ -370,8 +367,9 @@ class ReviewServiceTest {
         final Long animalId = 1L;
         final Long diseaseId = 1L;
         final Long purposeId = 1L;
+        final LocalDateTime visitedAt = LocalDateTime.parse("2025-07-12T15:20:19");
 
-        final Review review = Review.builder().hospitalId(hospitalId).memberId(memberId).breedId(breedId).diseaseId(diseaseId).purposeId(purposeId).build();
+        final Review review = Review.builder().visitedAt(visitedAt).hospitalId(hospitalId).memberId(memberId).breedId(breedId).diseaseId(diseaseId).purposeId(purposeId).build();
         ReflectionTestUtils.setField(review, "id", reviewId);
         final Hospital hospital = Hospital.builder().name("테스트 병원").build();
         ReflectionTestUtils.setField(hospital, "id", hospitalId);
@@ -422,8 +420,9 @@ class ReviewServiceTest {
         final Long diseaseId = 1L;
         final Long purposeId = 1L;
         final Long reviewHospitalId = 2L;
+        final LocalDateTime visitedAt = LocalDateTime.parse("2025-07-12T15:20:19");
 
-        final Review review = Review.builder().hospitalId(reviewHospitalId).memberId(memberId).breedId(breedId).diseaseId(diseaseId).purposeId(purposeId).build();
+        final Review review = Review.builder().visitedAt(visitedAt).hospitalId(reviewHospitalId).memberId(memberId).breedId(breedId).diseaseId(diseaseId).purposeId(purposeId).build();
         ReflectionTestUtils.setField(review, "id", reviewId);
         final Hospital hospital = Hospital.builder().name("테스트 병원").build();
         ReflectionTestUtils.setField(hospital, "id", reviewHospitalId);
@@ -468,6 +467,7 @@ class ReviewServiceTest {
         // given
         final Long hospitalId = 100L;
         final int pageSize = 5;
+        final LocalDateTime visitedAt = LocalDateTime.parse("2025-07-12T15:20:19");
 
         final Member member = Member.builder().nickname("테스트유저").build();
         ReflectionTestUtils.setField(member, "id", 1L); // Assuming memberId 1 is always present for simplicity
@@ -475,6 +475,7 @@ class ReviewServiceTest {
         final List<Review> allReviews = new ArrayList<>();
         for (long i = 10; i >= 1; i--) {
             final Review review = Review.builder()
+                    .visitedAt(visitedAt)
                     .hospitalId(hospitalId)
                     .memberId(member.getId())
                     .breedId(1L)
@@ -555,12 +556,15 @@ class ReviewServiceTest {
         final Long hospitalId = 100L;
         final Long bodyId = 1L;
         final int pageSize = 3;
+        final LocalDateTime visitedAt = LocalDateTime.parse("2025-07-12T15:20:19");
+
         final Member member = Member.builder().nickname("테스트유저").build();
         ReflectionTestUtils.setField(member, "id", 1L);
 
         final List<Review> allReviews = new ArrayList<>();
         for (long i = 7; i >= 1; i--) {
             final Review review = Review.builder()
+                    .visitedAt(visitedAt)
                     .hospitalId(hospitalId)
                     .memberId(member.getId())
                     .breedId(1L)
