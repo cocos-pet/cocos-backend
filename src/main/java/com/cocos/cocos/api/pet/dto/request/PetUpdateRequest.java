@@ -22,11 +22,11 @@ public record PetUpdateRequest(
         @Schema(description = "성별", example = "F or M")
         Gender gender,
 
-        @Schema(description = "나이", example = "12", nullable = true)
+        @Schema(description = "나이", example = "12")
         @Min(1)
         Integer age, // [TODO] 프론트 배포 후 제거 필요
 
-        @Schema(description = "생년월일", example = "2020-01-01", nullable = true)
+        @Schema(description = "생년월일", example = "2020-01-01")
         LocalDate birthDate,
 
         @Schema(description = "질병 아이디 리스트", example = "[1,2,3]")
