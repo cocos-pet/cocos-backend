@@ -37,7 +37,6 @@ import com.cocos.cocos.enums.pet.Gender;
 import com.cocos.cocos.enums.tag.TagType;
 import com.cocos.cocos.external.s3.S3BucketType;
 import com.cocos.cocos.external.s3.S3PresignClient;
-import com.cocos.cocos.util.PetAgeCalculator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -209,7 +208,7 @@ class PostServiceTest {
                 .nickname(member.getNickname())
                 .profileImage(member.getImage())
                 .breed(Objects.requireNonNull(breed).getName())
-                .petAge(PetAgeCalculator.calculate(pet.getBirthDate(), CLOCK))
+                .petAge(pet.calculateAge(CLOCK))
                 .likeCounts(likeCounts)
                 .totalCommentCounts(commentCounts + subCommentCounts)
                 .title(Objects.requireNonNull(post).getTitle())
