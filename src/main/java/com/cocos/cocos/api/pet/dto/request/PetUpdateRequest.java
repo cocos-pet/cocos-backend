@@ -12,28 +12,28 @@ import java.util.List;
 
 @Schema(description = "반려동물 수정 형식")
 public record PetUpdateRequest(
-        @Schema(description = "동물 종 아이디", example = "1")
+        @Schema(description = "동물 종 아이디", example = "1", nullable = true)
         @BreedIdConstraint
         Long breedId,
 
-        @Schema(description = "반려동물 이름", example = "포리")
+        @Schema(description = "반려동물 이름", example = "포리", nullable = true)
         String name,
 
-        @Schema(description = "성별", example = "F or M")
+        @Schema(description = "성별", example = "F or M", nullable = true)
         Gender gender,
 
-        @Schema(description = "나이", example = "12")
+        @Schema(description = "나이", example = "12", nullable = true)
         @Min(1)
         Integer age, // [TODO] 프론트 배포 후 제거 필요
 
-        @Schema(description = "생년월일", example = "2020-01-01")
+        @Schema(description = "생년월일", example = "2020-01-01", nullable = true)
         LocalDate birthDate,
 
-        @Schema(description = "질병 아이디 리스트", example = "[1,2,3]")
+        @Schema(description = "질병 아이디 리스트", example = "[1,2,3]", nullable = true)
         @DiseaseIdsConstraint
         List<Long> diseaseIds,
 
-        @Schema(description = "증상 아이디 리스트", example = "[1,2,3]")
+        @Schema(description = "증상 아이디 리스트", example = "[1,2,3]", nullable = true)
         @SymptomIdsConstraint
         List<Long> symptomIds
 ) {
