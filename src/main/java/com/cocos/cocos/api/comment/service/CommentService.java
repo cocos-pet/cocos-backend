@@ -45,8 +45,7 @@ public class CommentService {
     private final PostRepository postRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final S3PresignClient s3PresignClient;
-
-    private static final Clock CLOCK = Clock.systemDefaultZone();
+    private final Clock clock;
 
     @Transactional
     public void addPostComment(final Long postId, final String content, final Long memberId) {
@@ -252,7 +251,7 @@ public class CommentService {
                 commentMember.getNickname(),
                 s3PresignClient.get(S3BucketType.MEMBER_DATA, commentMember.getImage()),
                 commentBreed.getName(),
-                commentPet.calculateAge(CLOCK),
+                commentPet.calculateAge(clock),
                 comment.getContent(),
                 comment.getCreatedAt(),
                 isCommentWriter(comment.getMemberId(), memberId),
@@ -278,7 +277,7 @@ public class CommentService {
                 subCommentMember.getNickname(),
                 s3PresignClient.get(S3BucketType.MEMBER_DATA, subCommentMember.getImage()),
                 subCommentBreed.getName(),
-                subCommentPet.calculateAge(CLOCK),
+                subCommentPet.calculateAge(clock),
                 subComment.getContent(),
                 subComment.getCreatedAt(),
                 isCommentWriter(subComment.getMemberId(), memberId),

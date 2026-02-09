@@ -84,8 +84,7 @@ public class PostService {
     private final PetSymptomRepository petSymptomRepository;
     private final S3PresignClient s3PresignClient;
     private final ApplicationEventPublisher eventPublisher;
-
-    private static final Clock CLOCK = Clock.systemDefaultZone();
+    private final Clock clock;
 
     @Transactional(readOnly = true)
     public PostDetailResponse getPostDetail(final Long postId, final Long memberId) {
@@ -142,7 +141,7 @@ public class PostService {
                 .nickname(member.getNickname())
                 .profileImage(s3PresignClient.get(S3BucketType.MEMBER_DATA, member.getImage()))
                 .breed(breed.getName())
-                .petAge(pet.calculateAge(CLOCK))
+                .petAge(pet.calculateAge(clock))
                 .likeCounts(likeCounts)
                 .totalCommentCounts(commentCounts + subCommentCounts)
                 .title(post.getTitle())
@@ -440,7 +439,7 @@ public class PostService {
                             return PostResponse.builder()
                                     .id(post.getId())
                                     .breed(breed.getName())
-                                    .petAge(pet.calculateAge(CLOCK))
+                                    .petAge(pet.calculateAge(clock))
                                     .title(post.getTitle())
                                     .content(post.getContent())
                                     .likeCount(post.getLikeCount())
@@ -500,7 +499,7 @@ public class PostService {
                                             () -> new CocosException(FailMessage.NOT_FOUND_CATEGORY)
                                     ).getName())
                                     .breed(breed.getName())
-                                    .age(pet.calculateAge(CLOCK))
+                                    .age(pet.calculateAge(clock))
                                     .build();
                         }).toList()
         );

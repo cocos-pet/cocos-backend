@@ -88,8 +88,7 @@ public class ReviewService {
     private static final String REVIEW_IMAGE_S3_PREFIX = "reviewImage";
     private static final boolean IS_GOOD_REVIEW = true;
     private static final int DEFAULT_PAGE_SIZE = 4;
-
-    private static final Clock CLOCK = Clock.systemDefaultZone();
+    private final Clock clock;
 
     @Transactional
     public ReviewAddResponse addReview(final Long memberId, final Long hospitalId, final Long breedId, final Gender gender,
@@ -316,7 +315,7 @@ public class ReviewService {
                             member.getId(),
                             member.getNickname(),
                             memberBreed.getName(),
-                            pet.calculateAge(CLOCK),
+                            pet.calculateAge(clock),
                             hospital.getId(),
                             hospital.getName(),
                             visitedAt,
