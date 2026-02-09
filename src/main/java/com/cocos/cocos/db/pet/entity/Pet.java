@@ -37,9 +37,9 @@ public class Pet extends BaseTime {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Column(name = "age", nullable = false)
+    @Column(name = "age")
     @Min(1)
-    private int age;
+    private Integer age;
 
     @Column(name = "member_id", nullable = false, unique = true)
     private Long memberId;
@@ -54,7 +54,7 @@ public class Pet extends BaseTime {
     private LocalDate birthDate;
 
     @Builder
-    public Pet(final String name, final Gender gender, final int age, final LocalDate birthDate, final Long memberId, final Long breedId,
+    public Pet(final String name, final Gender gender, final Integer age, final LocalDate birthDate, final Long memberId, final Long breedId,
                final String image) {
         this.name = name;
         this.gender = gender;
