@@ -3,6 +3,7 @@ package com.cocos.cocos.api.pet.dto.request;
 import com.cocos.cocos.enums.pet.Gender;
 import com.cocos.cocos.validation.breed.BreedIdConstraint;
 import com.cocos.cocos.validation.disease.DiseaseIdsConstraint;
+import com.cocos.cocos.validation.pet.AgeOrBirthDateRequiredConstraint;
 import com.cocos.cocos.validation.symptom.SymptomIdsConstraint;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Schema(description = "반려동물 생성 형식")
+@AgeOrBirthDateRequiredConstraint
 public record PetCreateRequest(
         @Schema(description = "동물 종 아이디", example = "1")
         @BreedIdConstraint
