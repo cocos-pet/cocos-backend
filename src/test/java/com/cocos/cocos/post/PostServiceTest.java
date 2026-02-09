@@ -46,10 +46,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -101,12 +103,10 @@ class PostServiceTest {
     private PetSymptomRepository petSymptomRepository;
     @Mock
     private S3PresignClient s3PresignClient;
-
-    private static final Clock CLOCK = Clock.fixed(
-            LocalDate.of(2026, 7, 12)
-                    .atStartOfDay(ZoneId.systemDefault())
-                    .toInstant(),
-            ZoneId.systemDefault()
+    @Spy
+    private Clock clock = Clock.fixed(
+            Instant.parse("2026-02-10T00:00:00Z"),
+            ZoneId.of("Asia/Seoul")
     );
 
     @Test
@@ -208,7 +208,7 @@ class PostServiceTest {
                 .nickname(member.getNickname())
                 .profileImage(member.getImage())
                 .breed(Objects.requireNonNull(breed).getName())
-                .petAge(pet.calculateAge(CLOCK))
+                .petAge(6)
                 .likeCounts(likeCounts)
                 .totalCommentCounts(commentCounts + subCommentCounts)
                 .title(Objects.requireNonNull(post).getTitle())
@@ -221,11 +221,12 @@ class PostServiceTest {
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .build();
+
         //when
         final PostDetailResponse actual = postService.getPostDetail(postId, memberId);
 
         //then
-        Assertions.assertThat(expected).usingRecursiveComparison().isEqualTo(actual);
+        Assertions.assertThat(actual).isEqualTo(expected);
     }
 
     @Test
