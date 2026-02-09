@@ -27,7 +27,6 @@ import com.cocos.cocos.db.post.entity.Post;
 import com.cocos.cocos.db.post.entity.PostCategory;
 import com.cocos.cocos.db.post.entity.PostImage;
 import com.cocos.cocos.db.post.entity.PostTag;
-
 import com.cocos.cocos.db.post.repository.PostCategoryRepository;
 import com.cocos.cocos.db.post.repository.PostImageRepository;
 import com.cocos.cocos.db.post.repository.PostLikeRepository;
@@ -38,6 +37,7 @@ import com.cocos.cocos.enums.pet.Gender;
 import com.cocos.cocos.enums.tag.TagType;
 import com.cocos.cocos.external.s3.S3BucketType;
 import com.cocos.cocos.external.s3.S3PresignClient;
+import com.cocos.cocos.util.PetAgeCalculator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -50,6 +50,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.Clock;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -100,6 +103,13 @@ class PostServiceTest {
     @Mock
     private S3PresignClient s3PresignClient;
 
+    private static final Clock CLOCK = Clock.fixed(
+            LocalDate.of(2026, 7, 12)
+                    .atStartOfDay(ZoneId.systemDefault())
+                    .toInstant(),
+            ZoneId.systemDefault()
+    );
+
     @Test
     @DisplayName("게시글 세부사항을 조회할 수 있다.")
     void getPostDetail() {
@@ -123,7 +133,7 @@ class PostServiceTest {
         final Pet pet = Pet.builder()
                 .name("반려동물 이름")
                 .gender(Gender.M)
-                .age(1)
+                .birthDate(LocalDate.parse("2020-01-01"))
                 .breedId(breedId)
                 .memberId(memberId)
                 .build();
@@ -199,7 +209,7 @@ class PostServiceTest {
                 .nickname(member.getNickname())
                 .profileImage(member.getImage())
                 .breed(Objects.requireNonNull(breed).getName())
-                .petAge(pet.getAge())
+                .petAge(PetAgeCalculator.calculate(pet.getBirthDate(), CLOCK))
                 .likeCounts(likeCounts)
                 .totalCommentCounts(commentCounts + subCommentCounts)
                 .title(Objects.requireNonNull(post).getTitle())
