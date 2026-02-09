@@ -1,9 +1,9 @@
 package com.cocos.cocos.api.pet.controller;
 
-import com.cocos.cocos.api.pet.dto.response.PetOwnerCheckResponse;
-import com.cocos.cocos.api.pet.dto.response.PetResponse;
 import com.cocos.cocos.api.pet.dto.request.PetCreateRequest;
 import com.cocos.cocos.api.pet.dto.request.PetUpdateRequest;
+import com.cocos.cocos.api.pet.dto.response.PetOwnerCheckResponse;
+import com.cocos.cocos.api.pet.dto.response.PetResponse;
 import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.validation.member.MemberNicknameConstraint;
 import com.cocos.cocos.validation.pet.PetIdConstraint;
@@ -35,7 +35,7 @@ public interface PetControllerSwagger {
             responseCode = "200",
             description = "요청이 성공했습니다. ")
     public ResponseEntity<BaseResponse<Void>> updatePet(
-            @Parameter(name = "petId", description = "애완동물 아이디", in = ParameterIn.PATH, required = true, schema = @Schema(type = "Long")) @PetIdConstraint final Long petId,
+            @Parameter(name = "petId", description = "반려동물 아이디", in = ParameterIn.PATH, required = true, schema = @Schema(type = "Long")) @PetIdConstraint final Long petId,
             @RequestBody @Valid final PetUpdateRequest petUpdateRequest
     );
 
