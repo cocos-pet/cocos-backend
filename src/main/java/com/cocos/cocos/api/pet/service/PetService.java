@@ -20,6 +20,8 @@ import com.cocos.cocos.db.pet.entity.PetSymptom;
 import com.cocos.cocos.db.pet.repository.PetDiseaseRepository;
 import com.cocos.cocos.db.pet.repository.PetRepository;
 import com.cocos.cocos.db.pet.repository.PetSymptomRepository;
+import com.cocos.cocos.db.pet.support.PetAgeResolver;
+import com.cocos.cocos.db.pet.support.PetAgeResolver.AgeAndBirthDate;
 import com.cocos.cocos.db.symptom.entity.Symptom;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.message.FailMessage;
@@ -29,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.util.List;
 
 @Service
@@ -43,6 +46,7 @@ public class PetService {
     private final SymptomRepository symptomRepository;
     private final MemberRepository memberRepository;
     private final S3PresignClient s3PresignClient;
+    private final Clock clock;
 
     //ToDo: yml에 추가하는 방향 고민 중
     private static final String PET_BASE_IMAGE_URL = "member/basePetImage.png";
@@ -54,13 +58,20 @@ public class PetService {
             throw new CocosException(FailMessage.CONFLICT_PET);
         }
 
+        AgeAndBirthDate reconciled =
+                PetAgeResolver.resolve(
+                        petCreateRequest.age(),
+                        petCreateRequest.birthDate(),
+                        clock
+                );
+
         final Pet pet = petRepository.save(
                 Pet.builder()
                         .name(petCreateRequest.name())
                         .gender(petCreateRequest.gender())
                         .image(PET_BASE_IMAGE_URL)
-                        .age(petCreateRequest.age())
-                        .birthDate(petCreateRequest.birthDate())
+                        .age(reconciled.age())
+                        .birthDate(reconciled.birthDate())
                         .memberId(memberId)
                         .breedId(petCreateRequest.breedId())
                         .build()
@@ -115,7 +126,14 @@ public class PetService {
             throw new CocosException(FailMessage.NOT_FOUND_BREED);
         }
 
-        pet.updateFields(petUpdateRequest.name(), petUpdateRequest.gender(), petUpdateRequest.age(), petUpdateRequest.birthDate(), petUpdateRequest.breedId());
+        AgeAndBirthDate reconciled =
+                PetAgeResolver.resolve(
+                        petUpdateRequest.age(),
+                        petUpdateRequest.birthDate(),
+                        clock
+                );
+
+        pet.updateFields(petUpdateRequest.name(), petUpdateRequest.gender(), reconciled.age(), reconciled.birthDate(), petUpdateRequest.breedId());
 
         if (petUpdateRequest.diseaseIds() != null) {
             petDiseaseRepository.deleteAllByPetId(petId);
