@@ -1,6 +1,15 @@
 package com.cocos.cocos.api.post.service;
 
-import com.cocos.cocos.api.post.dto.response.*;
+import com.cocos.cocos.api.post.dto.response.MemberPostDetailResponse;
+import com.cocos.cocos.api.post.dto.response.MemberPostsResponse;
+import com.cocos.cocos.api.post.dto.response.PopularPostResponse;
+import com.cocos.cocos.api.post.dto.response.PopularPostsResponse;
+import com.cocos.cocos.api.post.dto.response.PostCategoriesResponse;
+import com.cocos.cocos.api.post.dto.response.PostCategoryResponse;
+import com.cocos.cocos.api.post.dto.response.PostDetailResponse;
+import com.cocos.cocos.api.post.dto.response.PostImagesResponse;
+import com.cocos.cocos.api.post.dto.response.PostListResponse;
+import com.cocos.cocos.api.post.dto.response.PostResponse;
 import com.cocos.cocos.common.exception.CocosException;
 import com.cocos.cocos.db.animal.entity.Animal;
 import com.cocos.cocos.db.animal.repository.AnimalRepository;
@@ -23,7 +32,11 @@ import com.cocos.cocos.db.post.entity.Post;
 import com.cocos.cocos.db.post.entity.PostCategory;
 import com.cocos.cocos.db.post.entity.PostImage;
 import com.cocos.cocos.db.post.entity.PostTag;
-import com.cocos.cocos.db.post.repository.*;
+import com.cocos.cocos.db.post.repository.PostCategoryRepository;
+import com.cocos.cocos.db.post.repository.PostImageRepository;
+import com.cocos.cocos.db.post.repository.PostLikeRepository;
+import com.cocos.cocos.db.post.repository.PostRepository;
+import com.cocos.cocos.db.post.repository.PostTagRepository;
 import com.cocos.cocos.db.symptom.entity.Symptom;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.message.FailMessage;
@@ -44,6 +57,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -70,6 +84,8 @@ public class PostService {
     private final PetSymptomRepository petSymptomRepository;
     private final S3PresignClient s3PresignClient;
     private final ApplicationEventPublisher eventPublisher;
+
+    private static final Clock CLOCK = Clock.systemDefaultZone();
 
     @Transactional(readOnly = true)
     public PostDetailResponse getPostDetail(final Long postId, final Long memberId) {
@@ -126,7 +142,7 @@ public class PostService {
                 .nickname(member.getNickname())
                 .profileImage(s3PresignClient.get(S3BucketType.MEMBER_DATA, member.getImage()))
                 .breed(breed.getName())
-                .petAge(pet.getAge())
+                .petAge(pet.calculateAge(CLOCK))
                 .likeCounts(likeCounts)
                 .totalCommentCounts(commentCounts + subCommentCounts)
                 .title(post.getTitle())
@@ -424,7 +440,7 @@ public class PostService {
                             return PostResponse.builder()
                                     .id(post.getId())
                                     .breed(breed.getName())
-                                    .petAge(pet.getAge())
+                                    .petAge(pet.calculateAge(CLOCK))
                                     .title(post.getTitle())
                                     .content(post.getContent())
                                     .likeCount(post.getLikeCount())
@@ -484,7 +500,7 @@ public class PostService {
                                             () -> new CocosException(FailMessage.NOT_FOUND_CATEGORY)
                                     ).getName())
                                     .breed(breed.getName())
-                                    .age(pet.getAge())
+                                    .age(pet.calculateAge(CLOCK))
                                     .build();
                         }).toList()
         );
