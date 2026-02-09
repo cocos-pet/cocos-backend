@@ -32,7 +32,7 @@ public record PetResponse(
         @Schema(description = "증상 리스트")
         List<PetSymptomResponse> symptoms
 ) {
-    public static PetResponse of(final Long petId, final String petImage, final String petName, final int petAge, final LocalDate petBirtDate, final Gender petGender, final Long breedId, final String breed, final Long animalId, final String animal, final List<PetDiseaseResponse> diseases, final List<PetSymptomResponse> symptoms) {
+    public static PetResponse of(final Long petId, final String petImage, final String petName, final Integer petAge, final LocalDate petBirtDate, final Gender petGender, final Long breedId, final String breed, final Long animalId, final String animal, final List<PetDiseaseResponse> diseases, final List<PetSymptomResponse> symptoms) {
         return new PetResponse(petId, petImage, petName, petAge, petBirtDate, petGender, breedId, breed, animalId, animal, diseases, symptoms);
     }
 }
