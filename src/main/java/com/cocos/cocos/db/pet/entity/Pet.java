@@ -1,8 +1,8 @@
 package com.cocos.cocos.db.pet.entity;
 
 import com.cocos.cocos.db.BaseTime;
+import com.cocos.cocos.db.pet.support.PetAgeCalculator;
 import com.cocos.cocos.enums.pet.Gender;
-import com.cocos.cocos.util.PetAgeCalculator;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
