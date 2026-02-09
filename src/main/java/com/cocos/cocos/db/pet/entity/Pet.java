@@ -2,11 +2,22 @@ package com.cocos.cocos.db.pet.entity;
 
 import com.cocos.cocos.db.BaseTime;
 import com.cocos.cocos.enums.pet.Gender;
-import jakarta.persistence.*;
+import com.cocos.cocos.util.PetAgeCalculator;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.Clock;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -39,18 +50,22 @@ public class Pet extends BaseTime {
     @Column(name = "image", nullable = false)
     private String image;
 
+    @Column(name = "birth_date", nullable = false)
+    private LocalDate birthDate;
+
     @Builder
-    public Pet(final String name, final Gender gender, final int age, final Long memberId, final Long breedId,
+    public Pet(final String name, final Gender gender, final int age, final LocalDate birthDate, final Long memberId, final Long breedId,
                final String image) {
         this.name = name;
         this.gender = gender;
         this.age = age;
+        this.birthDate = birthDate;
         this.memberId = memberId;
         this.breedId = breedId;
         this.image = image;
     }
 
-    public void updateFields(final String name, final Gender gender, final Integer age, final Long breedId) {
+    public void updateFields(final String name, final Gender gender, final Integer age, final LocalDate birthDate, final Long breedId) {
         if (name != null) {
             this.name = name;
         }
@@ -60,8 +75,15 @@ public class Pet extends BaseTime {
         if (age != null) {
             this.age = age;
         }
+        if (birthDate != null) {
+            this.birthDate = birthDate;
+        }
         if (breedId != null) {
             this.breedId = breedId;
         }
+    }
+
+    public int calculateAge(final Clock clock) {
+        return PetAgeCalculator.calculate(this.birthDate, clock);
     }
 }
