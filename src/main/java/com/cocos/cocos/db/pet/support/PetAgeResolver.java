@@ -17,14 +17,14 @@ public final class PetAgeResolver {
             throw new IllegalArgumentException("age 또는 birthDate 중 하나는 필수입니다.");
         }
 
-        if (birthDate != null) {
-            age = PetAgeCalculator.calculate(birthDate, clock);
-        } else {
+        if (age != null && birthDate == null) {
             birthDate = LocalDate.of(
                     LocalDate.now(clock).getYear() - age,
                     1,
                     1
             );
+        } else if (age == null) {
+            age = PetAgeCalculator.calculate(birthDate, clock);
         }
 
         return new AgeAndBirthDate(age, birthDate);
