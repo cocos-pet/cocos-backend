@@ -50,10 +50,15 @@ import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -72,48 +77,39 @@ class ReviewServiceTest {
 
     @Mock
     ReviewRepository reviewRepository;
-
     @Mock
     ReviewSummaryRepository reviewSummaryRepository;
-
     @Mock
     ReviewSymptomRepository reviewSymptomRepository;
-
     @Mock
     ReviewImageRepository reviewImageRepository;
-
     @Mock
     ReviewSummaryOptionRepository reviewSummaryOptionRepository;
-
     @Mock
     HospitalRepository hospitalRepository;
-
     @Mock
     BreedRepository breedRepository;
-
     @Mock
     AnimalRepository animalRepository;
-
     @Mock
     DiseaseRepository diseaseRepository;
-
     @Mock
     MemberRepository memberRepository;
-
     @Mock
     PetRepository petRepository;
-
     @Mock
     DistrictRepository districtRepository;
-
     @Mock
     HospitalVisitPurposeRepository hospitalVisitPurposeRepository;
-
     @Mock
     SymptomRepository symptomRepository;
-
     @Mock
     S3PresignClient s3PresignClient;
+    @Spy
+    private Clock clock = Clock.fixed(
+            Instant.parse("2026-02-10T00:00:00Z"),
+            ZoneId.of("Asia/Seoul")
+    );
 
     @Test
     @DisplayName("리뷰를 작성할 수 있다.")
@@ -355,7 +351,6 @@ class ReviewServiceTest {
     }
 
     @Test
-
     @DisplayName("병원 ID 필터링 조건으로 병원 리뷰 목록을 조회할 수 있다.")
     void getHospitalReviewListWithHospitalIdFilter() {
 
@@ -375,7 +370,7 @@ class ReviewServiceTest {
         ReflectionTestUtils.setField(hospital, "id", hospitalId);
         final Member member = Member.builder().nickname("테스트유저").build();
         ReflectionTestUtils.setField(member, "id", memberId);
-        final Pet pet = Pet.builder().memberId(memberId).breedId(breedId).age(1).build();
+        final Pet pet = Pet.builder().memberId(memberId).breedId(breedId).age(1).birthDate(LocalDate.parse("2020-01-01")).build();
         ReflectionTestUtils.setField(pet, "id", 1L);
         final Breed breed = Breed.builder().name("테스트견종").animalId(animalId).build();
         ReflectionTestUtils.setField(breed, "id", breedId);
@@ -428,7 +423,7 @@ class ReviewServiceTest {
         ReflectionTestUtils.setField(hospital, "id", reviewHospitalId);
         final Member member = Member.builder().nickname("테스트유저").build();
         ReflectionTestUtils.setField(member, "id", memberId);
-        final Pet pet = Pet.builder().memberId(memberId).breedId(breedId).age(1).build();
+        final Pet pet = Pet.builder().memberId(memberId).breedId(breedId).age(1).birthDate(LocalDate.parse("2020-01-01")).build();
         ReflectionTestUtils.setField(pet, "id", 1L);
         final Breed breed = Breed.builder().name("테스트견종").animalId(animalId).build();
         ReflectionTestUtils.setField(breed, "id", breedId);
@@ -470,7 +465,7 @@ class ReviewServiceTest {
         final LocalDateTime visitedAt = LocalDateTime.parse("2025-07-12T15:20:19");
 
         final Member member = Member.builder().nickname("테스트유저").build();
-        ReflectionTestUtils.setField(member, "id", 1L); // Assuming memberId 1 is always present for simplicity
+        ReflectionTestUtils.setField(member, "id", 1L);
 
         final List<Review> allReviews = new ArrayList<>();
         for (long i = 10; i >= 1; i--) {
@@ -489,7 +484,7 @@ class ReviewServiceTest {
         final Hospital hospital = Hospital.builder().name("테스트 병원").reviewCount(allReviews.size()).build();
         ReflectionTestUtils.setField(hospital, "id", hospitalId);
 
-        final Pet pet = Pet.builder().memberId(member.getId()).breedId(1L).age(1).build();
+        final Pet pet = Pet.builder().memberId(member.getId()).breedId(1L).age(1).birthDate(LocalDate.parse("2020-01-01")).build();
         ReflectionTestUtils.setField(pet, "id", 1L);
         final Breed breed = Breed.builder().name("테스트견종").animalId(1L).build();
         ReflectionTestUtils.setField(breed, "id", 1L);
@@ -577,7 +572,7 @@ class ReviewServiceTest {
 
         final Hospital hospital = Hospital.builder().name("테스트 병원").build();
         ReflectionTestUtils.setField(hospital, "id", hospitalId);
-        final Pet pet = Pet.builder().memberId(member.getId()).breedId(1L).age(1).build();
+        final Pet pet = Pet.builder().memberId(member.getId()).breedId(1L).age(1).birthDate(LocalDate.parse("2020-01-01")).build();
         ReflectionTestUtils.setField(pet, "id", 1L);
         final Breed breed = Breed.builder().name("테스트견종").animalId(1L).build();
         ReflectionTestUtils.setField(breed, "id", 1L);

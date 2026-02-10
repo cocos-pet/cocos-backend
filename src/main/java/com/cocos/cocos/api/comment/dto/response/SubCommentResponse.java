@@ -11,9 +11,9 @@ public record SubCommentResponse(
         String nickname,
         @Schema(description = "대댓글 사용자 프로필 사진", example = "https://")
         String profileImage,
-        @Schema(description = "대댓글 사용자 애완동물 종", example = "포메라니안")
+        @Schema(description = "대댓글 사용자 반려동물 종", example = "포메라니안")
         String breed,
-        @Schema(description = "애완동물 나이", example = "12")
+        @Schema(description = "반려동물 나이", example = "12")
         int petAge,
         @Schema(description = "대댓글 내용", example = "~~좋아요")
         String content,

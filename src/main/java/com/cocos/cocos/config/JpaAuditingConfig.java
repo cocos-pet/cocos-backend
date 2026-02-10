@@ -10,8 +10,8 @@ import java.time.Clock;
 @EnableJpaAuditing
 public class JpaAuditingConfig {
 
-    @Bean
-    public Clock clock() {
+    @Bean(name = "auditingClock")
+    public Clock auditingClock() {
         return Clock.systemUTC();
     }
 }

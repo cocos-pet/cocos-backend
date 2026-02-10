@@ -1,11 +1,11 @@
 package com.cocos.cocos.api.pet.service;
 
+import com.cocos.cocos.api.pet.dto.request.PetCreateRequest;
+import com.cocos.cocos.api.pet.dto.request.PetUpdateRequest;
 import com.cocos.cocos.api.pet.dto.response.PetDiseaseResponse;
 import com.cocos.cocos.api.pet.dto.response.PetOwnerCheckResponse;
 import com.cocos.cocos.api.pet.dto.response.PetResponse;
 import com.cocos.cocos.api.pet.dto.response.PetSymptomResponse;
-import com.cocos.cocos.api.pet.dto.request.PetCreateRequest;
-import com.cocos.cocos.api.pet.dto.request.PetUpdateRequest;
 import com.cocos.cocos.common.exception.CocosException;
 import com.cocos.cocos.db.animal.entity.Animal;
 import com.cocos.cocos.db.animal.repository.AnimalRepository;
@@ -20,15 +20,18 @@ import com.cocos.cocos.db.pet.entity.PetSymptom;
 import com.cocos.cocos.db.pet.repository.PetDiseaseRepository;
 import com.cocos.cocos.db.pet.repository.PetRepository;
 import com.cocos.cocos.db.pet.repository.PetSymptomRepository;
+import com.cocos.cocos.db.pet.support.PetAgeResolver;
+import com.cocos.cocos.db.pet.support.PetAgeResolver.AgeAndBirthDate;
 import com.cocos.cocos.db.symptom.entity.Symptom;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.external.s3.S3BucketType;
 import com.cocos.cocos.external.s3.S3PresignClient;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.util.List;
 
 @Service
@@ -43,6 +46,7 @@ public class PetService {
     private final SymptomRepository symptomRepository;
     private final MemberRepository memberRepository;
     private final S3PresignClient s3PresignClient;
+    private final Clock clock;
 
     //ToDo: yml에 추가하는 방향 고민 중
     private static final String PET_BASE_IMAGE_URL = "member/basePetImage.png";
@@ -54,12 +58,20 @@ public class PetService {
             throw new CocosException(FailMessage.CONFLICT_PET);
         }
 
+        AgeAndBirthDate reconciled =
+                PetAgeResolver.resolve(
+                        petCreateRequest.age(),
+                        petCreateRequest.birthDate(),
+                        clock
+                );
+
         final Pet pet = petRepository.save(
                 Pet.builder()
                         .name(petCreateRequest.name())
                         .gender(petCreateRequest.gender())
                         .image(PET_BASE_IMAGE_URL)
-                        .age(petCreateRequest.age())
+                        .age(reconciled.age())
+                        .birthDate(reconciled.birthDate())
                         .memberId(memberId)
                         .breedId(petCreateRequest.breedId())
                         .build()
@@ -110,13 +122,18 @@ public class PetService {
         if (!pet.getMemberId().equals(memberId)) {
             throw new CocosException(FailMessage.FORBIDDEN_PET_UPDATE);
         }
-        if (petUpdateRequest.breedId() != null) {
-            //TODO: 리팩 필요 (if문 제거)
-            if (!breedRepository.existsById(petUpdateRequest.breedId())) {
-                throw new CocosException(FailMessage.NOT_FOUND_BREED);
-            }
+        if (petUpdateRequest.breedId() != null && !breedRepository.existsById(petUpdateRequest.breedId())) {
+            throw new CocosException(FailMessage.NOT_FOUND_BREED);
         }
-        pet.updateFields(petUpdateRequest.name(), petUpdateRequest.gender(), petUpdateRequest.age(), petUpdateRequest.breedId());
+
+        AgeAndBirthDate reconciled =
+                PetAgeResolver.resolve(
+                        petUpdateRequest.age(),
+                        petUpdateRequest.birthDate(),
+                        clock
+                );
+
+        pet.updateFields(petUpdateRequest.name(), petUpdateRequest.gender(), reconciled.age(), reconciled.birthDate(), petUpdateRequest.breedId());
 
         if (petUpdateRequest.diseaseIds() != null) {
             petDiseaseRepository.deleteAllByPetId(petId);
@@ -182,6 +199,7 @@ public class PetService {
                 s3PresignClient.get(S3BucketType.MEMBER_DATA, pet.getImage()),
                 pet.getName(),
                 pet.getAge(),
+                pet.getBirthDate(),
                 pet.getGender(),
                 breed.getId(),
                 breed.getName(),

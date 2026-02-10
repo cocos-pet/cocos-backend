@@ -27,7 +27,6 @@ import com.cocos.cocos.db.post.entity.Post;
 import com.cocos.cocos.db.post.entity.PostCategory;
 import com.cocos.cocos.db.post.entity.PostImage;
 import com.cocos.cocos.db.post.entity.PostTag;
-
 import com.cocos.cocos.db.post.repository.PostCategoryRepository;
 import com.cocos.cocos.db.post.repository.PostImageRepository;
 import com.cocos.cocos.db.post.repository.PostLikeRepository;
@@ -47,9 +46,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -99,6 +103,11 @@ class PostServiceTest {
     private PetSymptomRepository petSymptomRepository;
     @Mock
     private S3PresignClient s3PresignClient;
+    @Spy
+    private Clock clock = Clock.fixed(
+            Instant.parse("2026-02-10T00:00:00Z"),
+            ZoneId.of("Asia/Seoul")
+    );
 
     @Test
     @DisplayName("게시글 세부사항을 조회할 수 있다.")
@@ -123,7 +132,7 @@ class PostServiceTest {
         final Pet pet = Pet.builder()
                 .name("반려동물 이름")
                 .gender(Gender.M)
-                .age(1)
+                .birthDate(LocalDate.parse("2020-01-01"))
                 .breedId(breedId)
                 .memberId(memberId)
                 .build();
@@ -199,7 +208,7 @@ class PostServiceTest {
                 .nickname(member.getNickname())
                 .profileImage(member.getImage())
                 .breed(Objects.requireNonNull(breed).getName())
-                .petAge(pet.getAge())
+                .petAge(6)
                 .likeCounts(likeCounts)
                 .totalCommentCounts(commentCounts + subCommentCounts)
                 .title(Objects.requireNonNull(post).getTitle())
@@ -212,11 +221,12 @@ class PostServiceTest {
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .build();
+
         //when
         final PostDetailResponse actual = postService.getPostDetail(postId, memberId);
 
         //then
-        Assertions.assertThat(expected).usingRecursiveComparison().isEqualTo(actual);
+        Assertions.assertThat(actual).isEqualTo(expected);
     }
 
     @Test

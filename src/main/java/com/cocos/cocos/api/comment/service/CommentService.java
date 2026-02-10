@@ -1,6 +1,11 @@
 package com.cocos.cocos.api.comment.service;
 
-import com.cocos.cocos.api.comment.dto.response.*;
+import com.cocos.cocos.api.comment.dto.response.CommentAndSubCommentsResponse;
+import com.cocos.cocos.api.comment.dto.response.CommentsAndSubCommentsResponse;
+import com.cocos.cocos.api.comment.dto.response.MemberAllCommentsResponse;
+import com.cocos.cocos.api.comment.dto.response.MemberCommentResponse;
+import com.cocos.cocos.api.comment.dto.response.MemberSubCommentResponse;
+import com.cocos.cocos.api.comment.dto.response.SubCommentResponse;
 import com.cocos.cocos.common.exception.CocosException;
 import com.cocos.cocos.db.breed.entity.Breed;
 import com.cocos.cocos.db.breed.repository.BreedRepository;
@@ -24,6 +29,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -39,6 +45,7 @@ public class CommentService {
     private final PostRepository postRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final S3PresignClient s3PresignClient;
+    private final Clock clock;
 
     @Transactional
     public void addPostComment(final Long postId, final String content, final Long memberId) {
@@ -244,7 +251,7 @@ public class CommentService {
                 commentMember.getNickname(),
                 s3PresignClient.get(S3BucketType.MEMBER_DATA, commentMember.getImage()),
                 commentBreed.getName(),
-                commentPet.getAge(),
+                commentPet.calculateAge(clock),
                 comment.getContent(),
                 comment.getCreatedAt(),
                 isCommentWriter(comment.getMemberId(), memberId),
@@ -270,7 +277,7 @@ public class CommentService {
                 subCommentMember.getNickname(),
                 s3PresignClient.get(S3BucketType.MEMBER_DATA, subCommentMember.getImage()),
                 subCommentBreed.getName(),
-                subCommentPet.getAge(),
+                subCommentPet.calculateAge(clock),
                 subComment.getContent(),
                 subComment.getCreatedAt(),
                 isCommentWriter(subComment.getMemberId(), memberId),
