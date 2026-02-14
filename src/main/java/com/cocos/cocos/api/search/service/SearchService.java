@@ -6,6 +6,7 @@ import com.cocos.cocos.db.search.entity.Search;
 import com.cocos.cocos.db.search.repository.SearchRepository;
 import com.cocos.cocos.enums.search.SearchType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,16 +20,26 @@ public class SearchService {
 
     @Transactional
     public void addSearch(final Long memberId, final String keyword, final SearchType searchType) {
-        final Search search = searchRepository.findWithLockByMemberIdAndKeywordAndSearchType(memberId, keyword, searchType);
+        final Search search = searchRepository.findByMemberIdAndKeywordAndSearchType(memberId, keyword, searchType);
 
         if (search != null) {
             search.updateTime();
-        } else {
+            return;
+        }
+
+        try {
             searchRepository.save(Search.builder()
                     .memberId(memberId)
                     .keyword(keyword)
                     .searchType(searchType)
                     .build());
+        } catch (DataIntegrityViolationException exception) {
+            final Search existingSearch = searchRepository.findByMemberIdAndKeywordAndSearchType(memberId, keyword, searchType);
+            if (existingSearch != null) {
+                existingSearch.updateTime();
+                return;
+            }
+            throw exception;
         }
     }
 
