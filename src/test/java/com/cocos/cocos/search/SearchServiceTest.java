@@ -12,6 +12,7 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -74,7 +75,7 @@ class SearchServiceTest {
         final SearchType searchType = SearchType.HOSPITAL;
 
         final Search existingSearch = Mockito.mock(Search.class);
-        BDDMockito.given(searchRepository.findWithLockByMemberIdAndKeywordAndSearchType(memberId, keyword, searchType))
+        BDDMockito.given(searchRepository.findByMemberIdAndKeywordAndSearchType(memberId, keyword, searchType))
                 .willReturn(existingSearch);
 
         // when
@@ -93,13 +94,35 @@ class SearchServiceTest {
         final String keyword = "피부과";
         final SearchType searchType = SearchType.HOSPITAL;
 
-        BDDMockito.given(searchRepository.findWithLockByMemberIdAndKeywordAndSearchType(memberId, keyword, searchType))
+        BDDMockito.given(searchRepository.findByMemberIdAndKeywordAndSearchType(memberId, keyword, searchType))
                 .willReturn(null);
 
         // when
         searchService.addSearch(memberId, keyword, searchType);
 
         // then
+        Mockito.verify(searchRepository, Mockito.times(1)).save(Mockito.any(Search.class));
+    }
+
+    @Test
+    @DisplayName("중복키 충돌이 발생하면 기존 검색어를 조회해 업데이트한다")
+    void addSearchOnDuplicateKey() {
+        // given
+        final Long memberId = 1L;
+        final String keyword = "피부과";
+        final SearchType searchType = SearchType.HOSPITAL;
+        final Search existingSearch = Mockito.mock(Search.class);
+
+        BDDMockito.given(searchRepository.findByMemberIdAndKeywordAndSearchType(memberId, keyword, searchType))
+                .willReturn(null, existingSearch);
+        BDDMockito.willThrow(new DataIntegrityViolationException("duplicate key"))
+                .given(searchRepository).save(Mockito.any(Search.class));
+
+        // when
+        searchService.addSearch(memberId, keyword, searchType);
+
+        // then
+        Mockito.verify(existingSearch, Mockito.times(1)).updateTime();
         Mockito.verify(searchRepository, Mockito.times(1)).save(Mockito.any(Search.class));
     }
 }
