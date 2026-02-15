@@ -76,6 +76,7 @@ SLOW_QUERY_THRESHOLD_SECONDS=0.05 \
 - `ACTUATOR_PASSWORD`는 필수다. 기본값이 없으므로 실행 시 반드시 지정해야 한다.
 
 결과는 `perf/results/observability/<run-id>/` 아래에 생성된다.
+- 위 경로는 로컬 실행 산출물이며 커밋 대상이 아니다.
 - `k6-summary.json`
 - `app-metrics/*.json`
 - `db/slow_log_window.tsv`

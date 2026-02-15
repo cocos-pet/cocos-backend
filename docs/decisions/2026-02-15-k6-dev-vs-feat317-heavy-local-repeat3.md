@@ -6,17 +6,6 @@
 - Profile: member pool 1,000 / keyword pool 10,000 / max 100 VU
 - Method: `dev`, `feat/#317` 각각 3회 반복 (동일 조건)
 
-## Run Files
-### feat/#317
-- `perf/results/repeat-heavy/summary-feat-heavy-run1.json`
-- `perf/results/repeat-heavy/summary-feat-heavy-run2.json`
-- `perf/results/repeat-heavy/summary-feat-heavy-run3.json`
-
-### dev
-- `perf/results/repeat-heavy/summary-dev-heavy-run1.json`
-- `perf/results/repeat-heavy/summary-dev-heavy-run2.json`
-- `perf/results/repeat-heavy/summary-dev-heavy-run3.json`
-
 ## Per-Run Snapshot
 | Branch | Run | TPS | p95 (ms) | p99 (ms) | error rate |
 |---|---:|---:|---:|---:|---:|

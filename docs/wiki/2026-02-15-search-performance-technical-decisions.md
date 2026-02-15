@@ -6,7 +6,7 @@
 - 목표: 검색 write 경로의 안정성(p95/p99/error)과 처리량(TPS) 균형 개선
 - 조건 통일:
   - 동일 부하 시나리오
-  - 동일 benchmark migration 경로(`/tmp/cocos-mig-benchmark`)
+  - 동일 benchmark migration 경로(벤치마크 전용 임시 경로)
   - 실행 전 `docker compose ... down -v` 초기화
 
 ## Experiments
@@ -19,7 +19,7 @@
   - error rate: dev 0.0165% / feat 0.0098% (feat 개선)
 
 2. 원인 분석 실험 (observability 1회)
-- run: `perf/results/observability/20260215-021141`
+- run: observability 1회 측정 번들(로컬 산출물, 커밋 제외)
 - 보고서: `docs/decisions/2026-02-15-k6-observability-root-cause-20260215-021141.md`
 - 핵심 관측:
   - `hikaricp.connections.pending` max 87
