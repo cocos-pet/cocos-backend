@@ -13,7 +13,6 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
@@ -97,7 +96,7 @@ class SearchServiceTest {
         final String keyword = "피부과";
         final SearchType searchType = SearchType.HOSPITAL;
 
-        BDDMockito.willThrow(new DuplicateKeyException("duplicate key"))
+        BDDMockito.willThrow(new DataIntegrityViolationException("duplicate key"))
                 .given(searchWriteTxExecutor).saveOrUpdateExisting(memberId, keyword, searchType);
         BDDMockito.given(searchWriteTxExecutor.recoverDuplicate(memberId, keyword, searchType))
                 .willReturn(true);
@@ -119,7 +118,8 @@ class SearchServiceTest {
         final Long memberId = 1L;
         final String keyword = "피부과";
         final SearchType searchType = SearchType.HOSPITAL;
-        final DuplicateKeyException duplicateException = new DuplicateKeyException("duplicate key");
+        final DataIntegrityViolationException duplicateException =
+                new DataIntegrityViolationException("duplicate key");
 
         BDDMockito.willThrow(duplicateException)
                 .given(searchWriteTxExecutor).saveOrUpdateExisting(memberId, keyword, searchType);
@@ -132,7 +132,7 @@ class SearchServiceTest {
     }
 
     @Test
-    @DisplayName("중복키가 아닌 무결성 예외는 복구 시도 없이 그대로 던진다")
+    @DisplayName("중복키가 아닌 무결성 예외는 복구를 시도하고 실패 시 그대로 던진다")
     void throwExceptionWhenIntegrityViolationIsNotDuplicate() {
         // given
         final Long memberId = 1L;
@@ -147,7 +147,7 @@ class SearchServiceTest {
         // when & then
         Assertions.assertThatThrownBy(() -> searchService.addSearch(memberId, keyword, searchType))
                 .isSameAs(integrityException);
-        Mockito.verify(searchWriteTxExecutor, Mockito.never())
-                .recoverDuplicate(Mockito.anyLong(), Mockito.anyString(), Mockito.any());
+        Mockito.verify(searchWriteTxExecutor, Mockito.times(1))
+                .recoverDuplicate(memberId, keyword, searchType);
     }
 }

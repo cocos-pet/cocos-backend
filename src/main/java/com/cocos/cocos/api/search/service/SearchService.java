@@ -6,7 +6,7 @@ import com.cocos.cocos.db.search.entity.Search;
 import com.cocos.cocos.db.search.repository.SearchRepository;
 import com.cocos.cocos.enums.search.SearchType;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +22,7 @@ public class SearchService {
     public void addSearch(final Long memberId, final String keyword, final SearchType searchType) {
         try {
             searchWriteTxExecutor.saveOrUpdateExisting(memberId, keyword, searchType);
-        } catch (DuplicateKeyException exception) {
+        } catch (DataIntegrityViolationException exception) {
             final boolean recovered = searchWriteTxExecutor.recoverDuplicate(memberId, keyword, searchType);
             if (!recovered) {
                 throw exception;
