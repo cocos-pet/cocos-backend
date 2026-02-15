@@ -29,7 +29,7 @@ K6_EXTRA_ARGS="${K6_EXTRA_ARGS:-}"
 
 BASE_URL="${BASE_URL:-http://localhost:8080}"
 API_PREFIX="${API_PREFIX:-/api/dev}"
-TEST_AUTH_SECRET="${TEST_AUTH_SECRET:-perf-test-secret}"
+TEST_AUTH_SECRET="${TEST_AUTH_SECRET:-}"
 
 ACTUATOR_BASE_URL="${ACTUATOR_BASE_URL:-http://localhost:9090/actuator}"
 ACTUATOR_USER="${ACTUATOR_USER:-cocos}"
@@ -50,6 +50,11 @@ mkdir -p "$APP_METRICS_DIR" "$DB_DIR"
 
 if [ -z "$ACTUATOR_PASSWORD" ]; then
   echo "ACTUATOR_PASSWORD is required. Set it explicitly before running."
+  exit 1
+fi
+
+if [ -z "$TEST_AUTH_SECRET" ]; then
+  echo "TEST_AUTH_SECRET is required. Set it explicitly before running."
   exit 1
 fi
 

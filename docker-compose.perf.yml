@@ -30,8 +30,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/cocos?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
       SPRING_DATASOURCE_USERNAME: cocos
       SPRING_DATASOURCE_PASSWORD: cocos
-      TEST_AUTH_SECRET: perf-test-secret
-      JWT_SECRET: perf-jwt-secret-perf-jwt-secret-perf-jwt-secret-123456
+      TEST_AUTH_SECRET: ${TEST_AUTH_SECRET:-changeme-test-auth-secret}
+      JWT_SECRET: ${JWT_SECRET:-changeme-jwt-secret-please-set-before-run-1234567890-abcdef}
       AWS_ACCESS_KEY: test
       AWS_SECRET_KEY: test
       AWS_APP_DATA_S3_BUCKET_NAME: test-bucket
@@ -54,7 +54,7 @@ services:
     environment:
       BASE_URL: http://app:8080
       API_PREFIX: /api/dev
-      TEST_AUTH_SECRET: perf-test-secret
+      TEST_AUTH_SECRET: ${TEST_AUTH_SECRET:-changeme-test-auth-secret}
       TEST_MEMBER_ID: "1"
     volumes:
       - ./perf/k6:/perf/k6:ro
@@ -68,4 +68,3 @@ services:
       ]
     mem_limit: 512m
     cpus: 1.0
-

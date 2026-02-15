@@ -3,7 +3,7 @@ import { check, sleep } from "k6";
 
 const BASE_URL = __ENV.BASE_URL || "http://localhost:8080";
 const API_PREFIX = __ENV.API_PREFIX || "/api/dev";
-const TEST_AUTH_SECRET = __ENV.TEST_AUTH_SECRET || "perf-test-secret";
+const TEST_AUTH_SECRET = __ENV.TEST_AUTH_SECRET || "changeme-test-auth-secret";
 
 const MEMBER_POOL_START = Number(__ENV.MEMBER_POOL_START || "1");
 const MEMBER_POOL_SIZE = Number(__ENV.MEMBER_POOL_SIZE || "1000");

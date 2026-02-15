@@ -66,6 +66,7 @@ docker compose -f docker-compose.perf.yml down -v
 ```bash
 START_STACK=1 \
 ACTUATOR_PASSWORD='<actuator-basic-auth-password>' \
+TEST_AUTH_SECRET='<test-auth-secret>' \
 K6_MODE=local \
 K6_SCRIPT_LOCAL=perf/k6/search-write-heavy.js \
 SAMPLE_INTERVAL_SECONDS=5 \
@@ -74,6 +75,7 @@ SLOW_QUERY_THRESHOLD_SECONDS=0.05 \
 ```
 
 - `ACTUATOR_PASSWORD`는 필수다. 기본값이 없으므로 실행 시 반드시 지정해야 한다.
+- `TEST_AUTH_SECRET`도 필수다. 기본값이 없으므로 실행 시 반드시 지정해야 한다.
 
 결과는 `perf/results/observability/<run-id>/` 아래에 생성된다.
 - 위 경로는 로컬 실행 산출물이며 커밋 대상이 아니다.

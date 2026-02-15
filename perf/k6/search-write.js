@@ -3,7 +3,7 @@ import { check, sleep } from "k6";
 
 const BASE_URL = __ENV.BASE_URL || "http://localhost:8080";
 const API_PREFIX = __ENV.API_PREFIX || "/api/dev";
-const TEST_AUTH_SECRET = __ENV.TEST_AUTH_SECRET || "perf-test-secret";
+const TEST_AUTH_SECRET = __ENV.TEST_AUTH_SECRET || "changeme-test-auth-secret";
 const TEST_MEMBER_ID = Number(__ENV.TEST_MEMBER_ID || "1");
 
 export const options = {
@@ -85,4 +85,3 @@ export default function (data) {
 
   sleep(0.1);
 }
-
