@@ -44,3 +44,16 @@ application.yml
 application-local.yml
 application-dev.yml
 application-prod.yml
+
+### Local Agent/Workspace ###
+.codex/
+CODEX.md
+
+### Runtime Outputs ###
+logs/
+perf/results/
+
+### Personal Notes ###
+docs/portfolio/
+docs/adr/
+docs/troubleshooting/
