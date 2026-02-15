@@ -3,6 +3,7 @@ package com.cocos.cocos.search;
 import com.cocos.cocos.api.search.dto.response.KeywordResponse;
 import com.cocos.cocos.api.search.dto.response.SearchResponse;
 import com.cocos.cocos.api.search.service.SearchService;
+import com.cocos.cocos.api.search.service.SearchWriteTxExecutor;
 import com.cocos.cocos.db.search.entity.Search;
 import com.cocos.cocos.db.search.repository.SearchRepository;
 import com.cocos.cocos.enums.search.SearchType;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
@@ -32,6 +34,9 @@ class SearchServiceTest {
 
     @Mock
     private SearchRepository searchRepository;
+
+    @Mock
+    private SearchWriteTxExecutor searchWriteTxExecutor;
 
     @Test
     @DisplayName("최근에 검색한 커뮤니티 검색어 5개를 보여줄 수 있다.")
@@ -67,41 +72,21 @@ class SearchServiceTest {
     }
 
     @Test
-    @DisplayName("이미 존재하는 검색어가 있을 경우 업데이트가 된다")
-    void addSearch() {
+    @DisplayName("정상 저장(또는 기존 검색어 업데이트)은 저장 트랜잭션에서 처리한다")
+    void addSearchSuccess() {
         // given
         final Long memberId = 1L;
         final String keyword = "피부과";
         final SearchType searchType = SearchType.HOSPITAL;
 
-        final Search existingSearch = Mockito.mock(Search.class);
-        BDDMockito.given(searchRepository.findByMemberIdAndKeywordAndSearchType(memberId, keyword, searchType))
-                .willReturn(existingSearch);
-
         // when
         searchService.addSearch(memberId, keyword, searchType);
 
         // then
-        Mockito.verify(existingSearch, Mockito.times(1)).updateTime();
-        Mockito.verify(searchRepository, Mockito.never()).save(Mockito.any());
-    }
-
-    @Test
-    @DisplayName("동일한 검색어가 없으면 새로 저장한다")
-    void addSearchIfSearchDoesNotExist() {
-        // given
-        final Long memberId = 1L;
-        final String keyword = "피부과";
-        final SearchType searchType = SearchType.HOSPITAL;
-
-        BDDMockito.given(searchRepository.findByMemberIdAndKeywordAndSearchType(memberId, keyword, searchType))
-                .willReturn(null);
-
-        // when
-        searchService.addSearch(memberId, keyword, searchType);
-
-        // then
-        Mockito.verify(searchRepository, Mockito.times(1)).save(Mockito.any(Search.class));
+        Mockito.verify(searchWriteTxExecutor, Mockito.times(1))
+                .saveOrUpdateExisting(memberId, keyword, searchType);
+        Mockito.verify(searchWriteTxExecutor, Mockito.never())
+                .recoverDuplicate(Mockito.anyLong(), Mockito.anyString(), Mockito.any());
     }
 
     @Test
@@ -111,18 +96,58 @@ class SearchServiceTest {
         final Long memberId = 1L;
         final String keyword = "피부과";
         final SearchType searchType = SearchType.HOSPITAL;
-        final Search existingSearch = Mockito.mock(Search.class);
 
-        BDDMockito.given(searchRepository.findByMemberIdAndKeywordAndSearchType(memberId, keyword, searchType))
-                .willReturn(null, existingSearch);
-        BDDMockito.willThrow(new DataIntegrityViolationException("duplicate key"))
-                .given(searchRepository).save(Mockito.any(Search.class));
+        BDDMockito.willThrow(new DuplicateKeyException("duplicate key"))
+                .given(searchWriteTxExecutor).saveOrUpdateExisting(memberId, keyword, searchType);
+        BDDMockito.given(searchWriteTxExecutor.recoverDuplicate(memberId, keyword, searchType))
+                .willReturn(true);
 
         // when
         searchService.addSearch(memberId, keyword, searchType);
 
         // then
-        Mockito.verify(existingSearch, Mockito.times(1)).updateTime();
-        Mockito.verify(searchRepository, Mockito.times(1)).save(Mockito.any(Search.class));
+        Mockito.verify(searchWriteTxExecutor, Mockito.times(1))
+                .saveOrUpdateExisting(memberId, keyword, searchType);
+        Mockito.verify(searchWriteTxExecutor, Mockito.times(1))
+                .recoverDuplicate(memberId, keyword, searchType);
+    }
+
+    @Test
+    @DisplayName("중복키 충돌 후 복구에 실패하면 원래 예외를 다시 던진다")
+    void throwExceptionWhenDuplicateRecoveryFails() {
+        // given
+        final Long memberId = 1L;
+        final String keyword = "피부과";
+        final SearchType searchType = SearchType.HOSPITAL;
+        final DuplicateKeyException duplicateException = new DuplicateKeyException("duplicate key");
+
+        BDDMockito.willThrow(duplicateException)
+                .given(searchWriteTxExecutor).saveOrUpdateExisting(memberId, keyword, searchType);
+        BDDMockito.given(searchWriteTxExecutor.recoverDuplicate(memberId, keyword, searchType))
+                .willReturn(false);
+
+        // when & then
+        Assertions.assertThatThrownBy(() -> searchService.addSearch(memberId, keyword, searchType))
+                .isSameAs(duplicateException);
+    }
+
+    @Test
+    @DisplayName("중복키가 아닌 무결성 예외는 복구 시도 없이 그대로 던진다")
+    void throwExceptionWhenIntegrityViolationIsNotDuplicate() {
+        // given
+        final Long memberId = 1L;
+        final String keyword = "피부과";
+        final SearchType searchType = SearchType.HOSPITAL;
+        final DataIntegrityViolationException integrityException =
+                new DataIntegrityViolationException("NOT NULL constraint failed");
+
+        BDDMockito.willThrow(integrityException)
+                .given(searchWriteTxExecutor).saveOrUpdateExisting(memberId, keyword, searchType);
+
+        // when & then
+        Assertions.assertThatThrownBy(() -> searchService.addSearch(memberId, keyword, searchType))
+                .isSameAs(integrityException);
+        Mockito.verify(searchWriteTxExecutor, Mockito.never())
+                .recoverDuplicate(Mockito.anyLong(), Mockito.anyString(), Mockito.any());
     }
 }
