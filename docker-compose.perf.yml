@@ -1,0 +1,71 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: cocos-perf-mysql
+    environment:
+      MYSQL_DATABASE: cocos
+      MYSQL_USER: cocos
+      MYSQL_PASSWORD: cocos
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-proot"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    mem_limit: 768m
+    cpus: 1.0
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cocos-perf-app
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/cocos?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+      SPRING_DATASOURCE_USERNAME: cocos
+      SPRING_DATASOURCE_PASSWORD: cocos
+      TEST_AUTH_SECRET: perf-test-secret
+      JWT_SECRET: perf-jwt-secret-perf-jwt-secret-perf-jwt-secret-123456
+      AWS_ACCESS_KEY: test
+      AWS_SECRET_KEY: test
+      AWS_APP_DATA_S3_BUCKET_NAME: test-bucket
+      AWS_MEMBER_DATA_S3_BUCKET_NAME: test-bucket
+      KAKAO_CLIENT_ID: test-client-id
+      KAKAO_REDIRECT_URL: http://localhost:5173/auth
+      KAKAO_ADMIN_KEY: test-admin-key
+      SENTRY_DSN: ""
+    ports:
+      - "8080:8080"
+      - "9090:9090"
+    mem_limit: 1500m
+    cpus: 1.5
+
+  k6:
+    image: grafana/k6:0.49.0
+    container_name: cocos-perf-k6
+    depends_on:
+      - app
+    environment:
+      BASE_URL: http://app:8080
+      API_PREFIX: /api/dev
+      TEST_AUTH_SECRET: perf-test-secret
+      TEST_MEMBER_ID: "1"
+    volumes:
+      - ./perf/k6:/perf/k6:ro
+      - ./perf/results:/perf/results
+    entrypoint: ["k6"]
+    command:
+      [
+        "run",
+        "--summary-export=/perf/results/summary.json",
+        "/perf/k6/search-write.js"
+      ]
+    mem_limit: 512m
+    cpus: 1.0
+
