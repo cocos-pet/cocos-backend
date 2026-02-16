@@ -2,7 +2,14 @@ package com.cocos.cocos.api.member.controller;
 
 import com.cocos.cocos.api.member.dto.request.LoginRequest;
 import com.cocos.cocos.api.member.dto.request.ProfileUpdateRequest;
-import com.cocos.cocos.api.member.dto.response.*;
+import com.cocos.cocos.api.member.dto.response.LoginResponse;
+import com.cocos.cocos.api.member.dto.response.MemberHospitalResponse;
+import com.cocos.cocos.api.member.dto.response.MemberLocationResponse;
+import com.cocos.cocos.api.member.dto.response.MemberProfileResponse;
+import com.cocos.cocos.api.member.dto.response.MemberRecentReviewResponse;
+import com.cocos.cocos.api.member.dto.response.MemberReviewTermsAgreeResponse;
+import com.cocos.cocos.api.member.dto.response.NicknameExistenceResponse;
+import com.cocos.cocos.api.member.dto.response.ReissueTokenResponse;
 import com.cocos.cocos.api.member.service.MemberService;
 import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.common.response.SuccessResponse;
@@ -14,8 +21,12 @@ import com.cocos.cocos.validation.member.MemberNicknameConstraint;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -111,5 +122,12 @@ public class MemberController implements MemberControllerSwagger {
     public ResponseEntity<BaseResponse<Void>> deactivateMember() {
         memberService.deactivateMember(PrincipalHandler.getMemberIdFromPrincipal());
         return SuccessResponse.success(SuccessMessage.OK, null);
+    }
+
+    @GetMapping("/reviews/recent")
+    public ResponseEntity<BaseResponse<MemberRecentReviewResponse>> getRecentMemberReview(
+            @RequestParam(name = "nickname", required = false) @MemberNicknameConstraint final String nickname
+    ) {
+        return SuccessResponse.success(SuccessMessage.OK, memberService.getRecentVisitedReview(nickname, PrincipalHandler.getMemberIdFromPrincipal()));
     }
 }

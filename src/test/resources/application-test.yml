@@ -1,0 +1,43 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: false
+
+  flyway:
+    enabled: false
+
+api:
+  prefix: /api/test
+
+test:
+  auth-secret: as
+
+aws:
+  access-key: ak
+  secret-key: sk
+  region: ap-northeast-2
+  app-data-s3-bucket-name: bucket
+  member-data-s3-bucket-name: bucket
+
+kakao:
+  client-id: client-id
+  redirect-url: redirect-url
+  admin-key: admin-key
+
+jwt:
+  secret: jwt-secret

@@ -18,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -55,6 +56,7 @@ class PetServiceTest {
                 "포리",
                 Gender.M,
                 12,
+                LocalDate.parse("2014-01-01"),
                 List.of(1L,2L,3L),
                 null
         );
@@ -63,6 +65,7 @@ class PetServiceTest {
                 .name("포리")
                 .gender(Gender.M)
                 .age(12)
+                .birthDate(LocalDate.parse("2014-01-01"))
                 .memberId(memberId)
                 .breedId(breedId)
                 .build();

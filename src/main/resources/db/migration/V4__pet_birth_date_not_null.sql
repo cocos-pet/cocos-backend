@@ -1,0 +1,2 @@
+ALTER TABLE pet
+MODIFY birth_date DATE NOT NULL;

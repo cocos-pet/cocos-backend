@@ -12,9 +12,9 @@ public record CommentAndSubCommentsResponse(
         String nickname,
         @Schema(description = "댓글 단 사용자의 프로필 이미지 주소", example = "https://")
         String profileImage,
-        @Schema(description = "댓글 단 사용자의 애완동물 종", example = "포메라니안")
+        @Schema(description = "댓글 단 사용자의 반려동물 종", example = "포메라니안")
         String breed,
-        @Schema(description = "애완동물 나이", example = "11")
+        @Schema(description = "반려동물 나이", example = "11")
         int petAge,
         @Schema(description = "댓글 내용", example = "요즘 ~~고민ㄴ이..")
         String content,
@@ -31,5 +31,3 @@ public record CommentAndSubCommentsResponse(
         return new CommentAndSubCommentsResponse(id, nickname, profileImage, breed, petAge, content, createdAt, isWriter, isPostWriter, List.copyOf(subComments));
     }
 }
-
-

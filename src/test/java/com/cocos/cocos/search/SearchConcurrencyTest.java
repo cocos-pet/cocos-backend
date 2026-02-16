@@ -4,16 +4,15 @@ import com.cocos.cocos.api.search.service.SearchService;
 import com.cocos.cocos.config.JpaAuditingConfig;
 import com.cocos.cocos.config.QuerydslConfig;
 import com.cocos.cocos.db.member.repository.MemberRepository;
+import com.cocos.cocos.db.search.entity.Search;
 import com.cocos.cocos.db.search.repository.SearchRepository;
 import com.cocos.cocos.enums.search.SearchType;
-import com.cocos.cocos.db.search.entity.Search;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -22,7 +21,6 @@ import java.util.concurrent.Executors;
 
 @DataJpaTest
 @Import({SearchService.class,JpaAuditingConfig.class, QuerydslConfig.class })
-@ActiveProfiles("test")
 class SearchConcurrencyTest {
 
     @Autowired

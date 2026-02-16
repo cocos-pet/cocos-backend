@@ -2,7 +2,14 @@ package com.cocos.cocos.api.member.controller;
 
 import com.cocos.cocos.api.member.dto.request.LoginRequest;
 import com.cocos.cocos.api.member.dto.request.ProfileUpdateRequest;
-import com.cocos.cocos.api.member.dto.response.*;
+import com.cocos.cocos.api.member.dto.response.LoginResponse;
+import com.cocos.cocos.api.member.dto.response.MemberHospitalResponse;
+import com.cocos.cocos.api.member.dto.response.MemberLocationResponse;
+import com.cocos.cocos.api.member.dto.response.MemberProfileResponse;
+import com.cocos.cocos.api.member.dto.response.MemberRecentReviewResponse;
+import com.cocos.cocos.api.member.dto.response.MemberReviewTermsAgreeResponse;
+import com.cocos.cocos.api.member.dto.response.NicknameExistenceResponse;
+import com.cocos.cocos.api.member.dto.response.ReissueTokenResponse;
 import com.cocos.cocos.common.response.BaseResponse;
 import com.cocos.cocos.validation.hospital.HospitalIdConstraint;
 import com.cocos.cocos.validation.member.MemberNicknameConstraint;
@@ -94,4 +101,13 @@ public interface MemberControllerSwagger {
             description = "요청에 성공했습니다."
     )
     public ResponseEntity<BaseResponse<MemberReviewTermsAgreeResponse>> getMemberReviewTerms();
+
+    @Operation(summary = "사용자 진단 정보 있는 최근 리뷰 조회 API", description = "사용자의 진단 정보 있는 최근 리뷰 조회 API입니다. ")
+    @ApiResponse(
+            responseCode = "200",
+            description = "요청에 성공했습니다."
+    )
+    public ResponseEntity<BaseResponse<MemberRecentReviewResponse>> getRecentMemberReview(
+            @RequestParam(name = "nickname", required = false) @MemberNicknameConstraint final String nickname
+    );
 }

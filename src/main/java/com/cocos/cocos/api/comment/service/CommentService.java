@@ -1,6 +1,11 @@
 package com.cocos.cocos.api.comment.service;
 
-import com.cocos.cocos.api.comment.dto.response.*;
+import com.cocos.cocos.api.comment.dto.response.CommentAndSubCommentsResponse;
+import com.cocos.cocos.api.comment.dto.response.CommentsAndSubCommentsResponse;
+import com.cocos.cocos.api.comment.dto.response.MemberAllCommentsResponse;
+import com.cocos.cocos.api.comment.dto.response.MemberCommentResponse;
+import com.cocos.cocos.api.comment.dto.response.MemberSubCommentResponse;
+import com.cocos.cocos.api.comment.dto.response.SubCommentResponse;
 import com.cocos.cocos.common.exception.CocosException;
 import com.cocos.cocos.db.breed.entity.Breed;
 import com.cocos.cocos.db.breed.repository.BreedRepository;
@@ -15,11 +20,16 @@ import com.cocos.cocos.db.pet.repository.PetRepository;
 import com.cocos.cocos.db.post.entity.Post;
 import com.cocos.cocos.db.post.repository.PostRepository;
 import com.cocos.cocos.enums.message.FailMessage;
-import com.cocos.cocos.external.MemberDataS3Client;
+import com.cocos.cocos.event.PostCommentEvent;
+import com.cocos.cocos.event.PostSubCommentEvent;
+import com.cocos.cocos.external.s3.S3BucketType;
+import com.cocos.cocos.external.s3.S3PresignClient;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -33,7 +43,9 @@ public class CommentService {
     private final PetRepository petRepository;
     private final BreedRepository breedRepository;
     private final PostRepository postRepository;
-    private final MemberDataS3Client memberDataS3Client;
+    private final ApplicationEventPublisher eventPublisher;
+    private final S3PresignClient s3PresignClient;
+    private final Clock clock;
 
     @Transactional
     public void addPostComment(final Long postId, final String content, final Long memberId) {
@@ -41,13 +53,30 @@ public class CommentService {
             throw new CocosException(FailMessage.UNAUTHORIZED);
         }
 
-        commentRepository.save(
+        final Comment comment = commentRepository.save(
                 Comment.builder()
                         .content(content)
                         .memberId(memberId)
                         .postId(postId)
                         .build()
         );
+
+        final Post post = postRepository.findById(postId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_POST));
+        final Member actor = memberRepository.findById(memberId).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
+
+        if (!comment.isSelfComment(post.getMemberId())) {
+            eventPublisher.publishEvent(
+                    new PostCommentEvent(
+                            post.getId(),
+                            post.getMemberId(),
+                            post.getTitle(),
+                            comment.getId(),
+                            comment.getContent(),
+                            actor.getId(),
+                            actor.getNickname()
+                    )
+            );
+        }
     }
 
     @Transactional
@@ -74,7 +103,7 @@ public class CommentService {
         }
 
         final Member mentionedMember = memberRepository.findByNickname(nickname).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
-        subCommentRepository.save(
+        final SubComment subComment = subCommentRepository.save(
                 SubComment.builder()
                         .commentId(commentId)
                         .mentionedMemberId(mentionedMember.getId())
@@ -82,6 +111,32 @@ public class CommentService {
                         .memberId(memberId)
                         .build()
         );
+
+        final Comment parentComment = commentRepository.findById(subComment.getCommentId()).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_COMMENT));
+        final Post post = postRepository.findById(parentComment.getPostId()).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_POST));
+        final Member actor = memberRepository.findById(subComment.getMemberId()).orElseThrow(() -> new CocosException(FailMessage.NOT_FOUND_MEMBER));
+
+        if (shouldSkipNotification(subComment, parentComment.getMemberId(), post.getMemberId())) {
+            return;
+        }
+
+        eventPublisher.publishEvent(
+                new PostSubCommentEvent(
+                        post.getId(),
+                        post.getMemberId(),
+                        parentComment.getId(),
+                        parentComment.getMemberId(),
+                        subComment.getId(),
+                        actor.getId(),
+                        actor.getNickname(),
+                        subComment.getContent(),
+                        post.getTitle()
+                )
+        );
+    }
+
+    private static boolean shouldSkipNotification(SubComment subComment, Long parentCommentMemberId, Long postMemberId) {
+        return subComment.isSelfSubComment(parentCommentMemberId) || subComment.isSelfComment(postMemberId);
     }
 
     @Transactional
@@ -194,9 +249,9 @@ public class CommentService {
         return CommentAndSubCommentsResponse.of(
                 comment.getId(),
                 commentMember.getNickname(),
-                memberDataS3Client.getPresignedUrl(commentMember.getImage()),
+                s3PresignClient.get(S3BucketType.MEMBER_DATA, commentMember.getImage()),
                 commentBreed.getName(),
-                commentPet.getAge(),
+                commentPet.calculateAge(clock),
                 comment.getContent(),
                 comment.getCreatedAt(),
                 isCommentWriter(comment.getMemberId(), memberId),
@@ -220,9 +275,9 @@ public class CommentService {
         return SubCommentResponse.of(
                 subComment.getId(),
                 subCommentMember.getNickname(),
-                memberDataS3Client.getPresignedUrl(subCommentMember.getImage()),
+                s3PresignClient.get(S3BucketType.MEMBER_DATA, subCommentMember.getImage()),
                 subCommentBreed.getName(),
-                subCommentPet.getAge(),
+                subCommentPet.calculateAge(clock),
                 subComment.getContent(),
                 subComment.getCreatedAt(),
                 isCommentWriter(subComment.getMemberId(), memberId),

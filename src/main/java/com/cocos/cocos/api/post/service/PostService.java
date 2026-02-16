@@ -1,6 +1,15 @@
 package com.cocos.cocos.api.post.service;
 
-import com.cocos.cocos.api.post.dto.response.*;
+import com.cocos.cocos.api.post.dto.response.MemberPostDetailResponse;
+import com.cocos.cocos.api.post.dto.response.MemberPostsResponse;
+import com.cocos.cocos.api.post.dto.response.PopularPostResponse;
+import com.cocos.cocos.api.post.dto.response.PopularPostsResponse;
+import com.cocos.cocos.api.post.dto.response.PostCategoriesResponse;
+import com.cocos.cocos.api.post.dto.response.PostCategoryResponse;
+import com.cocos.cocos.api.post.dto.response.PostDetailResponse;
+import com.cocos.cocos.api.post.dto.response.PostImagesResponse;
+import com.cocos.cocos.api.post.dto.response.PostListResponse;
+import com.cocos.cocos.api.post.dto.response.PostResponse;
 import com.cocos.cocos.common.exception.CocosException;
 import com.cocos.cocos.db.animal.entity.Animal;
 import com.cocos.cocos.db.animal.repository.AnimalRepository;
@@ -23,17 +32,23 @@ import com.cocos.cocos.db.post.entity.Post;
 import com.cocos.cocos.db.post.entity.PostCategory;
 import com.cocos.cocos.db.post.entity.PostImage;
 import com.cocos.cocos.db.post.entity.PostTag;
-import com.cocos.cocos.db.post.repository.*;
+import com.cocos.cocos.db.post.repository.PostCategoryRepository;
+import com.cocos.cocos.db.post.repository.PostImageRepository;
+import com.cocos.cocos.db.post.repository.PostLikeRepository;
+import com.cocos.cocos.db.post.repository.PostRepository;
+import com.cocos.cocos.db.post.repository.PostTagRepository;
 import com.cocos.cocos.db.symptom.entity.Symptom;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.enums.post.PostSortCriteria;
 import com.cocos.cocos.enums.tag.TagType;
-import com.cocos.cocos.external.AppDataS3Client;
-import com.cocos.cocos.external.MemberDataS3Client;
+import com.cocos.cocos.event.MagazinePublishedEvent;
+import com.cocos.cocos.external.s3.S3BucketType;
+import com.cocos.cocos.external.s3.S3PresignClient;
 import com.cocos.cocos.util.PostSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -42,6 +57,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -66,8 +82,9 @@ public class PostService {
     private final SymptomRepository symptomRepository;
     private final PetDiseaseRepository petDiseaseRepository;
     private final PetSymptomRepository petSymptomRepository;
-    private final AppDataS3Client appDataS3Client;
-    private final MemberDataS3Client memberDataS3Client;
+    private final S3PresignClient s3PresignClient;
+    private final ApplicationEventPublisher eventPublisher;
+    private final Clock clock;
 
     @Transactional(readOnly = true)
     public PostDetailResponse getPostDetail(final Long postId, final Long memberId) {
@@ -82,7 +99,7 @@ public class PostService {
                 () -> new CocosException(FailMessage.NOT_FOUND_BREED)
         );
         final List<String> images = postImageRepository.findAllByPostId(postId).stream()
-                .map(postImage -> memberDataS3Client.getPresignedUrl(postImage.getImage()))
+                .map(postImage -> s3PresignClient.get(S3BucketType.MEMBER_DATA, postImage.getImage()))
                 .toList();
         final PostCategory postCategory = postCategoryRepository.findById(post.getCategoryId()).orElseThrow(
                 () -> new CocosException(FailMessage.NOT_FOUND_CATEGORY)
@@ -122,9 +139,9 @@ public class PostService {
 
         return PostDetailResponse.builder()
                 .nickname(member.getNickname())
-                .profileImage(memberDataS3Client.getPresignedUrl(member.getImage()))
+                .profileImage(s3PresignClient.get(S3BucketType.MEMBER_DATA, member.getImage()))
                 .breed(breed.getName())
-                .petAge(pet.getAge())
+                .petAge(pet.calculateAge(clock))
                 .likeCounts(likeCounts)
                 .totalCommentCounts(commentCounts + subCommentCounts)
                 .title(post.getTitle())
@@ -178,7 +195,7 @@ public class PostService {
     public PostCategoriesResponse getCategories() {
         final List<PostCategory> postCategories = postCategoryRepository.findAll();
         return PostCategoriesResponse.of(postCategories.stream()
-                .map(postCategory -> PostCategoryResponse.of(postCategory.getId(), postCategory.getName(), appDataS3Client.getPresignedUrl(postCategory.getImage())))
+                .map(postCategory -> PostCategoryResponse.of(postCategory.getId(), postCategory.getName(), s3PresignClient.get(S3BucketType.APP_DATA, postCategory.getImage())))
                 .toList());
     }
 
@@ -189,7 +206,7 @@ public class PostService {
         final List<PostCategory> postCategories = getWritableCategories(member.isAdmin());
 
         return PostCategoriesResponse.of(postCategories.stream()
-                .map(postCategory -> PostCategoryResponse.of(postCategory.getId(), postCategory.getName(), appDataS3Client.getPresignedUrl(postCategory.getImage())))
+                .map(postCategory -> PostCategoryResponse.of(postCategory.getId(), postCategory.getName(), s3PresignClient.get(S3BucketType.APP_DATA, postCategory.getImage())))
                 .toList());
     }
 
@@ -241,8 +258,11 @@ public class PostService {
                             .build()
             ));
         }
+
+        PostImagesResponse imagesResponse = PostImagesResponse.of(null);
+
         if (images != null) {
-            return PostImagesResponse.of(
+            imagesResponse = PostImagesResponse.of(
                     images.stream()
                             .map(image -> {
                                 //ToDo: "post"를 상수화 해도 될 듯, 파일 포맷에 이미지 이름 추가 안 해도 됫 듯
@@ -253,12 +273,22 @@ public class PostService {
                                                 .image(fileName)
                                                 .build()
                                 );
-                                return memberDataS3Client.putPresignedUrl(fileName);
+                                return s3PresignClient.put(S3BucketType.MEMBER_DATA, fileName);
                             })
                             .toList()
             );
         }
-        return PostImagesResponse.of(null);
+
+        if (post.isMagazine()) {
+            eventPublisher.publishEvent(new MagazinePublishedEvent(
+                    post.getId(),
+                    post.getMemberId(),
+                    post.getTitle(),
+                    post.getContent()
+            ));
+        }
+
+        return imagesResponse;
     }
 
     @Transactional(readOnly = true)
@@ -409,7 +439,7 @@ public class PostService {
                             return PostResponse.builder()
                                     .id(post.getId())
                                     .breed(breed.getName())
-                                    .petAge(pet.getAge())
+                                    .petAge(pet.calculateAge(clock))
                                     .title(post.getTitle())
                                     .content(post.getContent())
                                     .likeCount(post.getLikeCount())
@@ -428,7 +458,7 @@ public class PostService {
 
     private String getFirstImage(final List<PostImage> postImages) {
         if (!postImages.isEmpty()) {
-            return memberDataS3Client.getPresignedUrl(postImages.getFirst().getImage());
+            return s3PresignClient.get(S3BucketType.MEMBER_DATA, postImages.getFirst().getImage());
         }
         return null;
     }
@@ -469,7 +499,7 @@ public class PostService {
                                             () -> new CocosException(FailMessage.NOT_FOUND_CATEGORY)
                                     ).getName())
                                     .breed(breed.getName())
-                                    .age(pet.getAge())
+                                    .age(pet.calculateAge(clock))
                                     .build();
                         }).toList()
         );

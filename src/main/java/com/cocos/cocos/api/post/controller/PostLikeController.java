@@ -9,7 +9,12 @@ import com.cocos.cocos.util.validation.EntityExistsValidator;
 import com.cocos.cocos.validation.post.PostIdConstraint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 
 @RestController
 @RequestMapping("${api.prefix}/likes")

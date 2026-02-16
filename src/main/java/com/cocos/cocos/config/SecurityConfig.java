@@ -5,7 +5,6 @@ import com.cocos.cocos.auth.CustomJwtAuthenticationEntryPoint;
 import com.cocos.cocos.auth.JwtAuthenticationFilter;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +20,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
-@Slf4j
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomJwtAuthenticationEntryPoint customJwtAuthenticationEntryPoint;
@@ -42,6 +40,7 @@ public class SecurityConfig {
                 "/swagger-ui/**",
                 "/v3/api-docs/**",
                 apiPrefix + "/test/health-check",
+                apiPrefix + "/test/auth/login",
                 apiPrefix + "/symptoms",
                 apiPrefix + "/diseases",
                 apiPrefix + "/bodies",

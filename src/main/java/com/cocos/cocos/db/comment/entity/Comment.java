@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Objects;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -31,5 +33,9 @@ public class Comment extends BaseTime {
         this.content = content;
         this.memberId = memberId;
         this.postId = postId;
+    }
+
+    public boolean isSelfComment(Long postMemberId) {
+        return Objects.equals(memberId, postMemberId);
     }
 }

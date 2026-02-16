@@ -1,7 +1,12 @@
-package com.cocos.cocos.db.review.db;
+package com.cocos.cocos.db.review.entity;
 
 import com.cocos.cocos.db.BaseTime;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

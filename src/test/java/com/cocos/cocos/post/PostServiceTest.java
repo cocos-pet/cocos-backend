@@ -27,7 +27,6 @@ import com.cocos.cocos.db.post.entity.Post;
 import com.cocos.cocos.db.post.entity.PostCategory;
 import com.cocos.cocos.db.post.entity.PostImage;
 import com.cocos.cocos.db.post.entity.PostTag;
-
 import com.cocos.cocos.db.post.repository.PostCategoryRepository;
 import com.cocos.cocos.db.post.repository.PostImageRepository;
 import com.cocos.cocos.db.post.repository.PostLikeRepository;
@@ -36,8 +35,8 @@ import com.cocos.cocos.db.post.repository.PostTagRepository;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.pet.Gender;
 import com.cocos.cocos.enums.tag.TagType;
-import com.cocos.cocos.external.AppDataS3Client;
-import com.cocos.cocos.external.MemberDataS3Client;
+import com.cocos.cocos.external.s3.S3BucketType;
+import com.cocos.cocos.external.s3.S3PresignClient;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -47,15 +46,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
@@ -97,9 +102,12 @@ class PostServiceTest {
     @Mock
     private PetSymptomRepository petSymptomRepository;
     @Mock
-    private AppDataS3Client appDataS3Client;
-    @Mock
-    private MemberDataS3Client memberDataS3Client;
+    private S3PresignClient s3PresignClient;
+    @Spy
+    private Clock clock = Clock.fixed(
+            Instant.parse("2026-02-10T00:00:00Z"),
+            ZoneId.of("Asia/Seoul")
+    );
 
     @Test
     @DisplayName("게시글 세부사항을 조회할 수 있다.")
@@ -124,7 +132,7 @@ class PostServiceTest {
         final Pet pet = Pet.builder()
                 .name("반려동물 이름")
                 .gender(Gender.M)
-                .age(1)
+                .birthDate(LocalDate.parse("2020-01-01"))
                 .breedId(breedId)
                 .memberId(memberId)
                 .build();
@@ -180,9 +188,9 @@ class PostServiceTest {
 
         BDDMockito.given(postImageRepository.findAllByPostId(postId)).willReturn(postImages);
 
-        BDDMockito.given(memberDataS3Client.getPresignedUrl(Objects.requireNonNull(member).getImage())).willReturn(Objects.requireNonNull(member).getImage());
-        BDDMockito.given(memberDataS3Client.getPresignedUrl(postImage1.getImage())).willReturn(postImage1.getImage());
-        BDDMockito.given(memberDataS3Client.getPresignedUrl(postImage2.getImage())).willReturn(postImage2.getImage());
+        BDDMockito.given(s3PresignClient.get(S3BucketType.MEMBER_DATA, Objects.requireNonNull(member).getImage())).willReturn(Objects.requireNonNull(member).getImage());
+        BDDMockito.given(s3PresignClient.get(S3BucketType.MEMBER_DATA, postImage1.getImage())).willReturn(postImage1.getImage());
+        BDDMockito.given(s3PresignClient.get(S3BucketType.MEMBER_DATA, postImage2.getImage())).willReturn(postImage2.getImage());
 
         BDDMockito.given(postCategoryRepository.findById(post.getCategoryId())).willReturn(Optional.of(postCategory));
 
@@ -200,7 +208,7 @@ class PostServiceTest {
                 .nickname(member.getNickname())
                 .profileImage(member.getImage())
                 .breed(Objects.requireNonNull(breed).getName())
-                .petAge(pet.getAge())
+                .petAge(6)
                 .likeCounts(likeCounts)
                 .totalCommentCounts(commentCounts + subCommentCounts)
                 .title(Objects.requireNonNull(post).getTitle())
@@ -213,11 +221,12 @@ class PostServiceTest {
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .build();
+
         //when
         final PostDetailResponse actual = postService.getPostDetail(postId, memberId);
 
         //then
-        Assertions.assertThat(expected).usingRecursiveComparison().isEqualTo(actual);
+        Assertions.assertThat(actual).isEqualTo(expected);
     }
 
     @Test
@@ -255,7 +264,7 @@ class PostServiceTest {
     @Test
     @DisplayName("게시글 카테고리 리스트를 조회할 수 있다.")
     void getPostCategories() {
-        //given
+        // given
         final PostCategory postCategory1 = PostCategory.builder()
                 .name("카테고리1")
                 .image("이미지1")
@@ -268,23 +277,39 @@ class PostServiceTest {
                 .name("카테고리3")
                 .image("이미지3")
                 .build();
-        final List<PostCategory> postCategories = new ArrayList<>(List.of(postCategory1, postCategory2, postCategory3));
 
-        BDDMockito.given(postCategoryRepository.findAll()).willReturn(postCategories);
-        BDDMockito.given(appDataS3Client.getPresignedUrl(postCategory1.getImage())).willReturn("이미지1");
-        BDDMockito.given(appDataS3Client.getPresignedUrl(postCategory2.getImage())).willReturn("이미지2");
-        BDDMockito.given(appDataS3Client.getPresignedUrl(postCategory3.getImage())).willReturn("이미지3");
+        final List<PostCategory> postCategories =
+                new ArrayList<>(List.of(postCategory1, postCategory2, postCategory3));
 
+        BDDMockito.given(postCategoryRepository.findAll())
+                .willReturn(postCategories);
+        BDDMockito.given(
+                s3PresignClient.get(
+                        eq(S3BucketType.APP_DATA),
+                        any(String.class)
+                )
+        ).willAnswer(invocation -> invocation.getArgument(1));
 
-        final PostCategoriesResponse expected = PostCategoriesResponse.of(postCategories.stream()
-                .map(postCategory -> PostCategoryResponse.of(postCategory.getId(), postCategory.getName(), postCategory.getImage()))
-                .toList());
+        final PostCategoriesResponse expected =
+                PostCategoriesResponse.of(
+                        postCategories.stream()
+                                .map(postCategory ->
+                                        PostCategoryResponse.of(
+                                                postCategory.getId(),
+                                                postCategory.getName(),
+                                                postCategory.getImage()
+                                        )
+                                )
+                                .toList()
+                );
 
-        //when
+        // when
         final PostCategoriesResponse actual = postService.getCategories();
 
-        //then
-        Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
+        // then
+        Assertions.assertThat(actual)
+                .usingRecursiveComparison()
+                .isEqualTo(expected);
     }
 
     @Test
@@ -572,7 +597,7 @@ class PostServiceTest {
                 .willReturn(Optional.of(admin));
         BDDMockito.given(postCategoryRepository.findAll())
                 .willReturn(categories);
-        BDDMockito.given(appDataS3Client.getPresignedUrl(any()))
+        BDDMockito.given(s3PresignClient.get(eq(S3BucketType.APP_DATA), any()))
                 .willReturn("presigned-url");
 
         // when
@@ -622,7 +647,7 @@ class PostServiceTest {
                 .willReturn(Optional.of(user));
         BDDMockito.given(postCategoryRepository.findAllByIsAdminOnlyFalse())
                 .willReturn(categories);
-        BDDMockito.given(appDataS3Client.getPresignedUrl(any()))
+        BDDMockito.given(s3PresignClient.get(eq(S3BucketType.APP_DATA), any()))
                 .willReturn("presigned-url");
 
         // when
