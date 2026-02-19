@@ -105,6 +105,7 @@ public enum FailMessage {
     CONFLICT_POSTLIKE(HttpStatus.CONFLICT, 40902, "이미 존재하는 게시글 공감입니다."),
     CONFLICT_PET(HttpStatus.CONFLICT, 40903, "이미 사용자의 반려동물이 존재합니다."),
     CONFLICT_MEMBER_HOSPITAL(HttpStatus.CONFLICT, 40904, "이미 사용자의 즐겨찾는 병원이 존재합니다."),
+    CONFLICT_PET_UPDATE(HttpStatus.CONFLICT, 40905, "반려동물 정보가 다른 요청에 의해 먼저 수정되었습니다."),
 
     /**
      * 422
