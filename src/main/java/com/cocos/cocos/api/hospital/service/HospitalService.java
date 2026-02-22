@@ -1,6 +1,10 @@
 package com.cocos.cocos.api.hospital.service;
 
-import com.cocos.cocos.api.hospital.dto.response.*;
+import com.cocos.cocos.api.hospital.dto.response.HospitalDetailResponse;
+import com.cocos.cocos.api.hospital.dto.response.HospitalListResponse;
+import com.cocos.cocos.api.hospital.dto.response.HospitalResponse;
+import com.cocos.cocos.api.hospital.dto.response.HospitalVisitPurposeListResponse;
+import com.cocos.cocos.api.hospital.dto.response.HospitalVisitPurposeResponse;
 import com.cocos.cocos.common.exception.CocosException;
 import com.cocos.cocos.db.district.entity.District;
 import com.cocos.cocos.db.district.repository.DistrictRepository;
@@ -141,13 +145,17 @@ public class HospitalService {
         final List<Long> hospitalTagIds = getHospitalTagIds(hospitalId);
         final List<String> hospitalTags = getHospitalTagLabels(hospitalTagIds);
 
+        final String imageUrl = hospital.getImage() != null
+                ? s3PresignClient.get(S3BucketType.APP_DATA, hospital.getImage())
+                : null;
+
         return HospitalDetailResponse.of(
                 hospital.getName(),
                 hospital.getPhoneNumber(),
                 hospitalTags,
                 hospital.getIntroduction(),
                 hospital.getDisplayAddress(),
-                s3PresignClient.get(S3BucketType.APP_DATA, hospital.getImage()),
+                imageUrl,
                 hospital.getKeywords(),
                 hospital.getHomepageUrl(),
                 hospital.getLatitude(),
