@@ -145,7 +145,7 @@ public class HospitalService {
         final List<Long> hospitalTagIds = getHospitalTagIds(hospitalId);
         final List<String> hospitalTags = getHospitalTagLabels(hospitalTagIds);
 
-        final String imageUrl = hospital.getImage() != null
+        final String imageUrl = hospital.getImage() != null && !hospital.getImage().isBlank()
                 ? s3PresignClient.get(S3BucketType.APP_DATA, hospital.getImage())
                 : null;
 
