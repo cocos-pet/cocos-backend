@@ -21,7 +21,9 @@ public class S3PresignClient {
     private final S3BucketResolver bucketResolver;
 
     public String get(final S3BucketType bucketType, final String key) {
-        validateKey(key);
+        if (key == null || key.isBlank()) {
+            return "";
+        }
 
         final String bucket = bucketResolver.resolve(bucketType);
 
