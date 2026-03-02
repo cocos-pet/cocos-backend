@@ -29,6 +29,7 @@ import com.cocos.cocos.external.s3.S3BucketType;
 import com.cocos.cocos.external.s3.S3PresignClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
@@ -134,6 +135,11 @@ public class PetService {
                 );
 
         pet.updateFields(petUpdateRequest.name(), petUpdateRequest.gender(), reconciled.age(), reconciled.birthDate(), petUpdateRequest.breedId());
+        try {
+            petRepository.flush();
+        } catch (OptimisticLockingFailureException e) {
+            throw new CocosException(FailMessage.CONFLICT_PET_UPDATE);
+        }
 
         if (petUpdateRequest.diseaseIds() != null) {
             petDiseaseRepository.deleteAllByPetId(petId);

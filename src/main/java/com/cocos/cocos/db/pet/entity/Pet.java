@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import jakarta.validation.constraints.Min;
 import lombok.Builder;
 import lombok.Getter;
@@ -52,6 +53,10 @@ public class Pet extends BaseTime {
 
     @Column(name = "birth_date", nullable = false)
     private LocalDate birthDate;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
 
     @Builder
     public Pet(final String name, final Gender gender, final Integer age, final LocalDate birthDate, final Long memberId, final Long breedId,
