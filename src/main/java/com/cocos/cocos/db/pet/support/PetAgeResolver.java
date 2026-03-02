@@ -13,10 +13,6 @@ public final class PetAgeResolver {
             LocalDate birthDate,
             Clock clock
     ) {
-        if (age == null && birthDate == null) {
-            throw new IllegalArgumentException("age 또는 birthDate 중 하나는 필수입니다.");
-        }
-
         if (age != null && birthDate == null) {
             birthDate = LocalDate.of(
                     LocalDate.now(clock).getYear() - age,
