@@ -13,7 +13,9 @@ public final class PetAgeResolver {
             LocalDate birthDate,
             Clock clock
     ) {
-        if (age != null && birthDate == null) {
+        if (age == null && birthDate == null) {
+            return new AgeAndBirthDate(null, null);
+        } else if (age != null && birthDate == null) {
             birthDate = LocalDate.of(
                     LocalDate.now(clock).getYear() - age,
                     1,
