@@ -127,11 +127,7 @@ public class PetService {
         }
 
         AgeAndBirthDate reconciled =
-                PetAgeResolver.resolve(
-                        petUpdateRequest.age(),
-                        petUpdateRequest.birthDate(),
-                        clock
-                );
+                PetAgeResolver.resolve(petUpdateRequest.age(), petUpdateRequest.birthDate(), clock);
 
         pet.updateFields(petUpdateRequest.name(), petUpdateRequest.gender(), reconciled.age(), reconciled.birthDate(), petUpdateRequest.breedId());
 
