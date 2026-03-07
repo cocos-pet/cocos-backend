@@ -18,6 +18,6 @@ public interface BodyControllerSwagger {
     @ApiResponse(
             responseCode = "200",
             description = "신체 부위 조회 성공")
-    @Parameter(name = "petProblem", description = "반려동물 문제(DISEASE or SYMPTOM)", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "String"))
+    @Parameter(name = "petProblem", description = "반려동물 문제(DISEASE or SYMPTOM)", in = ParameterIn.QUERY, required = false, schema = @Schema(type = "String"))
     public ResponseEntity<BaseResponse<BodiesResponse>> getBodies(final PetProblem petProblem);
 }
