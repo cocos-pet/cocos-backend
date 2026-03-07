@@ -44,6 +44,7 @@ public enum FailMessage {
     BAD_REQUEST_INVALID_NOTIFICATION_ID(HttpStatus.BAD_REQUEST, 40030, "유효하지 않은 알림 아이디입니다. "),
     BAD_REQUEST_INVALID_S3_OBJECT_KEY(HttpStatus.BAD_REQUEST, 40031, "유효하지 않은 S3 Object key 입니다. "),
     BAD_REQUEST_INVALID_VISITED_AT_FORMAT(HttpStatus.BAD_REQUEST, 40032, "유효하지 않은 방문 날짜 포맷입니다. "),
+    BAD_REQUEST_INVALID_PET_PROBLEM(HttpStatus.BAD_REQUEST, 40033, "유효하지 않은 펫 문제입니다. "),
     /**
      * 401
      */

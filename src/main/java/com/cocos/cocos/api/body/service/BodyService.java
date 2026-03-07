@@ -9,7 +9,6 @@ import com.cocos.cocos.db.disease.repository.DiseaseRepository;
 import com.cocos.cocos.db.symptom.entity.Symptom;
 import com.cocos.cocos.db.symptom.repository.SymptomRepository;
 import com.cocos.cocos.enums.pet.PetProblem;
-
 import com.cocos.cocos.external.s3.S3BucketType;
 import com.cocos.cocos.external.s3.S3PresignClient;
 import lombok.RequiredArgsConstructor;
@@ -29,13 +28,22 @@ public class BodyService {
 
     @Transactional(readOnly = true)
     public BodiesResponse getBodies(final PetProblem petProblem) {
-        final List<Long> bodyIds = fetchBodyIdsByPetProblem(petProblem);
-        final List<Body> bodies = bodyRepository.findAllById(bodyIds);
+
+        final List<Body> bodies = findBodiesByPetProblem(petProblem);
         return BodiesResponse.of(
                 bodies.stream()
                         .map(body -> BodyResponse.of(body.getId(), body.getName(), s3PresignClient.get(S3BucketType.APP_DATA, body.getImage())))
                         .toList()
         );
+    }
+
+    private List<Body> findBodiesByPetProblem(final PetProblem petProblem) {
+        if (petProblem == null) {
+            return bodyRepository.findAll();
+        } else {
+            final List<Long> bodyIds = fetchBodyIdsByPetProblem(petProblem);
+            return bodyRepository.findAllById(bodyIds);
+        }
     }
 
     private List<Long> fetchBodyIdsByPetProblem(final PetProblem petProblem) {

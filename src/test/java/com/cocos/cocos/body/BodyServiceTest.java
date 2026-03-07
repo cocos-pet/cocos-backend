@@ -87,4 +87,38 @@ class BodyServiceTest {
         //then
         Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
     }
+
+    @Test
+    @DisplayName("petProblem이 null일 때 전체 부위 리스트를 조회할 수 있다.")
+    void getAllBodies() {
+        final Body body1 = Body.builder()
+                .name("이름1")
+                .image("이미지1")
+                .build();
+        final Body body2 = Body.builder()
+                .name("이름2")
+                .image("이미지2")
+                .build();
+
+        final List<Body> bodies = List.of(body1, body2);
+        final BodiesResponse expected = BodiesResponse.of(
+                bodies.stream()
+                        .map(body -> BodyResponse.of(body.getId(), body.getName(), "image"))
+                        .toList()
+        );
+
+        BDDMockito.given(bodyRepository.findAll()).willReturn(bodies);
+        BDDMockito.given(
+                s3PresignClient.get(
+                        eq(S3BucketType.APP_DATA),
+                        any()
+                )
+        ).willReturn("image");
+
+        //when
+        final BodiesResponse actual = bodyService.getBodies(null);
+
+        //then
+        Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
+    }
 }
