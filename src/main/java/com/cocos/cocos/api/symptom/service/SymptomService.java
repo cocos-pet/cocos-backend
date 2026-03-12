@@ -24,6 +24,10 @@ public class SymptomService {
 
     @Transactional(readOnly = true)
     public SymptomsOfBodiesResponse getSymptoms(final List<Long> bodyIds) {
+        if (bodyIds == null || bodyIds.isEmpty()) {
+            return SymptomsOfBodiesResponse.of(List.of());
+        }
+
         return SymptomsOfBodiesResponse.of(
                 bodyIds.stream()
                         .map(bodyId -> {
