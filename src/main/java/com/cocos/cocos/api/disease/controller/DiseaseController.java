@@ -24,7 +24,7 @@ public class DiseaseController implements DiseaseControllerSwagger{
 
     @GetMapping
     public ResponseEntity<BaseResponse<DiseasesOfBodiesResponse>> getDiseases(
-            @RequestParam(name = "bodyIds") @BodyIdsConstraint final List<Long> bodyIds
+            @RequestParam(name = "bodyIds", required = false) @BodyIdsConstraint final List<Long> bodyIds
     ) {
         return SuccessResponse.success(SuccessMessage.OK, diseaseService.getDiseases(bodyIds));
     }
