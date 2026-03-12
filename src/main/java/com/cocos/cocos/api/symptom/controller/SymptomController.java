@@ -24,7 +24,7 @@ public class SymptomController implements SymptomControllerSwagger {
 
     @GetMapping
     public ResponseEntity<BaseResponse<SymptomsOfBodiesResponse>> getSymptoms(
-            @RequestParam(name = "bodyIds") @BodyIdsConstraint final List<Long> bodyIds
+            @RequestParam(name = "bodyIds", required = false) @BodyIdsConstraint final List<Long> bodyIds
     ) {
         return SuccessResponse.success(SuccessMessage.OK, symptomService.getSymptoms(bodyIds));
     }

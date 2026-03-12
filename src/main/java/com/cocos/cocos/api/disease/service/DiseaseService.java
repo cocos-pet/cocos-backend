@@ -24,14 +24,21 @@ public class DiseaseService {
 
     @Transactional(readOnly = true)
     public DiseasesOfBodiesResponse getDiseases(final List<Long> bodyIds) {
+
+        if (bodyIds == null || bodyIds.isEmpty()) {
+            return DiseasesOfBodiesResponse.of(List.of());
+        }
+
         return DiseasesOfBodiesResponse.of(
                 bodyIds.stream()
                         .map(bodyId -> {
-                            //ToDo: 의미에 따라 코드 간격 조절 필요 (ex: 조회하는 코드, DTO 만드는 코드, 로직 구현 코드)
+
                             final Body body = bodyRepository.findById(bodyId).orElseThrow(
                                     () -> new CocosException(FailMessage.NOT_FOUND_BODY)
                             );
+
                             final List<Disease> diseases = diseaseRepository.findAllByBodyId(bodyId);
+
                             return DiseasesOfBodyResponse.of(bodyId, body.getName(),
                                     diseases.stream()
                                             .map(disease -> DiseaseResponse.of(disease.getId(), disease.getName()))

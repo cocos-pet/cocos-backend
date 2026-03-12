@@ -93,4 +93,22 @@ public class DiseaseServiceTest {
         //then
         Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
     }
+
+    @Test
+    @DisplayName("bodyIds가 null일 때 빈 배열을 반환한다. ")
+    void returnEmptyListWhenBodyIdsIsNull() {
+        //given
+
+        final List<Long> bodyIds = null;
+
+        final DiseasesOfBodiesResponse expected = DiseasesOfBodiesResponse.of(
+                List.of()
+        );
+
+        //when
+        final DiseasesOfBodiesResponse actual = diseaseService.getDiseases(bodyIds);
+
+        //then
+        Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
+    }
 }
