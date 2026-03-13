@@ -6,7 +6,6 @@ import com.cocos.cocos.validation.disease.DiseaseIdsConstraint;
 import com.cocos.cocos.validation.pet.AgeOrBirthDateRequiredConstraint;
 import com.cocos.cocos.validation.symptom.SymptomIdsConstraint;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.PastOrPresent;
 
 import java.time.LocalDate;
@@ -26,7 +25,6 @@ public record PetCreateRequest(
         Gender gender,
 
         @Schema(description = "나이", example = "12", nullable = true)
-        @Min(1)
         Integer age, // [TODO] 프론트 배포 후 제거 필요
 
         @Schema(description = "생년월일", example = "2020-01-01", nullable = true)

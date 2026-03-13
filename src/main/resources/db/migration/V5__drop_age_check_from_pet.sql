@@ -1,0 +1,2 @@
+ALTER TABLE pet
+DROP CHECK pet_chk_1;
