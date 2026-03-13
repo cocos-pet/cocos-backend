@@ -11,7 +11,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Min;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,7 +37,6 @@ public class Pet extends BaseTime {
     private Gender gender;
 
     @Column(name = "age")
-    @Min(1)
     private Integer age;
 
     @Column(name = "member_id", nullable = false, unique = true)
