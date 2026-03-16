@@ -2,10 +2,14 @@ package com.cocos.cocos.notification;
 
 import com.cocos.cocos.api.notification.dto.response.NotificationListResponse;
 import com.cocos.cocos.api.notification.dto.response.NotificationResponse;
+import com.cocos.cocos.api.notification.dto.response.UnreadNotificationResponse;
 import com.cocos.cocos.api.notification.service.NotificationService;
+import com.cocos.cocos.common.exception.CocosException;
 import com.cocos.cocos.db.member.repository.MemberRepository;
 import com.cocos.cocos.db.notification.entity.Notification;
+import com.cocos.cocos.db.notification.repository.NotificationBulkRepository;
 import com.cocos.cocos.db.notification.repository.NotificationRepository;
+import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.enums.notification.NotificationCategory;
 import com.cocos.cocos.enums.notification.NotificationType;
 import com.cocos.cocos.event.MagazinePublishedEvent;
@@ -28,6 +32,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -51,6 +56,9 @@ class NotificationServiceTest {
 
     @Mock
     private MemberRepository memberRepository;
+
+    @Mock
+    private NotificationBulkRepository notificationBulkRepository;
 
     @Test
     void 좋아요_마일스톤이_중복이_아니면_NOTIFICATION이_저장된다() {
@@ -110,7 +118,7 @@ class NotificationServiceTest {
         ArgumentCaptor<List<Notification>> captor =
                 ArgumentCaptor.forClass(List.class);
 
-        verify(notificationRepository).saveAll(captor.capture());
+        verify(notificationBulkRepository).saveAllInBatch(captor.capture());
 
         List<Notification> savedNotifications = captor.getValue();
         assertThat(savedNotifications).hasSize(3);
@@ -284,6 +292,47 @@ class NotificationServiceTest {
         assertThat(response.notifications()).isEmpty();
         assertThat(response.cursorCreatedAt()).isNull();
         assertThat(response.cursorId()).isNull();
+    }
+
+    @Test
+    void 읽지_않은_알림이_있으면_true를_반환한다() {
+        given(notificationRepository.existsByNotifierIdAndIsReadFalse(1L))
+                .willReturn(true);
+
+        UnreadNotificationResponse response = notificationService.hasUnreadNotification(1L);
+
+        assertThat(response.hasUnread()).isTrue();
+    }
+
+    @Test
+    void 알림을_읽으면_isRead가_true로_변경된다() {
+        Notification notification = Notification.builder()
+                .notifierId(1L)
+                .actorId(2L)
+                .notificationType(NotificationType.COMMENT)
+                .notificationTargetId(10L)
+                .postId(1L)
+                .title("제목")
+                .content("내용")
+                .build();
+        ReflectionTestUtils.setField(notification, "id", 99L);
+
+        given(notificationRepository.findById(99L))
+                .willReturn(java.util.Optional.of(notification));
+
+        notificationService.readNotification(1L, 99L);
+
+        assertThat(notification.isRead()).isTrue();
+    }
+
+    @Test
+    void 존재하지_않는_알림을_읽으려_하면_예외가_발생한다() {
+        given(notificationRepository.findById(99L))
+                .willReturn(java.util.Optional.empty());
+
+        assertThatThrownBy(() -> notificationService.readNotification(1L, 99L))
+                .isInstanceOf(CocosException.class)
+                .hasFieldOrPropertyWithValue("failMessage", FailMessage.NOT_FOUND_NOTIFICATION);
     }
 
 }
