@@ -6,6 +6,7 @@ import com.cocos.cocos.api.notification.dto.response.UnreadNotificationResponse;
 import com.cocos.cocos.common.exception.CocosException;
 import com.cocos.cocos.db.member.repository.MemberRepository;
 import com.cocos.cocos.db.notification.entity.Notification;
+import com.cocos.cocos.db.notification.repository.NotificationBulkRepository;
 import com.cocos.cocos.db.notification.repository.NotificationRepository;
 import com.cocos.cocos.enums.message.FailMessage;
 import com.cocos.cocos.enums.notification.NotificationCategory;
@@ -28,6 +29,7 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final MemberRepository memberRepository;
+    private final NotificationBulkRepository notificationBulkRepository;
 
     private static final int DEFAULT_PAGE_SIZE = 20;
 
@@ -46,7 +48,7 @@ public class NotificationService {
         final List<Notification> notifications = memberIds.stream()
                 .map(memberId -> Notification.magazinePublished(memberId, magazinePublishedEvent))
                 .toList();
-        notificationRepository.saveAll(notifications);
+        notificationBulkRepository.saveAllInBatch(notifications);
     }
 
     public void createForPostLike(final PostLikeMilestoneEvent postLikeMilestoneEvent) {
