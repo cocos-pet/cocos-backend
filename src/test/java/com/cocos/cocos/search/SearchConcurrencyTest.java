@@ -1,13 +1,17 @@
 package com.cocos.cocos.search;
 
 import com.cocos.cocos.api.search.service.SearchService;
+import com.cocos.cocos.api.search.service.SearchWriteTxExecutor;
 import com.cocos.cocos.config.JpaAuditingConfig;
 import com.cocos.cocos.config.QuerydslConfig;
+import com.cocos.cocos.db.member.entity.Member;
 import com.cocos.cocos.db.member.repository.MemberRepository;
 import com.cocos.cocos.db.search.entity.Search;
 import com.cocos.cocos.db.search.repository.SearchRepository;
+import com.cocos.cocos.enums.member.Platform;
 import com.cocos.cocos.enums.search.SearchType;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +24,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @DataJpaTest
-@Import({SearchService.class,JpaAuditingConfig.class, QuerydslConfig.class })
+@Import({SearchService.class, SearchWriteTxExecutor.class, JpaAuditingConfig.class, QuerydslConfig.class })
 class SearchConcurrencyTest {
 
     @Autowired
@@ -32,6 +36,21 @@ class SearchConcurrencyTest {
     @Autowired
     private SearchRepository searchRepository;
 
+    private Long memberId;
+
+    @BeforeEach
+    void setUp() {
+        final Member member = memberRepository.save(
+                Member.builder()
+                        .sub("search-concurrency-member")
+                        .platform(Platform.KAKAO)
+                        .image("member/baseProfileImage.png")
+                        .isAdmin(false)
+                        .build()
+        );
+        this.memberId = member.getId();
+    }
+
     @Test
     @DisplayName("동시에 검색어 저장 요청이 와도 insert는 한 번만 발생한다")
     void addSearchConcurrency() throws InterruptedException {
@@ -39,8 +58,6 @@ class SearchConcurrencyTest {
         final int threadCount = 10;
         final ExecutorService executor = Executors.newFixedThreadPool(threadCount);
         final CountDownLatch latch = new CountDownLatch(threadCount);
-        final Long memberId = 1L;
-
         final String keyword = "피부과";
         final SearchType type = SearchType.HOSPITAL;
 

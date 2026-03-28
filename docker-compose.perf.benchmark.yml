@@ -1,0 +1,9 @@
+services:
+  app:
+    environment:
+      SPRING_FLYWAY_LOCATIONS: filesystem:/tmp/cocos-mig-benchmark
+      SPRING_FLYWAY_ENABLED: "true"
+      API_PREFIX: /api/dev
+      AWS_REGION: ap-northeast-2
+    volumes:
+      - /tmp/cocos-mig-benchmark:/tmp/cocos-mig-benchmark:ro

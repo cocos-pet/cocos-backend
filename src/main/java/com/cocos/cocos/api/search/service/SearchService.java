@@ -6,6 +6,7 @@ import com.cocos.cocos.db.search.entity.Search;
 import com.cocos.cocos.db.search.repository.SearchRepository;
 import com.cocos.cocos.enums.search.SearchType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,19 +17,16 @@ import java.util.List;
 public class SearchService {
 
     private final SearchRepository searchRepository;
+    private final SearchWriteTxExecutor searchWriteTxExecutor;
 
-    @Transactional
     public void addSearch(final Long memberId, final String keyword, final SearchType searchType) {
-        final Search search = searchRepository.findWithLockByMemberIdAndKeywordAndSearchType(memberId, keyword, searchType);
-
-        if (search != null) {
-            search.updateTime();
-        } else {
-            searchRepository.save(Search.builder()
-                    .memberId(memberId)
-                    .keyword(keyword)
-                    .searchType(searchType)
-                    .build());
+        try {
+            searchWriteTxExecutor.saveOrUpdateExisting(memberId, keyword, searchType);
+        } catch (DataIntegrityViolationException exception) {
+            final boolean recovered = searchWriteTxExecutor.recoverDuplicate(memberId, keyword, searchType);
+            if (!recovered) {
+                throw exception;
+            }
         }
     }
 
