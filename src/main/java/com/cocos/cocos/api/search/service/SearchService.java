@@ -1,8 +1,11 @@
 package com.cocos.cocos.api.search.service;
 
 import com.cocos.cocos.api.search.dto.response.KeywordResponse;
+import com.cocos.cocos.api.search.dto.response.PopularKeywordResponse;
 import com.cocos.cocos.api.search.dto.response.SearchResponse;
+import com.cocos.cocos.db.search.entity.PopularKeyword;
 import com.cocos.cocos.db.search.entity.Search;
+import com.cocos.cocos.db.search.repository.PopularKeywordRepository;
 import com.cocos.cocos.db.search.repository.SearchRepository;
 import com.cocos.cocos.enums.search.SearchType;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +19,7 @@ import java.util.List;
 public class SearchService {
 
     private final SearchRepository searchRepository;
+    private final PopularKeywordRepository popularKeywordRepository;
 
     @Transactional
     public void addSearch(final Long memberId, final String keyword, final SearchType searchType) {
@@ -38,6 +42,15 @@ public class SearchService {
         return SearchResponse.of(
                 searchList.stream()
                         .map(search -> KeywordResponse.of(search.getId(), search.getKeyword()))
+                        .toList()
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public PopularKeywordResponse getPopularKeywords() {
+        return PopularKeywordResponse.of(
+                popularKeywordRepository.findTop5ByOrderByDisplayRankAsc().stream()
+                        .map(PopularKeyword::getKeyword)
                         .toList()
         );
     }
