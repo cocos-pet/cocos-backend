@@ -1,5 +1,6 @@
 package com.cocos.cocos.api.search.controller;
 
+import com.cocos.cocos.api.search.dto.response.PopularKeywordResponse;
 import com.cocos.cocos.api.search.dto.response.SearchResponse;
 import com.cocos.cocos.api.search.service.SearchService;
 import com.cocos.cocos.common.response.BaseResponse;
@@ -42,5 +43,10 @@ public class SearchController implements SearchControllerSwagger {
     ) {
         searchService.addSearch(PrincipalHandler.getMemberIdFromPrincipal(), keyword, SearchType.HOSPITAL);
         return SuccessResponse.success(SuccessMessage.OK, null);
+    }
+
+    @GetMapping("/popular")
+    public ResponseEntity<BaseResponse<PopularKeywordResponse>> getPopularKeywords() {
+        return SuccessResponse.success(SuccessMessage.OK, searchService.getPopularKeywords());
     }
 }
